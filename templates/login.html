@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Gestión UABJB</title>
+   
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body class="login-body">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="material-icons">home</i>
+                </div>
+                <h1 class="logo-title">UABJB</h1>
+                <p class="logo-subtitle">Sistema de Gestión</p>
+            </div>
+            
+            <form id="loginForm" method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="input-field">
+                    <i class="material-icons">person</i>
+                    <input type="text" id="username" name="username" placeholder="Usuario o correo electrónico" required>
+                </div>
+                
+                <div class="input-field">
+                    <i class="material-icons">lock</i>
+                    <input type="password" id="password" name="password" placeholder="Contraseña" required>
+                </div>
+                
+                <div class="form-options">
+                    <label class="checkbox-field">
+                        <input type="checkbox" id="remember" name="remember">
+                        <span class="checkmark"></span>
+                        Recordarme
+                    </label>
+                    <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                </div>
+                
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <div class="loading"></div>
+                    <span class="btn-text">Iniciar Sesión</span>
+                </button>
+            </form>
+            
+            <div class="divider">
+                <span>o</span>
+            </div>
+            
+            <div class="register-link">
+                ¿No tienes una cuenta? 
+                <a href="{% url 'registro' %}" class="register-link-btn">Registrarse</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Script personalizado -->
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema UABJB - Gestión de Espacios Académicos</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body class="dashboard-body">
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">🏛️</div>
+                <div>
+                    <div class="header-title">UABJB - Sistema de Gestión</div>
+                    <div class="header-subtitle">Universidad Autónoma "José Ballivián"</div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <button class="theme-toggle">
+                    <span id="themeIcon">🌙</span>
+                    <span id="themeText">Modo Oscuro</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard">
+            <aside class="sidebar">
+                <nav class="nav-menu">
+                    <div class="nav-item active">
+                        <span>📊</span>
+                        Dashboard
+                    </div>
+                    <div class="nav-item">
+                        <span>🏛️</span>
+                        Espacios Académicos
+                    </div>
+                    <div class="nav-item">
+                        <span>📅</span>
+                        Reservas
+                    </div>
+                    <div class="nav-item">
+                        <span>📋</span>
+                        Horarios
+                    </div>
+                    <div class="nav-item">
+                        <span>👥</span>
+                        Usuarios
+                    </div>
+                    <div class="nav-item">
+                        <span>📊</span>
+                        Reportes
+                    </div>
+                    <div class="nav-item">
+                        <span>⚙️</span>
+                        Configuración
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="main-content">
+                <div class="welcome-card fade-in">
+                    <h1 class="welcome-title">¡Bienvenido al Sistema de Gestión de Espacios!</h1>
+                    <p class="welcome-subtitle">Administra eficientemente todos los espacios académicos del campus UABJB</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card fade-in" style="animation-delay: 0.1s">
+                        <div class="stat-icon">🏛️</div>
+                        <span class="stat-number">142</span>
+                        <div class="stat-label">Espacios Totales</div>
+                    </div>
+                    <div class="stat-card fade-in" style="animation-delay: 0.2s">
+                        <div class="stat-icon">✅</div>
+                        <span class="stat-number">89</span>
+                        <div class="stat-label">Disponibles Hoy</div>
+                    </div>
+                    <div class="stat-card fade-in" style="animation-delay: 0.3s">
+                        <div class="stat-icon">📅</div>
+                        <span class="stat-number">53</span>
+                        <div class="stat-label">Reservas Activas</div>
+                    </div>
+                    <div class="stat-card fade-in" style="animation-delay: 0.4s">
+                        <div class="stat-icon">👥</div>
+                        <span class="stat-number">1,247</span>
+                        <div class="stat-label">Usuarios Registrados</div>
+                    </div>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="feature-card fade-in" style="animation-delay: 0.5s">
+                        <div class="card-header">
+                            <div class="card-icon">🔍</div>
+                            <h3 class="card-title">Buscar Espacios</h3>
+                        </div>
+                        <p class="card-content">Encuentra rápidamente el espacio académico que necesitas según capacidad, ubicación y equipamiento disponible.</p>
+                        <div>
+                            <button class="btn-primary btn-ripple">
+                                <span>🔍</span>
+                                Buscar Ahora
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="feature-card fade-in" style="animation-delay: 0.6s">
+                        <div class="card-header">
+                            <div class="card-icon">📅</div>
+                            <h3 class="card-title">Reservar Espacio</h3>
+                        </div>
+                        <p class="card-content">Programa y reserva espacios académicos para tus clases, eventos o actividades con anticipación.</p>
+                        <div>
+                            <button class="btn-primary btn-ripple">
+                                <span>➕</span>
+                                Nueva Reserva
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="feature-card fade-in" style="animation-delay: 0.7s">
+                        <div class="card-header">
+                            <div class="card-icon">📊</div>
+                            <h3 class="card-title">Ver Reportes</h3>
+                        </div>
+                        <p class="card-content">Consulta estadísticas de uso, ocupación de espacios y genera reportes detallados para la administración.</p>
+                        <div>
+                            <button class="btn-secondary">
+                                <span>📈</span>
+                                Ver Reportes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quick-actions fade-in" style="animation-delay: 0.8s">
+                    <h3 class="actions-title">
+                        <span>⚡</span>
+                        Acciones Rápidas
+                    </h3>
+                    <div class="actions-grid">
+                        <a href="#" class="action-btn">
+                            <span class="action-icon">🏛️</span>
+                            Ver Aulas
+                        </a>
+                        <a href="#" class="action-btn">
+                            <span class="action-icon">🔬</span>
+                            Laboratorios
+                        </a>
+                        <a href="#" class="action-btn">
+                            <span class="action-icon">🎭</span>
+                            Auditorios
+                        </a>
+                        <a href="#" class="action-btn">
+                            <span class="action-icon">💻</span>
+                            Salas de Cómputo
+                        </a>
+                        <a href="#" class="action-btn">
+                            <span class="action-icon">📚</span>
+                            Bibliotecas
+                        </a>
+                        <a href="#" class="action-btn">
+                            <span class="action-icon">⚽</span>
+                            Espacios Deportivos
+                        </a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>
