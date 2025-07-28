@@ -1,0 +1,140 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar Encargados - UABJB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --uabjb-blue: #1e3a8a;
+            --uabjb-light-blue: #3b82f6;
+            --uabjb-yellow: #fbbf24;
+            --uabjb-red: #dc2626;
+            --primary-blue: #4361ee;
+            --secondary-blue: #3a5998;
+            --dark-bg: #1a1d29;
+            --card-bg: #2a2d3e;
+            --text-light: #ffffff;
+            --accent-orange: #f72585;
+            --success-green: #4cc9f0;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --card-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            --card-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: all 0.3s ease; }
+        body { font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-secondary); color: var(--text-primary); min-height: 100vh; }
+        .header { background: linear-gradient(135deg, var(--uabjb-blue), var(--uabjb-light-blue)); padding: 1rem 2rem; box-shadow: var(--shadow-lg); position: sticky; top: 0; z-index: 100; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; }
+        .logo { width: 50px; height: 50px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--uabjb-blue); box-shadow: var(--shadow); }
+        .header-title { color: white; font-size: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 12px; }
+        .header-subtitle { color: rgba(255, 255, 255, 0.9); font-size: 0.9rem; margin-top: 2px; }
+        .header-controls { display: flex; align-items: center; gap: 1rem; }
+        .theme-toggle { background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 25px; padding: 8px 16px; color: white; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; transition: all 0.3s ease; }
+        .theme-toggle:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .dashboard-container { background: var(--bg-primary); border-radius: 15px; padding: 2rem; box-shadow: var(--shadow); border: 1px solid var(--border-color); }
+        .back-link { color: var(--text-primary); text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .back-link:hover { color: var(--uabjb-blue); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background: linear-gradient(135deg, var(--uabjb-blue), var(--uabjb-light-blue)); color: white; font-weight: 600; }
+        td { color: var(--text-primary); }
+        tr:hover { background: var(--bg-secondary); }
+        .btn { padding: 0.75rem 1.5rem; border-radius: 12px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; border: none; cursor: pointer; }
+        .btn:hover { transform: translateY(-3px); }
+        .btn-edit { background: #4caf50; color: white; }
+        .btn-edit:hover { background: #45a049; }
+        .btn-delete { background: #f44336; color: white; }
+        .btn-delete:hover { background: #da190b; }
+        @media (max-width: 1024px) { .container { padding: 1rem; } .header-content { flex-direction: column; gap: 1rem; text-align: center; } }
+        @media (max-width: 768px) { .dashboard-container { padding: 1.5rem; } table { display: block; overflow-x: auto; } th, td { min-width: 120px; } }
+        @media (max-width: 480px) { .container { padding: 0.5rem; } .dashboard-container { padding: 1rem; } .btn { padding: 0.5rem 1rem; font-size: 0.9rem; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="logo"><i class="fas fa-graduation-cap"></i></div>
+                <div>
+                    <div class="header-title"><i class="fas fa-users"></i> Lista de Encargados</div>
+                    <div class="header-subtitle">Sistema de Gestión UABJB</div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                    <span id="theme-text">Modo Oscuro</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="dashboard-container">
+            <a href="{% url 'administrador:dashboard_administrador' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+            <h1><i class="fas fa-users"></i> Lista de Encargados</h1>
+            <a href="{% url 'administrador:registrar_encargados' %}" class="btn">Registrar Nuevo Encargado</a>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for encargado in encargados %}
+                    <tr>
+                        <td>{{ encargado.id }}</td>
+                        <td>{{ encargado.nombre }}</td>
+                        <td>{{ encargado.correo }}</td>
+                        <td>
+                            <a href="{% url 'editar_encargado' encargado.id %}" class="btn btn-edit"><i class="fas fa-edit"></i> Editar</a>
+                            <a href="{% url 'eliminar_encargado' encargado.id %}" class="btn btn-delete"><i class="fas fa-trash"></i> Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                themeIcon.className = 'fas fa-moon';
+                themeText.textContent = 'Modo Oscuro';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+                themeText.textContent = 'Modo Claro';
+            }
+        }
+    </script>
+</body>
+</html>

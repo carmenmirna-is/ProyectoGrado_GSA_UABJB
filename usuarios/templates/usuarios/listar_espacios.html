@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar Espacios - UABJB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --uabjb-blue: #1e3a8a;
+            --uabjb-light-blue: #3b82f6;
+            --uabjb-yellow: #fbbf24;
+            --uabjb-red: #dc2626;
+            --primary-blue: #4361ee;
+            --secondary-blue: #3a5998;
+            --dark-bg: #1a1d29;
+            --card-bg: #2a2d3e;
+            --text-light: #ffffff;
+            --accent-orange: #f72585;
+            --success-green: #4cc9f0;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --card-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            --card-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: all 0.3s ease; }
+        body { font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-secondary); color: var(--text-primary); min-height: 100vh; }
+        .header { background: linear-gradient(135deg, var(--uabjb-blue), var(--uabjb-light-blue)); padding: 1rem 2rem; box-shadow: var(--shadow-lg); position: sticky; top: 0; z-index: 100; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; }
+        .logo { width: 50px; height: 50px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--uabjb-blue); box-shadow: var(--shadow); }
+        .header-title { color: white; font-size: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 12px; }
+        .header-subtitle { color: rgba(255, 255, 255, 0.9); font-size: 0.9rem; margin-top: 2px; }
+        .header-controls { display: flex; align-items: center; gap: 1rem; }
+        .theme-toggle { background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 25px; padding: 8px 16px; color: white; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; transition: all 0.3s ease; }
+        .theme-toggle:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .header-section { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; }
+        .back-link { background: linear-gradient(135deg, var(--uabjb-blue), var(--uabjb-light-blue)); color: white; padding: 12px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: var(--shadow); }
+        .back-link:hover { transform: translateY(-2px); box-shadow: var(--card-hover); text-decoration: none; color: white; }
+        .page-title { font-size: 2.2rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 15px; margin: 0; }
+        .page-title i { color: var(--uabjb-yellow); background: linear-gradient(135deg, var(--uabjb-yellow), #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .pautas-box { background: var(--bg-primary); border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: var(--shadow); border: 1px solid var(--border-color); border-left: 5px solid var(--uabjb-yellow); }
+        .pautas-box h3 { color: var(--text-primary); font-size: 1.3rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .pautas-box h3 i { color: var(--uabjb-yellow); font-size: 1.2rem; }
+        .pautas-box ul { list-style: none; padding: 0; }
+        .pautas-box li { padding: 8px 0; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 10px; position: relative; padding-left: 25px; }
+        .pautas-box li::before { content: '✓'; position: absolute; left: 0; top: 8px; width: 18px; height: 18px; background: var(--success-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
+        .pautas-box strong { color: var(--uabjb-blue); font-weight: 600; }
+        .table-wrapper { background: var(--bg-primary); border-radius: 15px; box-shadow: var(--shadow); border: 1px solid var(--border-color); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; background: transparent; }
+        table thead { background: linear-gradient(135deg, var(--uabjb-blue), var(--uabjb-light-blue)); }
+        table thead th { color: white; font-weight: 600; font-size: 1rem; padding: 20px; text-align: left; position: relative; border: none; }
+        table thead th:not(:last-child)::after { content: ''; position: absolute; right: 0; top: 25%; height: 50%; width: 1px; background: rgba(255, 255, 255, 0.2); }
+        table tbody tr { border-bottom: 1px solid var(--border-color); transition: all 0.3s ease; }
+        table tbody tr:hover { background: var(--bg-secondary); transform: translateX(5px); }
+        table tbody tr:last-child { border-bottom: none; }
+        table tbody td { padding: 18px 20px; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; border: none; }
+        table tbody td:first-child { font-weight: 600; color: var(--text-primary); }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .empty-state i { font-size: 4rem; color: var(--uabjb-yellow); margin-bottom: 20px; opacity: 0.7; }
+        .empty-state h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--text-secondary); }
+        .empty-state p { font-size: 1rem; line-height: 1.6; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { .container { padding: 1rem; } .header-content { flex-direction: column; gap: 1rem; text-align: center; } .header-section { flex-direction: column; align-items: flex-start; gap: 15px; } .page-title { font-size: 1.8rem; } .table-wrapper { overflow-x: auto; } table { min-width: 600px; } table thead th, table tbody td { padding: 12px 15px; font-size: 0.9rem; } .back-link { width: 100%; justify-content: center; } }
+        @media (max-width: 480px) { .container { padding: 0.5rem; } .page-title { font-size: 1.5rem; flex-direction: column; gap: 10px; text-align: center; } .pautas-box li { font-size: 0.9rem; padding-left: 30px; } table { min-width: 500px; } table thead th, table tbody td { padding: 10px 12px; font-size: 0.85rem; } }
+        .table-wrapper:hover { box-shadow: var(--card-hover); }
+        .loading-skeleton { background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="logo"><i class="fas fa-graduation-cap"></i></div>
+                <div>
+                    <div class="header-title"><i class="fas fa-list"></i> Lista de Espacios</div>
+                    <div class="header-subtitle">Sistema de Gestión UABJB</div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                    <span id="theme-text">Modo Oscuro</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="header-section">
+            <a href="{% url 'usuarios:usuario' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+        </div>
+        <div class="pautas-box">
+            <h3><i class="fas fa-exclamation-circle"></i> Requisitos para reserva:</h3>
+            <ul>
+                <li><strong>Anticipación:</strong> Mínimo 3 días hábiles</li>
+                <li><strong>Documentación:</strong> Justificación en PDF (máx. 2MB)</li>
+                <li><strong>Horario:</strong> Lunes a Viernes de 8:00 AM a 6:00 PM</li>
+                <li><strong>Duración:</strong> Máximo 4 horas por reserva</li>
+                <li><strong>Confirmación:</strong> Respuesta en 24-48 horas hábiles</li>
+            </ul>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Encargado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for espacio in espacios %}
+                    <tr>
+                        <td>{{ espacio.nombre }}</td>
+                        <td>{{ espacio.descripcion }}</td>
+                        <td>{{ espacio.encargado }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                themeIcon.className = 'fas fa-moon';
+                themeText.textContent = 'Modo Oscuro';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+                themeText.textContent = 'Modo Claro';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    row.style.transition = 'all 0.6s ease';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, (index + 1) * 100);
+            });
+        });
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.boxShadow = '0 4px 12px rgba(30, 58, 138, 0.15)';
+            });
+            row.addEventListener('mouseleave', function() {
+                this.style.boxShadow = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

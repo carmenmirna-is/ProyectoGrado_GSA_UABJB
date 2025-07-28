@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Solicitud - UABJB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --uabjb-blue: #1e3a8a;
+            --uabjb-light-blue: #3b82f6;
+            --uabjb-yellow: #fbbf24;
+            --uabjb-red: #dc2626;
+            --primary-blue: #4361ee;
+            --secondary-blue: #3a5998;
+            --success-green: #4cc9f0;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --card-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            --card-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--uabjb-blue), var(--uabjb-light-blue));
+            padding: 1.5rem 2rem;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--uabjb-blue);
+            box-shadow: var(--shadow);
+        }
+
+        .header-title {
+            color: white;
+            font-size: 1.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-radius: 30px;
+            padding: 10px 18px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .main-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 120px);
+            padding: 2rem;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 520px;
+            background: var(--bg-primary);
+            border-radius: 24px;
+            padding: 45px 40px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            animation: slideUp 0.8s ease-out;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-container h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 35px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            letter-spacing: -0.8px;
+        }
+
+        .form-container h1 i {
+            font-size: 36px;
+            background: linear-gradient(135deg, var(--uabjb-yellow), #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .input-group {
+            margin-bottom: 28px;
+            position: relative;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+            animation-delay: calc(var(--animation-order, 0) * 0.15s);
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group label i {
+            color: var(--uabjb-yellow);
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .input-group input,
+        .input-group select {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px 22px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: none;
+            outline: none;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+            background: var(--bg-primary);
+            transform: translateY(-2px);
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .input-group select {
+            appearance: none;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="%2394a3b8"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 22px center;
+            background-size: 18px;
+            padding-right: 55px;
+            cursor: pointer;
+        }
+
+        .file-upload-container {
+            position: relative;
+        }
+
+        .file-upload-area {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 40px 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-blue);
+            background: rgba(67, 97, 238, 0.08);
+            transform: translateY(-3px);
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--success-green);
+            background: rgba(76, 201, 240, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .upload-icon {
+            font-size: 52px;
+            background: linear-gradient(135deg, var(--uabjb-yellow), #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .upload-text {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .upload-main {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 17px;
+        }
+
+        .upload-sub {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .file-info {
+            margin-top: 20px;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        .file-preview {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .file-icon {
+            font-size: 28px;
+            color: var(--success-green);
+            width: 35px;
+            text-align: center;
+        }
+
+        .file-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .file-name {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .file-size {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .remove-file {
+            background: var(--uabjb-red);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .remove-file:hover {
+            background: #b91c1c;
+            transform: scale(1.15);
+        }
+
+        .btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--success-green));
+            border: none;
+            border-radius: 16px;
+            padding: 22px;
+            font-size: 17px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            box-shadow: 0 12px 35px rgba(67, 97, 238, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 45px rgba(67, 97, 238, 0.45);
+            background: linear-gradient(135deg, var(--success-green), var(--primary-blue));
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.3);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem 1.5rem;
+            }
+            
+            .header-title {
+                font-size: 1.5rem;
+            }
+            
+            .main-container {
+                padding: 1.5rem;
+            }
+            
+            .form-container {
+                padding: 35px 30px;
+                border-radius: 20px;
+            }
+            
+            .form-container h1 {
+                font-size: 28px;
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .input-group input,
+            .input-group select {
+                padding: 18px 20px;
+                font-size: 15px;
+            }
+            
+            .theme-toggle {
+                padding: 8px 14px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .form-container {
+                padding: 30px 25px;
+            }
+            
+            .upload-content {
+                padding: 20px;
+            }
+        }
+
+        /* Validación visual */
+        .input-group input:invalid:not(:focus):not(:placeholder-shown) {
+            border-color: var(--uabjb-red);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+        }
+
+        .input-group input:valid:not(:focus):not(:placeholder-shown) {
+            border-color: var(--success-green);
+            box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <div class="header-title">
+                        <i class="fas fa-calendar-plus"></i>
+                        Enviar Solicitud
+                    </div>
+                    <div class="header-subtitle">Sistema de Gestión UABJB</div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                    <span id="theme-text">Modo Oscuro</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="form-container">
+            <h1>
+                <i class="fas fa-paper-plane"></i>
+                Enviar Solicitud
+            </h1>
+            
+            <form method="post" enctype="multipart/form-data" onsubmit="return validarFecha()">
+                <div class="input-group" style="--animation-order: 1">
+                    <label for="nombre_evento">
+                        <i class="fas fa-pencil-alt"></i>
+                        Nombre del Evento:
+                    </label>
+                    <input 
+                        type="text" 
+                        id="nombre_evento" 
+                        name="nombre_evento" 
+                        placeholder="Ingrese el nombre del evento" 
+                        required
+                    >
+                </div>
+
+                <div class="input-group" style="--animation-order: 2">
+                    <label for="fecha">
+                        <i class="fas fa-calendar-alt"></i>
+                        Fecha:
+                    </label>
+                    <input 
+                        type="datetime-local" 
+                        id="fecha" 
+                        name="fecha" 
+                        required
+                    >
+                </div>
+
+                <div class="input-group" style="--animation-order: 3">
+                    <label for="espacio_id">
+                        <i class="fas fa-building"></i>
+                        Espacio:
+                    </label>
+                    <select id="espacio_id" name="espacio_id" required>
+                        <option value="">Seleccione un espacio</option>
+                        <option value="1">Aula Magna</option>
+                        <option value="2">Sala de Conferencias A</option>
+                        <option value="3">Sala de Conferencias B</option>
+                        <option value="4">Auditorio Principal</option>
+                        <option value="5">Sala de Reuniones</option>
+                    </select>
+                </div>
+
+                <div class="input-group" style="--animation-order: 4">
+                    <label for="archivo_adjunto">
+                        <i class="fas fa-paperclip"></i>
+                        Archivo Adjunto (Opcional):
+                    </label>
+                    <div class="file-upload-container">
+                        <input 
+                            type="file" 
+                            id="archivo_adjunto" 
+                            name="archivo_adjunto" 
+                            accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx" 
+                            hidden
+                        >
+                        <div class="file-upload-area" onclick="document.getElementById('archivo_adjunto').click()">
+                            <div class="upload-content">
+                                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                <div class="upload-text">
+                                    <span class="upload-main">Haz clic para subir archivo</span>
+                                    <span class="upload-sub">Fotos, imágenes o documentos PDF</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="file-info" id="file-info" style="display: none;">
+                            <div class="file-preview">
+                                <i class="fas fa-file file-icon"></i>
+                                <div class="file-details">
+                                    <span class="file-name" id="file-name"></span>
+                                    <span class="file-size" id="file-size"></span>
+                                </div>
+                                <button type="button" class="remove-file" onclick="removeFile()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" style="--animation-order: 5">
+                    <i class="fas fa-paper-plane"></i>
+                    Enviar Solicitud
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                themeIcon.className = 'fas fa-moon';
+                themeText.textContent = 'Modo Oscuro';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+                themeText.textContent = 'Modo Claro';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Cargar tema guardado
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+                themeText.textContent = 'Modo Claro';
+            }
+        });
+
+        function validarFecha() {
+            const fechaInput = document.getElementById('fecha');
+            const fechaSeleccionada = new Date(fechaInput.value);
+            const fechaActual = new Date();
+            
+            if (fechaSeleccionada < fechaActual) {
+                alert('⚠️ La fecha no puede ser en el pasado.');
+                fechaInput.focus();
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Manejo de archivos
+        const fileInput = document.getElementById('archivo_adjunto');
+        const fileUploadArea = document.querySelector('.file-upload-area');
+        const fileInfo = document.getElementById('file-info');
+        const fileName = document.getElementById('file-name');
+        const fileSize = document.getElementById('file-size');
+
+        fileInput.addEventListener('change', function(e) {
+            handleFileSelect(e.target.files[0]);
+        });
+
+        fileUploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+
+        fileUploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+        });
+
+        fileUploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+                fileInput.files = files;
+            }
+        });
+
+        function handleFileSelect(file) {
+            if (file) {
+                const allowedTypes = [
+                    'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 
+                    'application/pdf', 'application/msword', 
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                ];
+                
+                if (!allowedTypes.includes(file.type)) {
+                    alert('❌ Tipo de archivo no permitido. Solo se permiten imágenes (JPG, PNG, GIF) y documentos (PDF, DOC, DOCX).');
+                    return;
+                }
+                
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('❌ El archivo es demasiado grande. El tamaño máximo permitido es 10MB.');
+                    return;
+                }
+
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                
+                const fileIcon = document.querySelector('.file-icon');
+                if (file.type.startsWith('image/')) {
+                    fileIcon.className = 'fas fa-image file-icon';
+                } else if (file.type === 'application/pdf') {
+                    fileIcon.className = 'fas fa-file-pdf file-icon';
+                } else {
+                    fileIcon.className = 'fas fa-file-word file-icon';
+                }
+                
+                fileUploadArea.style.display = 'none';
+                fileInfo.style.display = 'block';
+            }
+        }
+
+        function removeFile() {
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+            fileUploadArea.style.display = 'block';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Efectos de hover en inputs
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            });
+            
+            element.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Validación en tiempo real
+        document.getElementById('nombre_evento').addEventListener('input', function() {
+            if (this.value.length < 3) {
+                this.setCustomValidity('El nombre del evento debe tener al menos 3 caracteres');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+</body>
+</html>
