@@ -37,7 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gestion_espacios_academicos',  # Your app
+    'gestion_espacios_academicos',
+    'administrador',
+    'encargados',
+    'reportes',
+    'usuarios',
 ]
 
 MIDDLEWARE = [
