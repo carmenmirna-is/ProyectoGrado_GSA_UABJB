@@ -56,12 +56,66 @@
         .dashboard-container { background: var(--bg-primary); border-radius: 15px; padding: 2rem; box-shadow: var(--shadow); border: 1px solid var(--border-color); }
         .dashboard-title { font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 12px; }
         .welcome-text { color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.1rem; }
-        .dashboard-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; align-items: center; }
-        .dashboard-btn { background: linear-gradient(135deg, var(--uabjb-yellow), #f59e0b); color: var(--text-primary); padding: 14px 24px; border-radius: 12px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; gap: 10px; border: none; cursor: pointer; font-size: 0.95rem; box-shadow: var(--shadow); }
-        .dashboard-btn:hover { transform: translateY(-3px); box-shadow: var(--card-hover); color: var(--text-primary); }
-        @media (max-width: 1024px) { .container { padding: 1rem; } .header-content { flex-direction: column; gap: 1rem; text-align: center; } }
-        @media (max-width: 768px) { .dashboard-container { padding: 1.5rem; } .dashboard-actions { flex-direction: column; gap: 0.8rem; } .dashboard-btn { width: 100%; justify-content: center; } }
-        @media (max-width: 480px) { .header { padding: 1rem; } .container { padding: 0.5rem; } .dashboard-container { padding: 1rem; } .dashboard-title { font-size: 1.5rem; } .dashboard-btn { padding: 10px 16px; font-size: 0.9rem; } }
+        
+        .dashboard-sections { display: flex; flex-direction: column; gap: 2.5rem; }
+        .section { background: var(--bg-secondary); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border-color); }
+        .section-title { font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
+        .section-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+        
+        .dashboard-btn { 
+            background: linear-gradient(135deg, var(--uabjb-yellow), #f59e0b); 
+            color: var(--text-primary); 
+            padding: 14px 20px; 
+            border-radius: 12px; 
+            text-decoration: none; 
+            font-weight: 600; 
+            transition: all 0.3s ease; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 0.95rem; 
+            box-shadow: var(--shadow); 
+            text-align: center;
+            justify-content: center;
+        }
+        
+        .dashboard-btn.register { background: linear-gradient(135deg, var(--success-green), #0891b2); }
+        .dashboard-btn.list { background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); color: white; }
+        .dashboard-btn.logout { background: linear-gradient(135deg, var(--uabjb-red), #b91c1c); color: white; }
+        
+        .dashboard-btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: var(--card-hover); 
+            text-decoration: none;
+        }
+        
+        .dashboard-btn.register:hover { color: white; }
+        .dashboard-btn.list:hover { color: white; }
+        .dashboard-btn.logout:hover { color: white; }
+        
+        .logout-section { text-align: center; }
+        
+        @media (max-width: 1024px) { 
+            .container { padding: 1rem; } 
+            .header-content { flex-direction: column; gap: 1rem; text-align: center; }
+            .section-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        }
+        @media (max-width: 768px) { 
+            .dashboard-container { padding: 1.5rem; } 
+            .section-grid { grid-template-columns: 1fr; }
+            .dashboard-sections { gap: 2rem; }
+            .section { padding: 1.25rem; }
+        }
+        @media (max-width: 480px) { 
+            .header { padding: 1rem; } 
+            .container { padding: 0.5rem; } 
+            .dashboard-container { padding: 1rem; } 
+            .dashboard-title { font-size: 1.5rem; } 
+            .dashboard-btn { padding: 12px 16px; font-size: 0.9rem; }
+            .section-title { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
@@ -85,13 +139,70 @@
     <div class="container">
         <div class="dashboard-container">
             <h1 class="dashboard-title"><i class="fas fa-user-shield"></i> Bienvenido, {{ request.session.nombre }}</h1>
-            <p class="welcome-text">Gestiona los recursos y usuarios del sistema.</p>
-            <div class="dashboard-actions">
-                <a href="{% url 'administrador:registrar_espacios' %}" class="dashboard-btn"><i class="fas fa-plus"></i> Registrar Espacio</a>
-                <a href="{% url 'administrador:registrar_encargados' %}" class="dashboard-btn"><i class="fas fa-user-plus"></i> Registrar Encargado</a>
-                <a href="{% url 'administrador:lista_espacios' %}" class="dashboard-btn"><i class="fas fa-list"></i> Listar Espacios</a>
-                <a href="{% url 'administrador:lista_encargados' %}" class="dashboard-btn"><i class="fas fa-list"></i> Listar Encargados</a>
-                <a href="{% url 'logout' %}" class="dashboard-btn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+            <p class="welcome-text">Gestiona los recursos y usuarios del sistema universitario.</p>
+            
+            <div class="dashboard-sections">
+                <!-- Sección de Espacios -->
+                <div class="section">
+                    <h2 class="section-title"><i class="fas fa-building"></i> Gestión de Espacios</h2>
+                    <div class="section-grid">
+                        <a href="{% url 'administrador:registrar_espacios' %}" class="dashboard-btn register">
+                            <i class="fas fa-plus"></i> Registrar Espacio
+                        </a>
+                        <a href="{% url 'administrador:lista_espacios' %}" class="dashboard-btn list">
+                            <i class="fas fa-list"></i> Lista de Espacios
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sección de Encargados -->
+                <div class="section">
+                    <h2 class="section-title"><i class="fas fa-users"></i> Gestión de Encargados</h2>
+                    <div class="section-grid">
+                        <a href="{% url 'administrador:registrar_encargados' %}" class="dashboard-btn register">
+                            <i class="fas fa-user-plus"></i> Registrar Encargado
+                        </a>
+                        <a href="{% url 'administrador:lista_encargados' %}" class="dashboard-btn list">
+                            <i class="fas fa-users-cog"></i> Lista de Encargados
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sección de Facultades -->
+                <div class="section">
+                    <h2 class="section-title"><i class="fas fa-university"></i> Gestión de Facultades</h2>
+                    <div class="section-grid">
+                        <a href="{% url 'administrador:registrar_facultad' %}" class="dashboard-btn register">
+                            <i class="fas fa-plus-circle"></i> Registrar Facultad
+                        </a>
+                        <a href="{% url 'administrador:lista_facultades' %}" class="dashboard-btn list">
+                            <i class="fas fa-list-ul"></i> Lista de Facultades
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sección de Carreras -->
+                <div class="section">
+                    <h2 class="section-title"><i class="fas fa-graduation-cap"></i> Gestión de Carreras</h2>
+                    <div class="section-grid">
+                        <a href="{% url 'administrador:registrar_carrera' %}" class="dashboard-btn register">
+                            <i class="fas fa-bookmark"></i> Registrar Carrera
+                        </a>
+                        <a href="{% url 'administrador:lista_carreras' %}" class="dashboard-btn list">
+                            <i class="fas fa-th-list"></i> Lista de Carreras
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sección de Sesión -->
+                <div class="section logout-section">
+                    <h2 class="section-title"><i class="fas fa-sign-out-alt"></i> Sesión</h2>
+                    <div style="display: flex; justify-content: center;">
+                        <a href="{% url 'logout' %}" class="dashboard-btn logout">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
