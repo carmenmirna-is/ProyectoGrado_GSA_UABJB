@@ -2,10 +2,8 @@ from django.shortcuts import render, redirect
 from gestion_espacios_academicos.models import Espacio, Encargado, Facultad, Carrera, Administrador
 
 def dashboard_administrador(request):
-    if not request.session.get('usuario_id') or request.session.get('tipo_usuario') != 'administrador':
-        return redirect('login')
-
     return render(request, 'administrador/dashboard_administrador.html')
+
 def registrar_encargados(request):
     return render(request, 'administrador/registrar_encargados.html')
 
