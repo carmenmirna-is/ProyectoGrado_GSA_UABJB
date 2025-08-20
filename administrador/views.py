@@ -34,6 +34,9 @@ def editar_facultad(request):
 def registrar_carrera(request):
     return render(request, 'administrador/registrar_carrera.html')  
 
+def registrar_espacio_campus(request):
+    return render(request, 'administrador/registrar_espacio_campus.html')
+
 def editar_carrera(request):
     return render(request, 'administrador/editar_carrera.html')
 

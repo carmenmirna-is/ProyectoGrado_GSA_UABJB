@@ -28,7 +28,14 @@
     </div>
     <div class="container">
         <div class="dashboard-container">
-            <h1 class="dashboard-title"><i class="fas fa-user-shield"></i> Bienvenido, {{ request.session.nombre }}</h1>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <h1 class="dashboard-title"><i class="fas fa-user-shield"></i> Bienvenido, {{ request.user.first_name|default:request.user.username }}</h1>
             <p class="welcome-text">Gestiona los recursos y usuarios del sistema universitario.</p>
             
             <div class="dashboard-sections">
@@ -38,6 +45,9 @@
                     <div class="section-grid">
                         <a href="{% url 'administrador:registrar_espacios' %}" class="dashboard-btn register">
                             <i class="fas fa-plus"></i> Registrar Espacio
+                        </a>
+                        <a href="{% url 'administrador:registrar_espacio_campus' %}" class="dashboard-btn register">
+                            <i class="fas fa-plus"></i> Registrar Espacio del Campus
                         </a>
                         <a href="{% url 'administrador:lista_espacios' %}" class="dashboard-btn list">
                             <i class="fas fa-list"></i> Lista de Espacios

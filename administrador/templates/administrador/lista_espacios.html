@@ -14,7 +14,7 @@
             <div style="display: flex; align-items: center; gap: 1rem;">
                 <div class="logo"><i class="fas fa-graduation-cap"></i></div>
                 <div>
-                    <div class="header-title"><i class="fas fa-list"></i> Lista de Espacios por Carrera</div>
+                    <div class="header-title"><i class="fas fa-list"></i> Lista de Espacios por Carrera y Facultad</div>
                     <div class="header-subtitle">Sistema de Gestión UABJB</div>
                 </div>
             </div>
@@ -28,8 +28,18 @@
     </div>
     <div class="container">
         <div class="dashboard-container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
             <a href="{% url 'administrador:dashboard_administrador' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
-            <h1><i class="fas fa-list"></i> Lista de Espacios por Carrera y Facultad</h1>
+            <h1><i class="fas fa-list"></i> Lista de Espacios por Carrera, Facultad y Campus</h1>
+
+            <!-- Sección: Espacios de Carreras -->
+            <h2 class="section-title"><i class="fas fa-graduation-cap"></i> Espacios de Carreras</h2>
             <table>
                 <thead>
                     <tr>
@@ -43,14 +53,78 @@
                 <tbody>
                     {% for espacio in espacios_carrera %}
                     <tr>
-                        <td>{{ espacio.facultad_nombre }}</td>
-                        <td>{{ espacio.carrera_nombre }}</td>
+                        <td>{{ espacio.carrera.facultad.nombre|default:'Común' }}</td>
+                        <td>{{ espacio.carrera.nombre|default:'Sin carrera' }}</td>
                         <td>{{ espacio.nombre }}</td>
                         <td>{{ espacio.descripcion }}</td>
                         <td>
-                            <a href="{% url 'administrador:editar_espacio_carrera' espacio.id %}" class="btn btn-edit"><i class="fas fa-edit"></i> Editar</a>
-                            <a href="{% url 'administrador:eliminar_espacio_carrera' espacio.id %}" class="btn btn-delete"><i class="fas fa-trash"></i> Eliminar</a>
+                            <a href="{% url 'administrador:editar_espacios' espacio.id %}" class="btn btn-edit"><i class="fas fa-edit"></i> Editar</a>
+                            <a href="{% url 'administrador:editar_espacios' espacio.id %}" class="btn btn-delete"><i class="fas fa-trash"></i> Eliminar</a>
                         </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">No hay espacios de carreras registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Sección: Espacios de Facultades -->
+            <h2 class="section-title"><i class="fas fa-university"></i> Espacios de Facultades</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Facultad</th>
+                        <th>Nombre del Espacio</th>
+                        <th>Descripción</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for espacio in espacios_facultad %}
+                    <tr>
+                        <td>{{ espacio.facultad.nombre|default:'Sin facultad' }}</td>
+                        <td>{{ espacio.nombre }}</td>
+                        <td>{{ espacio.descripcion }}</td>
+                        <td>
+                            <a href="{% url 'administrador:editar_espacios' espacio.id %}" class="btn btn-edit"><i class="fas fa-edit"></i> Editar</a>
+                            <a href="{% url 'administrador:editar_espacios' espacio.id %}" class="btn btn-delete"><i class="fas fa-trash"></i> Eliminar</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No hay espacios de facultades registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Sección: Espacios del Campus -->
+            <h2 class="section-title"><i class="fas fa-building"></i> Espacios del Campus</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre del Espacio</th>
+                        <th>Ubicación</th>
+                        <th>Capacidad</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for espacio in espacios_campus %}
+                    <tr>
+                        <td>{{ espacio.nombre }}</td>
+                        <td>{{ espacio.ubicacion|default:'Sin ubicación' }}</td>
+                        <td>{{ espacio.capacidad|default:'No especificada' }}</td>
+                        <td>
+                            <a href="{% url 'administrador:editar_espacio_campus' espacio.id %}" class="btn btn-edit"><i class="fas fa-edit"></i> Editar</a>
+                            <a href="{% url 'administrador:editar_espacio_campus' espacio.id %}" class="btn btn-delete"><i class="fas fa-trash"></i> Eliminar</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No hay espacios del campus registrados.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

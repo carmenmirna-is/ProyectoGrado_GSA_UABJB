@@ -28,6 +28,13 @@
     </div>
     <div class="container">
         <div class="dashboard-container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
             <a href="{% url 'administrador:dashboard_administrador' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
             <h1><i class="fas fa-book"></i> Lista de Carreras</h1>
             <table>
@@ -45,13 +52,13 @@
                     {% for carrera in carreras %}
                     <tr>
                         <td>{{ carrera.id }}</td>
-                        <td>{{ carrera.facultad_nombre }}</td>
+                        <td>{{ carrera.facultad.nombre }}</td>
                         <td>{{ carrera.nombre }}</td>
                         <td>{{ carrera.codigo }}</td>
                         <td>{{ carrera.fecha_creacion|date:"d/m/Y H:i" }}</td>
                         <td>
                             <a href="{% url 'administrador:editar_carrera' carrera.id %}" class="btn btn-edit"><i class="fas fa-edit"></i> Editar</a>
-                            <a href="{% url 'administrador:eliminar_carrera' carrera.id %}" class="btn btn-delete"><i class="fas fa-trash"></i> Eliminar</a>
+                            <a href="{% url 'administrador:editar_carrera' carrera.id %}" class="btn btn-delete"><i class="fas fa-trash"></i> Eliminar</a>
                         </td>
                     </tr>
                     {% empty %}

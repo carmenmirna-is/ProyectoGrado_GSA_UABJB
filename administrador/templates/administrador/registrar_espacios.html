@@ -28,33 +28,18 @@
     </div>
     <div class="container">
         <div class="dashboard-container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
             <a href="{% url 'administrador:lista_espacios' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver a la Lista</a>
             <h1 class="dashboard-title"><i class="fas fa-plus"></i> Registrar Espacio por Carrera</h1>
-            <form method="POST">
+            <form method="post">
                 {% csrf_token %}
-                <div class="form-group">
-                    <label for="facultad">Facultad</label>
-                    <select id="facultad" name="facultad" class="form-control" onchange="updateCarreras()">
-                        <option value="">Seleccione una facultad</option>
-                        {% for facultad in facultades %}
-                            <option value="{{ facultad.id }}">{{ facultad.nombre }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="carrera">Carrera</label>
-                    <select id="carrera" name="carrera" class="form-control">
-                        <option value="">Seleccione una carrera</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="nombre">Nombre del Espacio</label>
-                    <input type="text" id="nombre" name="nombre" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="capacidad">Capacidad</label>
-                    <input type="number" id="capacidad" name="capacidad" class="form-control" required>
-                </div>
+                {{ form.as_p }}
                 <button type="submit" class="btn"><i class="fas fa-save"></i> Registrar Espacio</button>
             </form>
         </div>

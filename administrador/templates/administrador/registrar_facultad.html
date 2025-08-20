@@ -28,14 +28,18 @@
     </div>
     <div class="container">
         <div class="dashboard-container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
             <a href="{% url 'administrador:lista_facultades' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver a la Lista</a>
             <h1 class="dashboard-title"><i class="fas fa-plus-circle"></i> Registrar Facultad</h1>
-            <form method="POST">
+            <form method="post">
                 {% csrf_token %}
-                <div class="form-group">
-                    <label for="nombre">Nombre de la Facultad</label>
-                    <input type="text" id="nombre" name="nombre" class="form-control" required>
-                </div>
+                {{ form.as_p }}
                 <button type="submit" class="btn"><i class="fas fa-save"></i> Registrar Facultad</button>
             </form>
         </div>

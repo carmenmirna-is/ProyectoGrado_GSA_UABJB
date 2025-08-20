@@ -17,4 +17,5 @@ urlpatterns = [
     path('lista_espacios/', views.lista_espacios, name='lista_espacios'),
     path('editar_encargado/', views.editar_encargado, name='editar_encargado'),
     path('editar_espacios/', views.editar_espacios, name='editar_ espacios'),
+    path('registrar_espacio_campus/', views.registrar_espacio_campus, name='registrar_espacio_campus'),
 ]

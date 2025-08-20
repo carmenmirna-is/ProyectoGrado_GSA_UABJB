@@ -28,6 +28,13 @@
     </div>
     <div class="container">
         <div class="dashboard-container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
             <a href="{% url 'administrador:dashboard_administrador' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
             <h1 class="dashboard-title"><i class="fas fa-university"></i> Lista de Facultades</h1>
             <table>
@@ -43,7 +50,7 @@
                             <td>{{ facultad.nombre }}</td>
                             <td>
                                 <a href="{% url 'administrador:editar_facultad' facultad.id %}" class="btn btn-edit"><i class="fas fa-edit"></i> Editar</a>
-                                <a href="{% url 'administrador:eliminar_facultad' facultad.id %}" class="btn btn-delete" onclick="return confirm('¿Estás seguro de eliminar esta facultad?');"><i class="fas fa-trash"></i> Eliminar</a>
+                                <a href="{% url 'administrador:editar_facultad' facultad.id %}" class="btn btn-delete" onclick="return confirm('¿Estás seguro de eliminar esta facultad?');"><i class="fas fa-trash"></i> Eliminar</a>
                             </td>
                         </tr>
                     {% empty %}

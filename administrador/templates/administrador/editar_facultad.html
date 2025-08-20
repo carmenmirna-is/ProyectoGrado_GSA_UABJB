@@ -28,15 +28,21 @@
     </div>
     <div class="container">
         <div class="dashboard-container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
             <a href="{% url 'administrador:lista_facultades' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver a la Lista</a>
             <h1 class="dashboard-title"><i class="fas fa-university"></i> Editar Facultad</h1>
-            <form method="POST">
+            <form method="post">
                 {% csrf_token %}
-                <div class="form-group">
-                    <label for="nombre">Nombre de la Facultad</label>
-                    <input type="text" id="nombre" name="nombre" class="form-control" value="{{ facultad.nombre }}" required>
-                </div>
+                {{ form.as_p }}
                 <button type="submit" class="btn"><i class="fas fa-save"></i> Guardar Cambios</button>
+                <button type="submit" name="delete" value="true" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta facultad?')"><i class="fas fa-trash"></i> Eliminar</button>
+                <a href="{% url 'administrador:lista_facultades' %}" class="back-link">Volver a la Lista</a>
             </form>
         </div>
     </div>

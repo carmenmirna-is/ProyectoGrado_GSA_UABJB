@@ -28,6 +28,13 @@
     </div>
     <div class="container">
         <div class="dashboard-container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
             <a href="{% url 'administrador:dashboard_administrador' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
             <h1><i class="fas fa-users"></i> Lista de Encargados</h1>
             <a href="{% url 'administrador:registrar_encargados' %}" class="btn">Registrar Nuevo Encargado</a>
@@ -44,11 +51,11 @@
                     {% for encargado in encargados %}
                     <tr>
                         <td>{{ encargado.id }}</td>
-                        <td>{{ encargado.nombre }}</td>
-                        <td>{{ encargado.correo }}</td>
+                        <td>{{ encargado.first_name }} {{ encargado.last_name }}</td>
+                        <td>{{ encargado.email }}</td>
                         <td>
                             <a href="{% url 'administrador:editar_encargado' encargado.id %}" class="btn btn-edit"><i class="fas fa-edit"></i> Editar</a>
-                            <a href="{% url 'administrador:eliminar_encargado' encargado.id %}" class="btn btn-delete"><i class="fas fa-trash"></i> Eliminar</a>
+                            <a href="{% url 'administrador:editar_encargado' encargado.id %}" class="btn btn-delete"><i class="fas fa-trash"></i> Eliminar</a>
                         </td>
                     </tr>
                     {% endfor %}
