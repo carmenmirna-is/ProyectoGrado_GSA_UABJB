@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Facultad, Carrera, Espacio, CustomUser, EspacioCampus
+from .models import Facultad, Carrera, Espacio, CustomUser, EspacioCampus, Solicitud
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 class CustomAuthenticationForm(AuthenticationForm):
@@ -232,3 +232,11 @@ class EncargadoRegistrationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+class SolicitudRechazoForm(forms.ModelForm):
+    class Meta:
+        model = Solicitud
+        fields = ['motivo_rechazo']
+        widgets = {
+            'motivo_rechazo': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Especifica el motivo del rechazo'}),
+        }

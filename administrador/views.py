@@ -119,6 +119,20 @@ def registrar_espacios(request):
     return render(request, 'administrador/registrar_espacios.html', {'form': form})
 
 @user_type_required('administrador')
+def registrar_espacio_campus(request):
+    if request.method == 'POST':
+        form = EspacioCampusForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Espacio del campus registrado con éxito.')
+            return redirect('administrador:lista_espacios_campus')  # Redirige a la lista de espacios del campus
+        else:
+            messages.error(request, 'Error al registrar el espacio del campus. Por favor, verifica los datos.')
+    else:
+        form = EspacioCampusForm()
+    return render(request, 'administrador/registrar_espacio_campus.html', {'form': form})
+
+@user_type_required('administrador')
 def lista_espacios(request):
     try:
         # Espacios de carrera y facultad
