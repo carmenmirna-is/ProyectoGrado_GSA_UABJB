@@ -2,6 +2,26 @@ from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
+
+class CustomUser(AbstractUser):
+    telefono = models.CharField(max_length=15, blank=True, null=True, help_text="Número de teléfono del usuario")
+    documento = models.CharField(max_length=20, unique=True, blank=True, null=True, help_text="Cédula o número de identificación")
+    facultad = models.CharField(max_length=100, blank=True, null=True, help_text="Facultad a la que pertenece el usuario")
+    carrera = models.CharField(max_length=100, blank=True, null=True, help_text="Carrera del usuario")
+    tipo_usuario = models.CharField(
+        max_length=20,
+        choices=[
+            ('administrador', 'Administrador'),
+            ('encargado', 'Encargado'),
+            ('usuario', 'Usuario')
+        ],
+        default='usuario',
+        help_text="Rol del usuario en el sistema"
+    )
+
+    def __str__(self):
+        return self.username
 
 class Facultad(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
