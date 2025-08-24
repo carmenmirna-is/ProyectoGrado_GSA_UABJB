@@ -73,7 +73,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gestion_espacios_academicos.wsgi.application'
 
-AUTH_USER_MODEL = 'administrador.CustomUser'
+AUTH_USER_MODEL = 'gestion_espacios_academicos.CustomUser'
 
 
 # Database
