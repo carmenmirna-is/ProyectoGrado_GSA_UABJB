@@ -73,6 +73,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gestion_espacios_academicos.wsgi.application'
 
+AUTH_USER_MODEL = 'administrador.CustomUser'
+
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -124,7 +126,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),  # Directory for custom static files
 ]
