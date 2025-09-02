@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitudes Aceptadas - UABJB</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'encargados/css/styles.css' %}">
 </head>
 <body class="solicitudes-aceptadas">
     <div class="header">
@@ -41,13 +41,13 @@
                     <tbody>
                         {% for solicitud in solicitudes %}
                         <tr>
-                            <td>{{ solicitud.1 }}</td>
-                            <td>{{ solicitud.2 }}</td>
-                            <td>{{ solicitud.3 }}</td>
+                            <td>{{ solicitud.nombre_evento }}</td>
+                            <td>{{ solicitud.fecha_evento|date:"d/m/Y H:i" }}</td>
+                            <td>{{ solicitud.usuario_solicitante.get_full_name|default:solicitud.usuario_solicitante.username }}</td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="{% url 'editar_solicitud' solicitud.0 %}" class="btn btn-edit">Editar</a>
-                                    <a href="{% url 'eliminar_solicitud' solicitud.0 %}" class="btn btn-delete">Eliminar</a>
+                                    <a href="{% url 'encargados:editar_solicitud' solicitud.id %}" class="btn btn-edit">Editar</a>
+                                    <a href="{% url 'encargados:eliminar_solicitud' solicitud.id %}" class="btn btn-delete">Eliminar</a>
                                 </div>
                             </td>
                         </tr>
@@ -57,6 +57,6 @@
             </div>
         </div>
     </div>
-    <script src="{% static 'js/scripts.js' %}"></script>
+    <script src="{% static 'encargados/js/scripts.js' %}"></script>
 </body>
 </html>
