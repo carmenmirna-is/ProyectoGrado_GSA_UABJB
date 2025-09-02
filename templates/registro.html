@@ -22,22 +22,75 @@
 
             <form id="registerForm" method="POST" action="{% url 'registro' %}">
                 {% csrf_token %}
+
                 {% if messages %}
                     {% for message in messages %}
-                        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
-                            {{ message }}
-                        </div>
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
                     {% endfor %}
                 {% endif %}
-                {{ form.as_p }}
-                <div class="form-options">
-                    <label class="checkbox-field">
-                        <input type="checkbox" id="terms" name="terms" required>
-                        <span class="checkmark"></span>
-                        Acepto los <a href="#" class="forgot-password">términos y condiciones</a>
-                    </label>
+
+                <!-- Username -->
+                <div class="input-field">
+                    <i class="material-icons">person</i>
+                    <input type="text" name="username" maxlength="150" required id="id_username" placeholder="Nombre de usuario">
                 </div>
 
+                <!-- Nombre y Apellido -->
+                <div class="form-row">
+                    <div class="input-field">
+                        <i class="material-icons">badge</i>
+                        <input type="text" name="first_name" id="id_first_name" placeholder="Nombre">
+                    </div>
+                    <div class="input-field">
+                        <i class="material-icons">badge</i>
+                        <input type="text" name="last_name" id="id_last_name" placeholder="Apellido">
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="input-field">
+                    <i class="material-icons">email</i>
+                    <input type="email" name="email" id="id_email" placeholder="Correo electrónico">
+                </div>
+
+                <!-- Teléfono -->
+                <div class="input-field">
+                    <i class="material-icons">phone</i>
+                    <input type="tel" name="telefono" id="id_telefono" placeholder="Teléfono">
+                </div>
+
+                <!-- Documento -->
+                <div class="input-field">
+                    <i class="material-icons">badge</i>
+                    <input type="text" name="documento" id="id_documento" placeholder="Cédula / CI">
+                </div>
+
+                <!-- Carrera -->
+                <div class="input-field">
+                    <i class="material-icons">menu_book</i>
+                    <select name="carrera" id="id_carrera" class="form-control" required>
+                        <option value="">Seleccionar Carrera</option>
+                        {% for carrera in form.carrera.field.queryset %}
+                            <option value="{{ carrera.id }}" {% if form.carrera.value == carrera.id %}selected{% endif %}>
+                                {{ carrera.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Contraseña -->
+                <div class="input-field">
+                    <i class="material-icons">lock</i> 
+                    {{ form.password1 }}
+                </div>
+
+                <!-- Confirmar contraseña -->
+                <div class="input-field">
+                    <i class="material-icons">lock</i>
+                    {{ form.password2 }}
+                </div>
+
+                <!-- Botón -->
                 <button type="submit" class="btn-register" id="registerBtn">
                     <div class="loading" id="loading"></div>
                     Crear mi cuenta
@@ -54,6 +107,6 @@
             </div>
         </div>
     </div>
-    <script src="{% static 'js/scripts.js' %}"></script>
+
 </body>
 </html>
