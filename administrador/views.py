@@ -1,26 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Facultad, Carrera, Espacio, CustomUser, EspacioCampus
-from gestion_espacios_academicos.forms import FacultadForm, CarreraForm, EspacioForm, EncargadoRegistrationForm, EspacioCampusForm
+from gestion_espacios_academicos.models import Facultad, Carrera, Espacio, CustomUser, EspacioCampus
+from gestion_espacios_academicos.forms import (
+    FacultadForm, CarreraForm, EspacioForm,
+    EncargadoRegistrationForm, EspacioCampusForm
+)
 
-# Decorador para restringir acceso por tipo de usuario
-def user_type_required(user_type):
-    def decorator(view_func):
-        @login_required
-        def _wrapped_view(request, *args, **kwargs):
-            if request.user.tipo_usuario != user_type:
-                messages.error(request, 'Acceso denegado. No tienes permisos para esta acción.')
-                return redirect('login')
-            return view_func(request, *args, **kwargs)
-        return _wrapped_view
-    return decorator
-
-@user_type_required('administrador')
+# ================= Dashboard =================
 def dashboard_administrador(request):
     return render(request, 'administrador/dashboard_administrador.html')
 
-@user_type_required('administrador')
+# ================= Facultades =================
 def registrar_facultad(request):
     if request.method == 'POST':
         form = FacultadForm(request.POST)
@@ -29,17 +19,15 @@ def registrar_facultad(request):
             messages.success(request, 'Facultad registrada con éxito.')
             return redirect('lista_facultades')
         else:
-            messages.error(request, 'Error al registrar la facultad. Por favor, verifica los datos.')
+            messages.error(request, 'Error al registrar la facultad. Verifica los datos.')
     else:
         form = FacultadForm()
     return render(request, 'administrador/registrar_facultad.html', {'form': form})
 
-@user_type_required('administrador')
 def lista_facultades(request):
     facultades = Facultad.objects.all()
     return render(request, 'administrador/lista_facultades.html', {'facultades': facultades})
 
-@user_type_required('administrador')
 def editar_facultad(request, pk):
     facultad = get_object_or_404(Facultad, pk=pk)
     if request.method == 'POST':
@@ -57,31 +45,29 @@ def editar_facultad(request, pk):
                 messages.success(request, 'Facultad actualizada con éxito.')
                 return redirect('lista_facultades')
             else:
-                messages.error(request, 'Error al actualizar la facultad. Por favor, verifica los datos.')
+                messages.error(request, 'Error al actualizar la facultad. Verifica los datos.')
     else:
         form = FacultadForm(instance=facultad)
     return render(request, 'administrador/editar_facultad.html', {'form': form, 'facultad': facultad})
 
-@user_type_required('administrador')
+# ================= Carreras =================
 def registrar_carrera(request):
     if request.method == 'POST':
         form = CarreraForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Carrera registrada con éxito.')
-            return redirect('lista_carreras')
+            return redirect('administrador/lista_carreras')
         else:
-            messages.error(request, 'Error al registrar la carrera. Por favor, verifica los datos.')
+            messages.error(request, 'Error al registrar la carrera. Verifica los datos.')
     else:
         form = CarreraForm()
     return render(request, 'administrador/registrar_carrera.html', {'form': form})
 
-@user_type_required('administrador')
 def lista_carreras(request):
     carreras = Carrera.objects.all()
     return render(request, 'administrador/lista_carreras.html', {'carreras': carreras})
 
-@user_type_required('administrador')
 def editar_carrera(request, pk):
     carrera = get_object_or_404(Carrera, pk=pk)
     if request.method == 'POST':
@@ -99,73 +85,59 @@ def editar_carrera(request, pk):
                 messages.success(request, 'Carrera actualizada con éxito.')
                 return redirect('lista_carreras')
             else:
-                messages.error(request, 'Error al actualizar la carrera. Por favor, verifica los datos.')
+                messages.error(request, 'Error al actualizar la carrera. Verifica los datos.')
     else:
         form = CarreraForm(instance=carrera)
     return render(request, 'administrador/editar_carrera.html', {'form': form, 'carrera': carrera})
 
-@user_type_required('administrador')
+# ================= Espacios =================
 def registrar_espacios(request):
     if request.method == 'POST':
         form = EspacioForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Espacio registrado con éxito.')
-            return redirect('lista_espacios')
+            return redirect('administrador:lista_espacios')
         else:
-            messages.error(request, 'Error al registrar el espacio. Por favor, verifica los datos.')
+            messages.error(request, 'Error al registrar el espacio. Verifica los datos.')
     else:
         form = EspacioForm()
     return render(request, 'administrador/registrar_espacios.html', {'form': form})
 
-@user_type_required('administrador')
 def registrar_espacio_campus(request):
     if request.method == 'POST':
         form = EspacioCampusForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Espacio del campus registrado con éxito.')
-            return redirect('administrador:lista_espacios_campus')  # Redirige a la lista de espacios del campus
+            return redirect('administrador/lista_espacios_campus')
         else:
-            messages.error(request, 'Error al registrar el espacio del campus. Por favor, verifica los datos.')
+            messages.error(request, 'Error al registrar el espacio del campus. Verifica los datos.')
     else:
         form = EspacioCampusForm()
     return render(request, 'administrador/registrar_espacio_campus.html', {'form': form})
 
-@user_type_required('administrador')
+# ✅ VISTA CORREGIDA: lista_espacios
 def lista_espacios(request):
     try:
-        # Espacios de carrera y facultad
-        espacios_carrera = Espacio.objects.select_related('carrera__facultad').filter(carrera__isnull=False)
-        espacios_facultad = Espacio.objects.filter(carrera__isnull=True, facultad__isnull=False)
+        espacios_carrera = Espacio.objects.select_related('carrera__facultad').filter(activo=True)
         espacios_campus = EspacioCampus.objects.all()
 
-        # Combinar todos los espacios en una lista de diccionarios
         all_espacios = []
+
         for espacio in espacios_carrera:
             all_espacios.append({
                 'tipo': 'Carrera',
                 'nombre': espacio.nombre,
-                'facultad': espacio.carrera.facultad.nombre if espacio.carrera.facultad else 'Común',
+                'facultad': espacio.carrera.facultad.nombre if espacio.carrera and espacio.carrera.facultad else 'Sin facultad',
                 'carrera': espacio.carrera.nombre if espacio.carrera else 'Sin carrera',
-                'ubicacion': None,
-                'capacidad': None,
-                'descripcion': espacio.descripción,
+                'ubicacion': espacio.ubicacion,
+                'capacidad': espacio.capacidad,
+                'descripcion': espacio.descripcion,
                 'id': espacio.id,
                 'es_campus': False
             })
-        for espacio in espacios_facultad:
-            all_espacios.append({
-                'tipo': 'Facultad',
-                'nombre': espacio.nombre,
-                'facultad': espacio.facultad.nombre if espacio.facultad else 'Sin facultad',
-                'carrera': None,
-                'ubicacion': None,
-                'capacidad': None,
-                'descripcion': espacio.descripción,
-                'id': espacio.id,
-                'es_campus': False
-            })
+
         for espacio in espacios_campus:
             all_espacios.append({
                 'tipo': 'Campus',
@@ -179,17 +151,12 @@ def lista_espacios(request):
                 'es_campus': True
             })
 
-        context = {
-            'all_espacios': all_espacios
-        }
-        if messages.get_messages(request):
-            context['messages'] = messages.get_messages(request)
-        return render(request, 'administrador/lista_espacios.html', context)
+        return render(request, 'administrador/lista_espacios.html', {'all_espacios': all_espacios})
+
     except Exception as e:
         messages.error(request, f"Error al cargar la lista de espacios: {str(e)}")
         return render(request, 'administrador/lista_espacios.html', {'all_espacios': []})
 
-@user_type_required('administrador')
 def editar_espacios(request, pk):
     espacio = get_object_or_404(Espacio, pk=pk)
     if request.method == 'POST':
@@ -197,7 +164,7 @@ def editar_espacios(request, pk):
             try:
                 espacio.delete()
                 messages.success(request, 'Espacio eliminado con éxito.')
-                return redirect('lista_espacios')
+                return redirect('administrador:lista_espacios')
             except Exception as e:
                 messages.error(request, f'Error al eliminar el espacio: {str(e)}')
         else:
@@ -205,14 +172,14 @@ def editar_espacios(request, pk):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Espacio actualizado con éxito.')
-                return redirect('lista_espacios')
+                return redirect('administrador:lista_espacios')
             else:
-                messages.error(request, 'Error al actualizar el espacio. Por favor, verifica los datos.')
+                messages.error(request, 'Error al actualizar el espacio. Verifica los datos.')
     else:
         form = EspacioForm(instance=espacio)
     return render(request, 'administrador/editar_espacios.html', {'form': form, 'espacio': espacio})
 
-@user_type_required('administrador')
+# ================= Encargados =================
 def registrar_encargados(request):
     if request.method == 'POST':
         form = EncargadoRegistrationForm(request.POST)
@@ -221,19 +188,17 @@ def registrar_encargados(request):
             user.tipo_usuario = 'encargado'
             user.save()
             messages.success(request, 'Encargado registrado con éxito.')
-            return redirect('lista_encargados')
+            return redirect('administrador/lista_encargados')
         else:
-            messages.error(request, 'Error al registrar el encargado. Por favor, verifica los datos.')
+            messages.error(request, 'Error al registrar el encargado. Verifica los datos.')
     else:
         form = EncargadoRegistrationForm()
     return render(request, 'administrador/registrar_encargados.html', {'form': form})
 
-@user_type_required('administrador')
 def lista_encargados(request):
     encargados = CustomUser.objects.filter(tipo_usuario='encargado')
     return render(request, 'administrador/lista_encargados.html', {'encargados': encargados})
 
-@user_type_required('administrador')
 def editar_encargado(request, pk):
     encargado = get_object_or_404(CustomUser, pk=pk, tipo_usuario='encargado')
     if request.method == 'POST':
@@ -241,7 +206,7 @@ def editar_encargado(request, pk):
             try:
                 encargado.delete()
                 messages.success(request, 'Encargado eliminado con éxito.')
-                return redirect('lista_encargados')
+                return redirect('administrador/lista_encargados')
             except Exception as e:
                 messages.error(request, f'Error al eliminar el encargado: {str(e)}')
         else:
@@ -249,9 +214,9 @@ def editar_encargado(request, pk):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Encargado actualizado con éxito.')
-                return redirect('lista_encargados')
+                return redirect('administrador/lista_encargados')
             else:
-                messages.error(request, 'Error al actualizar el encargado. Por favor, verifica los datos.')
+                messages.error(request, 'Error al actualizar el encargado. Verifica los datos.')
     else:
         form = EncargadoRegistrationForm(instance=encargado)
-    return render(request, 'administrador/editar_encargado.html', {'form': form, 'encargado': encargado})
+    return render(request, 'administrador/editar_encargado', {'form': form, 'encargado': encargado})

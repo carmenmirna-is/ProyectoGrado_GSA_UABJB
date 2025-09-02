@@ -26,6 +26,7 @@
             </div>
         </div>
     </div>
+
     <div class="container">
         <div class="dashboard-container">
             {% if messages %}
@@ -35,17 +36,40 @@
                     </div>
                 {% endfor %}
             {% endif %}
-            <a href="{% url 'administrador:lista_encargados' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver a la Lista</a>
+
+            <!-- Enlace de vuelta -->
+            <a href="{% url 'administrador:lista_encargados' %}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Volver a la Lista
+            </a>
+
             <h1 class="dashboard-title"><i class="fas fa-user-edit"></i> Editar Encargado</h1>
-            <form method="post">
+
+            <!-- Formulario que envía al propio endpoint -->
+            <form method="post" action="{% url 'administrador:editar_encargado' pk=encargado.pk %}">
                 {% csrf_token %}
+
+                <!-- Campos del formulario -->
                 {{ form.as_p }}
-                <button type="submit" class="btn"><i class="fas fa-save"></i> Guardar Cambios</button>
-                <button type="submit" name="delete" value="true" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este encargado?')"><i class="fas fa-trash"></i> Eliminar</button>
-                <a href="{% url 'administrador:lista_encargados' %}" class="back-link">Volver a la Lista</a>
+
+                <!-- Botón Guardar -->
+                <button type="submit" class="btn">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+
+                <!-- Botón Eliminar -->
+                <button type="submit" name="delete" value="true" class="btn btn-danger"
+                        onclick="return confirm('¿Estás seguro de eliminar este encargado?');">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+
+                <!-- Enlace extra de vuelta -->
+                <a href="{% url 'administrador:lista_encargados' %}" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Volver a la Lista
+                </a>
             </form>
         </div>
     </div>
+
     <script src="{% static 'js/scripts.js' %}"></script>
 </body>
 </html>
