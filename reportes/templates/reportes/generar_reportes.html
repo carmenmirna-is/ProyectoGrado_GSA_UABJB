@@ -28,7 +28,9 @@
     </div>
     <div class="container">
         <div class="dashboard-container">
-            <a href="{% url 'encargados:dashboard_encargado' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+            <a href="{% url 'encargados:dashboard_encargados' %}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </a>
             <form action="{% url 'reportes:generar_reportes' %}" method="get">
                 <div class="form-group">
                     <label for="formato">Formato del Reporte:</label>
@@ -59,11 +61,6 @@
                     <button type="submit" class="btn btn-action"><i class="fas fa-file-export"></i> Generar Reporte</button>
                 </div>
             </form>
-            <div class="buttons">
-                <a href="{% url 'reportes:generar_reportes' %}?formato=pdf" class="btn btn-delete"><i class="fas fa-file-pdf"></i> Reporte PDF Rápido</a>
-                <a href="{% url 'reportes:generar_reportes' %}?formato=excel" class="btn btn-edit"><i class="fas fa-file-excel"></i> Reporte Excel Rápido</a>
-                <a href="{% url 'reportes:generar_reportes' %}?formato=word" class="btn btn-action"><i class="fas fa-file-word"></i> Reporte Word Rápido</a>
-            </div>
         </div>
     </div>
     <script src="{% static 'js/scripts.js' %}"></script>
