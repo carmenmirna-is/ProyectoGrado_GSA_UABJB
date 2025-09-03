@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espacios de Campus - UABJB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="logo"><i class="fas fa-graduation-cap"></i></div>
+                <div>
+                    <div class="header-title"><i class="fas fa-list"></i> Espacios de Campus</div>
+                    <div class="header-subtitle">Sistema de Gestión UABJB</div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                    <span id="theme-text">Modo Oscuro</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="dashboard-container">
+            <a href="{% url 'administrador:dashboard_administrador' %}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </a>
+
+            <h1 class="dashboard-title">
+                <i class="fas fa-list"></i> Lista de Espacios de Campus
+            </h1>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Ubicación</th>
+                            <th>Capacidad</th>
+                            <th>Encargado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for espacio in espacios %}
+                        <tr>
+                            <td>{{ espacio.nombre }}</td>
+                            <td>{{ espacio.ubicacion|default:"—" }}</td>
+                            <td>{{ espacio.capacidad|default:"—" }}</td>
+                            <td>
+                                {% if espacio.encargado %}
+                                    {{ espacio.encargado.get_full_name|default:espacio.encargado.username }}
+                                {% else %}
+                                    <span class="text-muted">Sin encargado</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'administrador:editar_espacio_campus' espacio.id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <a href="{% url 'administrador:editar_espacios' espacio.id %}" class="btn btn-delete" onclick="return confirm('¿Estás seguro de eliminar este espacio?');"><i class="fas fa-trash"></i> Eliminar</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align:center;">No hay espacios de campus registrados.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <a href="{% url 'administrador:registrar_espacio_campus' %}" class="btn">
+                    <i class="fas fa-plus"></i> Registrar Nuevo Espacio de Campus
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>

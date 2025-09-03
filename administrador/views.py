@@ -17,7 +17,7 @@ def registrar_facultad(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Facultad registrada con éxito.')
-            return redirect('lista_facultades')
+            return redirect('administrador:lista_facultades')  # ✅ CORREGIDO
         else:
             messages.error(request, 'Error al registrar la facultad. Verifica los datos.')
     else:
@@ -35,7 +35,7 @@ def editar_facultad(request, pk):
             try:
                 facultad.delete()
                 messages.success(request, 'Facultad eliminada con éxito.')
-                return redirect('lista_facultades')
+                return redirect('administrador:lista_facultades')  # ✅ CORREGIDO
             except Exception as e:
                 messages.error(request, f'Error al eliminar la facultad: {str(e)}')
         else:
@@ -43,7 +43,7 @@ def editar_facultad(request, pk):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Facultad actualizada con éxito.')
-                return redirect('lista_facultades')
+                return redirect('administrador:lista_facultades')  # ✅ CORREGIDO
             else:
                 messages.error(request, 'Error al actualizar la facultad. Verifica los datos.')
     else:
@@ -57,7 +57,7 @@ def registrar_carrera(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Carrera registrada con éxito.')
-            return redirect('administrador/lista_carreras')
+            return redirect('administrador:lista_carreras')  # ✅ CORREGIDO
         else:
             messages.error(request, 'Error al registrar la carrera. Verifica los datos.')
     else:
@@ -75,7 +75,7 @@ def editar_carrera(request, pk):
             try:
                 carrera.delete()
                 messages.success(request, 'Carrera eliminada con éxito.')
-                return redirect('lista_carreras')
+                return redirect('administrador:lista_carreras')  # ✅ CORREGIDO
             except Exception as e:
                 messages.error(request, f'Error al eliminar la carrera: {str(e)}')
         else:
@@ -83,7 +83,7 @@ def editar_carrera(request, pk):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Carrera actualizada con éxito.')
-                return redirect('lista_carreras')
+                return redirect('administrador:lista_carreras')  # ✅ CORREGIDO
             else:
                 messages.error(request, 'Error al actualizar la carrera. Verifica los datos.')
     else:
@@ -97,7 +97,7 @@ def registrar_espacios(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Espacio registrado con éxito.')
-            return redirect('administrador:lista_espacios')
+            return redirect('administrador:lista_espacios')  # ✅ Ya está correcto
         else:
             messages.error(request, 'Error al registrar el espacio. Verifica los datos.')
     else:
@@ -109,22 +109,16 @@ def registrar_espacio_campus(request):
         form = EspacioCampusForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Espacio del campus registrado con éxito.')
-            return redirect('administrador/lista_espacios_campus')
-        else:
-            messages.error(request, 'Error al registrar el espacio del campus. Verifica los datos.')
+            return redirect('administrador:lista_espacios')  # o la ruta que uses
     else:
         form = EspacioCampusForm()
     return render(request, 'administrador/registrar_espacio_campus.html', {'form': form})
 
-# ✅ VISTA CORREGIDA: lista_espacios
 def lista_espacios(request):
     try:
         espacios_carrera = Espacio.objects.select_related('carrera__facultad').filter(activo=True)
-        espacios_campus = EspacioCampus.objects.all()
 
         all_espacios = []
-
         for espacio in espacios_carrera:
             all_espacios.append({
                 'tipo': 'Carrera',
@@ -138,7 +132,16 @@ def lista_espacios(request):
                 'es_campus': False
             })
 
-        for espacio in espacios_campus:
+        return render(request, 'administrador/lista_espacios.html', {'all_espacios': all_espacios})
+
+    except Exception as e:
+        messages.error(request, f"Error al cargar la lista de espacios: {str(e)}")
+        return render(request, 'administrador/lista_espacios.html', {'all_espacios': []})
+    
+def lista_espacios_campus(request):
+    espacios_campus = EspacioCampus.objects.all()
+    all_espacios = []
+    for espacio in espacios_campus:
             all_espacios.append({
                 'tipo': 'Campus',
                 'nombre': espacio.nombre,
@@ -148,14 +151,10 @@ def lista_espacios(request):
                 'capacidad': espacio.capacidad,
                 'descripcion': espacio.descripcion,
                 'id': espacio.id,
-                'es_campus': True
+                'es_campus': True,
+                'encargado': espacio.encargado,
             })
-
-        return render(request, 'administrador/lista_espacios.html', {'all_espacios': all_espacios})
-
-    except Exception as e:
-        messages.error(request, f"Error al cargar la lista de espacios: {str(e)}")
-        return render(request, 'administrador/lista_espacios.html', {'all_espacios': []})
+    return render(request, 'administrador/lista_espacios_campus.html', {'espacios': all_espacios})
 
 def editar_espacios(request, pk):
     espacio = get_object_or_404(Espacio, pk=pk)
@@ -164,7 +163,7 @@ def editar_espacios(request, pk):
             try:
                 espacio.delete()
                 messages.success(request, 'Espacio eliminado con éxito.')
-                return redirect('administrador:lista_espacios')
+                return redirect('administrador:lista_espacios')  # ✅ Ya está correcto
             except Exception as e:
                 messages.error(request, f'Error al eliminar el espacio: {str(e)}')
         else:
@@ -172,12 +171,34 @@ def editar_espacios(request, pk):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Espacio actualizado con éxito.')
-                return redirect('administrador:lista_espacios')
+                return redirect('administrador:lista_espacios')  # ✅ Ya está correcto
             else:
                 messages.error(request, 'Error al actualizar el espacio. Verifica los datos.')
     else:
         form = EspacioForm(instance=espacio)
     return render(request, 'administrador/editar_espacios.html', {'form': form, 'espacio': espacio})
+
+def editar_espacio_campus(request, pk):
+    espacio = get_object_or_404(EspacioCampus, pk=pk)
+
+    if request.method == 'POST':
+        if 'delete' in request.POST:
+            espacio.delete()
+            messages.success(request, 'Espacio de campus eliminado con éxito.')
+            return redirect('administrador:lista_espacios_campus')
+
+        form = EspacioCampusForm(request.POST, instance=espacio)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Espacio de campus actualizado con éxito.')
+            return redirect('administrador:lista_espacios_campus')
+        else:
+            messages.error(request, 'Error al actualizar el espacio de campus. Revisa los datos.')
+
+    else:
+        form = EspacioCampusForm(instance=espacio)
+
+    return render(request, 'administrador/editar_espacio_campus.html', {'form': form, 'espacio': espacio})
 
 # ================= Encargados =================
 def registrar_encargados(request):
@@ -188,7 +209,7 @@ def registrar_encargados(request):
             user.tipo_usuario = 'encargado'
             user.save()
             messages.success(request, 'Encargado registrado con éxito.')
-            return redirect('administrador/lista_encargados')
+            return redirect('administrador:lista_encargados')  # ✅ Ya está correcto
         else:
             messages.error(request, 'Error al registrar el encargado. Verifica los datos.')
     else:
@@ -206,7 +227,7 @@ def editar_encargado(request, pk):
             try:
                 encargado.delete()
                 messages.success(request, 'Encargado eliminado con éxito.')
-                return redirect('administrador/lista_encargados')
+                return redirect('administrador:lista_encargados')  # ✅ CORREGIDO
             except Exception as e:
                 messages.error(request, f'Error al eliminar el encargado: {str(e)}')
         else:
@@ -214,9 +235,9 @@ def editar_encargado(request, pk):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Encargado actualizado con éxito.')
-                return redirect('administrador/lista_encargados')
+                return redirect('administrador:lista_encargados')  # ✅ CORREGIDO
             else:
                 messages.error(request, 'Error al actualizar el encargado. Verifica los datos.')
     else:
         form = EncargadoRegistrationForm(instance=encargado)
-    return render(request, 'administrador/editar_encargado', {'form': form, 'encargado': encargado})
+    return render(request, 'administrador/editar_encargado.html', {'form': form, 'encargado': encargado})  # ✅ CORREGIDO: faltaba .html

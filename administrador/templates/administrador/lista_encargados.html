@@ -44,6 +44,7 @@
                         <th>ID</th>
                         <th>Nombre</th>
                         <th>Correo</th>
+                        <th>Espacio</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -53,6 +54,7 @@
                         <td>{{ encargado.id }}</td>
                         <td>{{ encargado.first_name }} {{ encargado.last_name }}</td>
                         <td>{{ encargado.email }}</td>
+                        <td>{{ solicitud.get_nombre_espacio }}</td>
                         <td>
                             <a href="{% url 'administrador:editar_encargado' encargado.id %}" class="btn btn-edit"><i class="fas fa-edit"></i> Editar</a>
                             <a href="{% url 'administrador:editar_encargado' encargado.id %}" class="btn btn-delete"><i class="fas fa-trash"></i> Eliminar</a>

@@ -62,13 +62,8 @@
                         <td>{{ espacio.capacidad|default:'N/A' }}</td>
                         <td>{{ espacio.descripcion|default:'Sin descripción' }}</td>
                         <td>
-                            {% if not espacio.es_campus %}
                                 <a href="{% url 'administrador:editar_espacios' espacio.id %}" class="btn btn-edit"><i class="fas fa-edit"></i> Editar</a>
                                 <a href="{% url 'administrador:editar_espacios' espacio.id %}" class="btn btn-delete" onclick="return confirm('¿Estás seguro de eliminar este espacio?');"><i class="fas fa-trash"></i> Eliminar</a>
-                            {% else %}
-                                <a href="{% url 'administrador:editar_espacio_campus' espacio.id %}" class="btn btn-edit"><i class="fas fa-edit"></i> Editar</a>
-                                <a href="{% url 'administrador:editar_espacio_campus' espacio.id %}" class="btn btn-delete" onclick="return confirm('¿Estás seguro de eliminar este espacio?');"><i class="fas fa-trash"></i> Eliminar</a>
-                            {% endif %}
                         </td>
                     </tr>
                     {% empty %}

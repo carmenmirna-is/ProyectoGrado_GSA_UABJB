@@ -16,6 +16,8 @@ urlpatterns = [
     path('lista_encargados/', views.lista_encargados, name='lista_encargados'),
     path('editar_encargado/<int:pk>/', views.editar_encargado, name='editar_encargado'),
     path('lista_espacios/', views.lista_espacios, name='lista_espacios'),
+    path('lista_espacios_campus/', views.lista_espacios_campus, name='lista_espacios_campus'),
     path('editar_espacios/<int:pk>/', views.editar_espacios, name='editar_espacios'),
+    path('editar_espacio_campus/<int:pk>/', views.editar_espacio_campus, name='editar_espacio_campus'),
     path('registrar_espacio_campus/', views.registrar_espacio_campus, name='registrar_espacio_campus'),
 ]
