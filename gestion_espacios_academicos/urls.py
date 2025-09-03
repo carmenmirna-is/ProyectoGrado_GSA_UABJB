@@ -17,15 +17,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index, name='index'),  # Home page
-    path('login/', views.login, name='login'),  # Login page
-    path('logout/', views.logout, name='logout'),
-    path('registro/', views.registro, name='registro'),  # Registration page
-    path('dashboard_administrador/', include('administrador.urls')),  # Include admin URLs
-    path('dashboard_encargados/', include('encargados.urls')),  # Include manager URLs
-    path('reportes/', include('reportes.urls')),  # Include reports URLs
-    path('usuarios/', include('usuarios.urls')),  # Include user management URLs
-]
+    path('', views.index, name='index'),
+    path('login/', views.login, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('registro/', views.registro, name='registro'),
+    path('administrador/', include('administrador.urls')),  # ← Cambio aquí
+    path('encargados/', include('encargados.urls')),          # ← Y aquí
+    path('reportes/', include('reportes.urls')),
+    path('usuarios/', include('usuarios.urls')),
+]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

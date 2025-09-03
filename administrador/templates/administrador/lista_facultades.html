@@ -4,73 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listar Facultades - UABJB</title>
+    <title>Lista de Facultades - UABJB</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        :root {
-            --uabjb-blue: #1e3a8a;
-            --uabjb-light-blue: #3b82f6;
-            --uabjb-yellow: #fbbf24;
-            --uabjb-red: #dc2626;
-            --primary-blue: #4361ee;
-            --secondary-blue: #3a5998;
-            --dark-bg: #1a1d29;
-            --card-bg: #2a2d3e;
-            --text-light: #ffffff;
-            --accent-orange: #f72585;
-            --success-green: #4cc9f0;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8fafc;
-            --bg-tertiary: #e2e8f0;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
-            --border-color: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --card-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        [data-theme="dark"] {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-            --card-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; transition: all 0.3s ease; }
-        body { font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-secondary); color: var(--text-primary); min-height: 100vh; }
-        .header { background: linear-gradient(135deg, var(--uabjb-blue), var(--uabjb-light-blue)); padding: 1rem 2rem; box-shadow: var(--shadow-lg); position: sticky; top: 0; z-index: 100; }
-        .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; }
-        .logo { width: 50px; height: 50px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--uabjb-blue); box-shadow: var(--shadow); }
-        .header-title { color: white; font-size: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 12px; }
-        .header-subtitle { color: rgba(255, 255, 255, 0.9); font-size: 0.9rem; margin-top: 2px; }
-        .header-controls { display: flex; align-items: center; gap: 1rem; }
-        .theme-toggle { background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 25px; padding: 8px 16px; color: white; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; transition: all 0.3s ease; }
-        .theme-toggle:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
-        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
-        .dashboard-container { background: var(--bg-primary); border-radius: 15px; padding: 2rem; box-shadow: var(--shadow); border: 1px solid var(--border-color); }
-        .back-link { color: var(--text-primary); text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; }
-        .back-link:hover { color: var(--uabjb-blue); }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
-        th { background: linear-gradient(135deg, var(--uabjb-blue), var(--uabjb-light-blue)); color: white; font-weight: 600; }
-        td { color: var(--text-primary); }
-        tr:hover { background: var(--bg-secondary); }
-        .btn { padding: 0.75rem 1.5rem; border-radius: 12px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; border: none; cursor: pointer; }
-        .btn:hover { transform: translateY(-3px); }
-        .btn-edit { background: #4caf50; color: white; }
-        .btn-edit:hover { background: #45a049; }
-        .btn-delete { background: #f44336; color: white; }
-        .btn-delete:hover { background: #da190b; }
-        @media (max-width: 1024px) { .container { padding: 1rem; } .header-content { flex-direction: column; gap: 1rem; text-align: center; } }
-        @media (max-width: 768px) { .dashboard-container { padding: 1.5rem; } table { display: block; overflow-x: auto; } th, td { min-width: 120px; } }
-        @media (max-width: 480px) { .container { padding: 0.5rem; } .dashboard-container { padding: 1rem; } .btn { padding: 0.5rem 1rem; font-size: 0.9rem; } }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <div class="header">
@@ -92,55 +28,40 @@
     </div>
     <div class="container">
         <div class="dashboard-container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
             <a href="{% url 'administrador:dashboard_administrador' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
-            <h1><i class="fas fa-university"></i> Lista de Facultades</h1>
-            <a href="{% url 'administrador:registrar_facultad' %}" class="btn"><i class="fas fa-plus"></i> Registrar Nueva Facultad</a>
+            <h1 class="dashboard-title"><i class="fas fa-university"></i> Lista de Facultades</h1>
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Fecha de Creación</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for facultad in facultades %}
-                    <tr>
-                        <td>{{ facultad.id }}</td>
-                        <td>{{ facultad.nombre }}</td>
-                        <td>{{ facultad.descripcion|default:"Sin descripción" }}</td>
-                        <td>{{ facultad.fecha_creacion|date:"d/m/Y H:i" }}</td>
-                        <td>
-                            <a href="{% url 'administrador:editar_facultad' facultad.id %}" class="btn btn-edit"><i class="fas fa-edit"></i> Editar</a>
-                            <a href="{% url 'administrador:eliminar_facultad' facultad.id %}" class="btn btn-delete"><i class="fas fa-trash"></i> Eliminar</a>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td>{{ facultad.nombre }}</td>
+                            <td>
+                                <a href="{% url 'administrador:editar_facultad' facultad.id %}" class="btn btn-edit"><i class="fas fa-edit"></i> Editar</a>
+                                <a href="{% url 'administrador:editar_facultad' facultad.id %}" class="btn btn-delete" onclick="return confirm('¿Estás seguro de eliminar esta facultad?');"><i class="fas fa-trash"></i> Eliminar</a>
+                            </td>
+                        </tr>
                     {% empty %}
-                    <tr>
-                        <td colspan="5">No hay facultades registradas.</td>
-                    </tr>
+                        <tr>
+                            <td colspan="2">No hay facultades registradas.</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
-    <script>
-        function toggleTheme() {
-            const body = document.body;
-            const themeIcon = document.getElementById('theme-icon');
-            const themeText = document.getElementById('theme-text');
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.removeAttribute('data-theme');
-                themeIcon.className = 'fas fa-moon';
-                themeText.textContent = 'Modo Oscuro';
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                themeIcon.className = 'fas fa-sun';
-                themeText.textContent = 'Modo Claro';
-            }
-        }
-    </script>
+    <script src="{% static 'js/scripts.js' %}"></script>
 </body>
 </html>

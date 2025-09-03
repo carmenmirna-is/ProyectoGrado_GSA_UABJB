@@ -9,3 +9,4 @@ Dockerfile
 .dockerignore
 db.sqlite3
 .env
+staticfiles

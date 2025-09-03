@@ -7,4 +7,5 @@ urlpatterns = [
     path('', views.usuario, name='usuario'),  # User profile page
     path('enviar_solicitud/', views.enviar_solicitud, name='enviar_solicitud'),  # Send request page
     path('listar_espacios/', views.listar_espacios, name='listar_espacios'),  # List spaces page
+    path('api/eventos-usuario/', views.eventos_usuario_json, name='eventos_usuario_json'),
 ]

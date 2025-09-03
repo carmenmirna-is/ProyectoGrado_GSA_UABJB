@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
 from pathlib import Path
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -73,6 +74,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gestion_espacios_academicos.wsgi.application'
 
+AUTH_USER_MODEL = 'gestion_espacios_academicos.CustomUser'
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend', 
+]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'cibanezsanguino@gmail.com'  # Reemplaza con tu correo
+EMAIL_HOST_PASSWORD = 'ofwd qhdu hndd iqbh'  # Usa una contraseña de aplicación si es Gmail
+
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -113,23 +126,45 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
 USE_I18N = True
 
 USE_TZ = True
+
+USE_TZ = True
+TIME_ZONE = 'America/La_Paz'
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')     # Para archivos recopilados
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Directory for custom static files
+    os.path.join(BASE_DIR, 'static'),                   # Para archivos de desarrollo
 ]
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Configuración correcta
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Sesión expira al cerrar el navegador (opcional)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# =====================================
+# MENSAJES (Para que funcionen los messages.success, etc.)
+# =====================================
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'debug',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'error',
+}
+
