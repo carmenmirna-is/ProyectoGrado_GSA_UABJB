@@ -188,17 +188,22 @@ class EspacioForm(forms.ModelForm):
             raise ValidationError('La capacidad debe ser un número positivo.')
 
         return cleaned_data
-    
+
 class EspacioCampusForm(forms.ModelForm):
     class Meta:
         model = EspacioCampus
-        fields = ['nombre', 'ubicacion', 'capacidad', 'descripcion']
+        fields = ['nombre', 'ubicacion', 'capacidad', 'descripcion', 'encargado']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ejemplo: Auditorio Central'}),
             'ubicacion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ejemplo: Edificio A, Piso 2'}),
             'capacidad': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ejemplo: 150'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Descripción del espacio'}),
+            'encargado': forms.Select(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['encargado'].queryset = CustomUser.objects.filter(tipo_usuario='encargado')
 
 # Formulario para registrar y editar encargados
 class EncargadoRegistrationForm(forms.ModelForm):

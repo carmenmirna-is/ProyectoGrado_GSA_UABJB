@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,8 +26,8 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('registro/', views.registro, name='registro'),
-    path('administrador/', include('administrador.urls', namespace='administrador')),  # ← Cambio aquí
-    path('encargados/', include('encargados.urls', namespace='encargados')),          # ← Y aquí
+    path('administrador/', include('administrador.urls')),  # ← Cambio aquí
+    path('encargados/', include('encargados.urls')),          # ← Y aquí
     path('reportes/', include('reportes.urls')),
-    path('usuarios/', include('usuarios.urls', namespace='usuarios')),
-]
+    path('usuarios/', include('usuarios.urls')),
+]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

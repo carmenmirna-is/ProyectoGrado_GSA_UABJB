@@ -153,7 +153,8 @@ class Solicitud(models.Model):
     observaciones = models.TextField(blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
-    
+    archivo_adjunto = models.FileField(upload_to='solicitudes/')
+
     # Campo para determinar el tipo de espacio
     tipo_espacio = models.CharField(
         max_length=20,
