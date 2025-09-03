@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listar Espacios - UABJB</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
-    <link rel="stylesheet" href="{% static 'css/espacios.css' %}">
+    <link rel="stylesheet" href="{% static 'css/listar_espacios.css' %}">
 </head>
 <body>
     <div class="header">
@@ -27,10 +27,14 @@
             </div>
         </div>
     </div>
+
     <div class="container-listar">
         <div class="header-section">
-            <a href="{% url 'usuarios:usuario' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+            <a href="{% url 'usuarios:usuario' %}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </a>
         </div>
+
         <div class="pautas-box">
             <h3><i class="fas fa-exclamation-circle"></i> Requisitos para reserva:</h3>
             <ul>
@@ -41,6 +45,7 @@
                 <li><strong>Confirmación:</strong> Respuesta en 24-48 horas hábiles</li>
             </ul>
         </div>
+
         <div class="table-wrapper">
             <table>
                 <thead>
@@ -51,17 +56,36 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for espacio in espacios %}
+                    <!-- Espacios de la facultad del usuario -->
+                    {% for espacio in espacios_carrera %}
                     <tr>
                         <td>{{ espacio.nombre }}</td>
                         <td>{{ espacio.descripcion }}</td>
-                        <td>{{ espacio.encargado }}</td>
+                        <td>{{ espacio.encargado.get_full_name|default:espacio.encargado.username }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align:center;">No hay espacios disponibles para tu facultad.</td>
+                    </tr>
+                    {% endfor %}
+
+                    <!-- Espacios generales del campus -->
+                    {% for espacio in espacios_campus %}
+                    <tr>
+                        <td>{{ espacio.nombre }}</td>
+                        <td>{{ espacio.descripcion }}</td>
+                        <td>{{ espacio.encargado.get_full_name|default:espacio.encargado.username }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align:center;">No hay espacios del campus disponibles.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
     <script src="{% static 'js/scripts.js' %}"></script>
 </body>
 </html>

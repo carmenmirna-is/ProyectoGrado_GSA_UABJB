@@ -1,17 +1,21 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+# encargados/views.py  (reportes)
+
 from django.contrib.auth.decorators import login_required
-from gestion_espacios_academicos.models import Solicitud
+from django.shortcuts import render
+from django.http import HttpResponse, Http404
+from django.contrib import messages
 from django.utils import timezone
+from django.db.models import Q
+import openpyxl
+from gestion_espacios_academicos.models import Solicitud
 from datetime import datetime
 import io
 from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-import openpyxl
+from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 from docx import Document
 from docx.shared import Inches
@@ -20,53 +24,75 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 @login_required
 def generar_reportes(request):
     if request.method == 'GET' and any(param in request.GET for param in ['formato', 'estado', 'fecha_inicio', 'fecha_fin']):
-        # Obtener parámetros
         formato = request.GET.get('formato', 'pdf')
         estado = request.GET.get('estado', 'todos')
         fecha_inicio = request.GET.get('fecha_inicio')
         fecha_fin = request.GET.get('fecha_fin')
-        
-        # Filtrar solicitudes
-        solicitudes = Solicitud.objects.select_related('usuario_solicitante', 'espacio').all()
-        
-        # Aplicar filtros
+
+        user = request.user
+
+        # Solo encargados pueden generar reportes
+        if user.tipo_usuario != 'encargado':
+            messages.error(request, 'No tienes permiso para generar reportes.')
+            return render(request, 'reportes/generar_reportes.html')
+
+        # IDs de espacios que gestiona
+        ids_carrera = user.espacios_encargados.values_list('id', flat=True)
+        ids_campus = user.espacios_campus_encargados.values_list('id', flat=True)
+
+        # Filtrar solicitudes de sus espacios
+        solicitudes = (
+            Solicitud.objects
+            .select_related('usuario_solicitante', 'espacio', 'espacio_campus')
+            .filter(
+                Q(espacio_id__in=ids_carrera) |
+                Q(espacio_campus_id__in=ids_campus)
+            )
+        )
+
+        # Filtrar por estado
         if estado != 'todos':
             solicitudes = solicitudes.filter(estado=estado)
-        
+
+        # Filtrar por rango de fechas
         if fecha_inicio:
             try:
                 fecha_inicio_dt = datetime.strptime(fecha_inicio, '%Y-%m-%d')
                 solicitudes = solicitudes.filter(fecha_evento__gte=fecha_inicio_dt)
             except ValueError:
                 pass
-        
+
         if fecha_fin:
             try:
                 fecha_fin_dt = datetime.strptime(fecha_fin, '%Y-%m-%d')
                 solicitudes = solicitudes.filter(fecha_evento__lte=fecha_fin_dt)
             except ValueError:
                 pass
-        
+
         # Preparar datos para el reporte
         data = []
         for s in solicitudes:
+            espacio_nombre = s.get_nombre_espacio()
+            fecha_str = s.fecha_evento.strftime('%d/%m/%Y %H:%M') if s.fecha_evento else 'Sin fecha'
+
             data.append([
-                s.id, 
-                s.nombre_evento, 
-                s.fecha_evento.strftime('%Y-%m-%d %H:%M') if s.fecha_evento else 'Sin fecha', 
-                s.usuario_solicitante.username, 
-                s.estado
+                s.id,
+                s.nombre_evento,
+                fecha_str,
+                s.usuario_solicitante.get_full_name() or s.usuario_solicitante.username,
+                espacio_nombre,
+                s.estado.title()
             ])
-        
-        # Generar reporte según formato
+
+        # Generar el archivo según formato
         if formato == 'pdf':
             return generar_pdf(data, estado, fecha_inicio, fecha_fin)
         elif formato == 'excel':
             return generar_excel_openpyxl(data, estado, fecha_inicio, fecha_fin)
         elif formato == 'word':
             return generar_word(data, estado, fecha_inicio, fecha_fin)
-    
-    # Si no hay parámetros, mostrar el formulario
+
+    # Si no hay parámetros, mostrar formulario
     return render(request, 'reportes/generar_reportes.html')
 
 def generar_pdf(data, estado, fecha_inicio, fecha_fin):
@@ -102,7 +128,7 @@ def generar_pdf(data, estado, fecha_inicio, fecha_fin):
     elements.append(Spacer(1, 20))
     
     # Tabla de datos
-    table_data = [['ID', 'Evento', 'Fecha', 'Usuario', 'Estado']]
+    table_data = [['ID', 'Evento', 'Fecha/Hora', 'Usuario', 'Espacio', 'Estado']]
     table_data.extend(data)
     
     table = Table(table_data)
@@ -159,7 +185,7 @@ def generar_excel_openpyxl(data, estado, fecha_inicio, fecha_fin):
     filter_cell.alignment = center_alignment
     
     # Encabezados
-    headers = ['ID', 'Evento', 'Fecha', 'Usuario', 'Estado']
+    headers = ['ID', 'Evento', 'Fecha/Hora', 'Usuario', 'Espacio', 'Estado']
     for col_num, header in enumerate(headers, 1):
         cell = ws.cell(row=4, column=col_num)
         cell.value = header
@@ -216,7 +242,7 @@ def generar_word(data, estado, fecha_inicio, fecha_fin):
     table.style = 'Table Grid'
     
     # Encabezados
-    headers = ['ID', 'Evento', 'Fecha', 'Usuario', 'Estado']
+    headers = ['ID', 'Evento', 'Fecha/Hora', 'Usuario', 'Espacio', 'Estado']
     hdr_cells = table.rows[0].cells
     for i, header in enumerate(headers):
         hdr_cells[i].text = header
