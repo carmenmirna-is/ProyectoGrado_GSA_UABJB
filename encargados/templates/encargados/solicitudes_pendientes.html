@@ -35,19 +35,21 @@
                             <th>Evento</th>
                             <th>Fecha</th>
                             <th>Solicitante</th>
+                            <th>Espacio</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for solicitud in solicitudes %}
                         <tr>
-                            <td>{{ solicitud.1 }}</td>
-                            <td>{{ solicitud.2 }}</td>
-                            <td>{{ solicitud.3 }}</td>
+                            <td>{{ solicitud.nombre_evento }}</td>
+                            <td>{{ solicitud.fecha_evento }}</td>
+                            <td>{{ solicitud.usuario_solicitante }}</td>
+                            <td>{{ solicitud.get_nombre_espacio }}</td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="{% url 'aprobar_solicitud' solicitud.0 %}" class="btn btn-edit">Aprobar</a>
-                                    <a href="{% url 'rechazar_solicitud' solicitud.0 %}" class="btn btn-delete">Rechazar</a>
+                                    <a href="{% url 'encargados:aprobar_solicitud' solicitud.id %}" class="btn btn-edit">Aprobar</a>
+                                    <a href="{% url 'encargados:rechazar_solicitud' solicitud.id %}" class="btn btn-delete">Rechazar</a>
                                 </div>
                             </td>
                         </tr>

@@ -28,7 +28,7 @@
     </div>
     <div class="container">
         <div class="dashboard-container">
-            <h1 class="dashboard-title"><i class="fas fa-calendar-alt"></i> Bienvenido, Encargado</h1>
+            <h1 class="dashboard-title"><i class="fas fa-calendar-alt"></i> Bienvenido, {{ request.user.first_name|default:request.user.username }}</h1>
             <p class="welcome-text">Gestiona el calendario y las solicitudes del mes actual.</p>
             <div class="navegacion-mes">
                 <button class="btn-nav" onclick="cambiarMes(-1)"><i class="fas fa-chevron-left"></i> Anterior</button>
@@ -54,39 +54,14 @@
                 </table>
             </div>
             <div class="dashboard-actions">
-                <button class="btn-action" onclick="mostrarModal('agregar')"><i class="fas fa-plus"></i> Agregar Evento</button>
                 <a href="{% url 'reportes:generar_reportes' %}" class="btn-action"><i class="fas fa-file-alt"></i> Generar Reportes</a>
                 <a href="{% url 'encargados:lista_solicitudes' %}" class="btn-action"><i class="fas fa-list"></i> Ver Solicitudes</a>
                 <a href="{% url 'encargados:solicitudes_aceptadas' %}" class="btn-action"><i class="fas fa-list"></i> Solicitudes Aceptadas</a>
                 <a href="{% url 'encargados:solicitudes_pendientes' %}" class="btn-action"><i class="fas fa-list"></i> Solicitudes Pendientes</a>
                 <a href="{% url 'logout' %}" class="btn-action"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
             </div>
-            <!-- Modal para agregar/editar evento -->
-            <div id="modal" class="modal">
-                <div class="modal-content">
-                    <div class="modal-header" id="modal-title">Agregar Evento</div>
-                    <form id="evento-form">
-                        <div class="modal-form-group">
-                            <label class="modal-label" for="nombre">Nombre del Evento:</label>
-                            <input type="text" id="nombre" class="modal-input" required>
-                        </div>
-                        <div class="modal-form-group">
-                            <label class="modal-label" for="espacio">Espacio:</label>
-                            <input type="text" id="espacio" class="modal-input" required>
-                        </div>
-                        <div class="modal-form-group">
-                            <label class="modal-label" for="color">Color:</label>
-                            <input type="color" id="color" class="modal-input" value="#1e3a8a">
-                        </div>
-                        <div class="modal-buttons">
-                            <button type="submit" class="modal-btn modal-btn-save">Guardar</button>
-                            <button type="button" class="modal-btn modal-btn-cancel" onclick="cerrarModal()">Cancelar</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
         </div>
     </div>
-    <script src="{% static 'encargados/js/scripts.js' %}"></script>
+    <script src="{% static 'encargados/js/dashboard_encargado.js' %}"></script>
 </body>
 </html>

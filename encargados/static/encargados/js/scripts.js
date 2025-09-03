@@ -25,17 +25,33 @@ function toggleTheme() {
 function initDashboardEncargado() {
     if (!document.getElementById('calendario-body')) return;
 
-    let mesActual = 6; // Julio (0-11)
-    let anioActual = 2025;
     const hoy = new Date();
+    let mesActual = hoy.getMonth();
+    let anioActual = hoy.getFullYear();
     const nombresMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
     
-    let eventos = {
-        '2025-7-15': [{ nombre: 'Reunión Académica', espacio: 'Aula 101', color: '#1e3a8a' }],
-        '2025-7-22': [{ nombre: 'Examen Final', espacio: 'Aula 205', color: '#dc2626' }],
-        '2025-7-27': [{ nombre: 'Evento Especial', espacio: 'Patio Central', color: '#4cc9f0' }],
-        '2025-7-30': [{ nombre: 'Clase Magistral', espacio: 'Aula Magna', color: '#fbbf24' }]
-    };
+    async function cargarSolicitudesAceptadas() {
+    try {
+        const res = await fetch('/encargados/api/solicitudes-aceptadas/');
+        const data = await res.json();   // esperamos [{fecha, nombre_evento, espacio}]
+        const eventosMap = {};
+
+        data.forEach(s => {
+            // fecha viene 2025-09-23 → 2025-9-23 (sin 0)
+            const key = s.fecha.replace(/-0/g, '-');
+            if (!eventosMap[key]) eventosMap[key] = [];
+            eventosMap[key].push({
+                nombre: s.nombre_evento,
+                espacio: s.espacio__nombre,   // ajusta según tu modelo
+                color: '#10b981'              // verde “aceptada”
+            });
+        });
+        return eventosMap;
+    } catch (err) {
+        console.error('No se pudieron cargar las solicitudes aceptadas', err);
+        return {};
+    }
+}
 
     function generarCalendario() {
         const primerDia = new Date(anioActual, mesActual, 1);

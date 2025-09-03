@@ -1,14 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from gestion_espacios_academicos.models import Solicitud, Espacio
-from gestion_espacios_academicos.forms import SolicitudRechazoForm
 from django.utils import timezone
 from django.core.mail import send_mail
 import json
+from django.db.models import Q
 
 def dashboard_encargados(request):
     if request.method == 'POST':
@@ -23,30 +23,71 @@ def dashboard_encargados(request):
     }
     return render(request, 'encargados/dashboard_encargados.html', context)
 
+@login_required
 def lista_solicitudes(request):
-    # Obtener todas las solicitudes con sus relaciones
-    solicitudes = Solicitud.objects.select_related('usuario_solicitante', 'espacio').all().order_by('-id')
-    
-    context = {
-        'solicitudes': solicitudes,
-    }
-    return render(request, 'encargados/lista_solicitudes.html', context)
+    user = request.user
 
+    # Verificar que sea encargado
+    if user.tipo_usuario != 'encargado':
+        messages.error(request, 'No tienes permiso para ver esta página.')
+        return render(request, 'encargados/lista_solicitudes.html', {'solicitudes': []})
+
+    # Filtrar solicitudes que pertenecen a espacios gestionados por este encargado
+    solicitudes = (
+        Solicitud.objects
+        .select_related('usuario_solicitante', 'espacio', 'espacio_campus')
+        .filter(
+            Q(espacio__encargado=user) |
+            Q(espacio_campus__encargado=user)
+        )
+        .order_by('-fecha_creacion')
+    )
+
+    return render(request, 'encargados/lista_solicitudes.html', {'solicitudes': solicitudes})
+
+@login_required
 def solicitudes_pendientes(request):
-    solicitudes = Solicitud.objects.filter(estado='pendiente').select_related('usuario_solicitante', 'espacio')
-    context = {
-        'solicitudes': solicitudes,
-    }
-    return render(request, 'encargados/solicitudes_pendientes.html', context)
+    user = request.user
+    if user.tipo_usuario != 'encargado':
+        messages.error(request, 'No tienes permiso para ver esta página.')
+        return render(request, 'encargados/solicitudes_pendientes.html', {'solicitudes': []})
 
+    # Solo pendientes de sus espacios
+    solicitudes = (
+        Solicitud.objects
+        .select_related('usuario_solicitante', 'espacio', 'espacio_campus')
+        .filter(estado='pendiente')
+        .filter(
+            Q(espacio__encargado=user) |
+            Q(espacio_campus__encargado=user)
+        )
+        .order_by('-fecha_creacion')
+    )
+
+    return render(request, 'encargados/solicitudes_pendientes.html', {'solicitudes': solicitudes})
+
+@login_required
 def solicitudes_aceptadas(request):
-    solicitudes = Solicitud.objects.filter(estado='aceptada').select_related('usuario_solicitante', 'espacio')
-    context = {
-        'solicitudes': solicitudes,
-    }
-    return render(request, 'encargados/solicitudes_aceptadas.html', context)
+    user = request.user
+    if user.tipo_usuario != 'encargado':
+        messages.error(request, 'No tienes permiso para ver esta página.')
+        return render(request, 'encargados/solicitudes_aceptadas.html', {'solicitudes': []})
 
-@require_http_methods(["POST"])
+    # Solo aceptadas de sus espacios
+    solicitudes = (
+        Solicitud.objects
+        .select_related('usuario_solicitante', 'espacio', 'espacio_campus')
+        .filter(estado='aceptada')
+        .filter(
+            Q(espacio__encargado=user) |
+            Q(espacio_campus__encargado=user)
+        )
+        .order_by('-fecha_creacion')
+    )
+
+    return render(request, 'encargados/solicitudes_aceptadas.html', {'solicitudes': solicitudes})
+
+@login_required
 def aprobar_solicitud(request, solicitud_id):
     try:
         solicitud = get_object_or_404(Solicitud, id=solicitud_id)
@@ -93,7 +134,7 @@ Sistema de Gestión UABJB'''
             'message': f'Error al aprobar la solicitud: {str(e)}'
         }, status=500)
 
-@require_http_methods(["POST"])
+@login_required
 def rechazar_solicitud(request, solicitud_id):
     try:
         solicitud = get_object_or_404(Solicitud, id=solicitud_id)
@@ -156,7 +197,7 @@ Sistema de Gestión UABJB'''
             'message': f'Error al rechazar la solicitud: {str(e)}'
         }, status=500)
 
-@require_http_methods(["POST"])
+@login_required
 def eliminar_solicitud(request, solicitud_id):
     try:
         solicitud = get_object_or_404(Solicitud, id=solicitud_id)
@@ -174,6 +215,7 @@ def eliminar_solicitud(request, solicitud_id):
             'message': f'Error al eliminar la solicitud: {str(e)}'
         }, status=500)
 
+@login_required
 def detalle_solicitud(request, solicitud_id):
     solicitud = get_object_or_404(Solicitud, id=solicitud_id)
     if request.method == 'POST':
@@ -185,50 +227,50 @@ def detalle_solicitud(request, solicitud_id):
     }
     return render(request, 'encargados/detalle_solicitud.html', context)
 
-def editar_solicitud(request, solicitud_id):
+@login_required
+def descargar_archivo(request, solicitud_id):
     solicitud = get_object_or_404(Solicitud, id=solicitud_id)
-    
-    if request.method == 'POST':
-        try:
-            # Obtener datos del formulario
-            nombre_evento = request.POST.get('nombre_evento')
-            descripcion = request.POST.get('descripcion')
-            fecha_evento = request.POST.get('fecha_evento')
-            hora_inicio = request.POST.get('hora_inicio')
-            hora_fin = request.POST.get('hora_fin')
-            tipo_espacio = request.POST.get('tipo_espacio')
-            espacio_id = request.POST.get('espacio')
-            
-            # Validaciones básicas
-            if not all([nombre_evento, descripcion, fecha_evento, hora_inicio, hora_fin, tipo_espacio]):
-                messages.error(request, 'Todos los campos son obligatorios.')
-                return render(request, 'encargados/editar_solicitud.html', {'solicitud': solicitud})
-            
-            # Actualizar la solicitud
-            solicitud.nombre_evento = nombre_evento
-            solicitud.descripcion = descripcion
-            solicitud.fecha_evento = f"{fecha_evento} {hora_inicio}"
-            solicitud.hora_inicio = hora_inicio
-            solicitud.hora_fin = hora_fin
-            solicitud.tipo_espacio = tipo_espacio
-            
-            if espacio_id:
-                espacio = get_object_or_404(Espacio, id=espacio_id)
-                solicitud.espacio = espacio
-            
-            solicitud.save()
-            
-            messages.success(request, f'Solicitud "{nombre_evento}" actualizada con éxito.')
-            return redirect('encargados:solicitudes_aceptadas')
-            
-        except Exception as e:
-            messages.error(request, f'Error al actualizar la solicitud: {str(e)}')
-    
-    # Obtener espacios para el select
-    espacios = Espacio.objects.all()
-    
-    context = {
-        'solicitud': solicitud,
-        'espacios': espacios,
-    }
-    return render(request, 'encargados/editar_solicitud.html', context)
+    if not solicitud.archivo_adjunto:
+        raise Http404("Sin archivo.")
+    return HttpResponse(
+        open(solicitud.archivo_adjunto.path, 'rb'),
+        content_type='application/octet-stream',
+        headers={'Content-Disposition': f'attachment; filename="{solicitud.archivo_adjunto.name}"'}
+    )
+
+@login_required
+def solicitudes_aceptadas_json(request):
+    user = request.user
+
+    if not user.is_encargado:
+        return JsonResponse([], safe=False)
+
+    # IDs de espacios de carrera que gestiona
+    ids_carrera = user.espacios_encargados.values_list('id', flat=True)
+
+    # IDs de espacios de campus que gestiona
+    ids_campus = user.espacios_campus_encargados.values_list('id', flat=True)
+
+    # Filtrar solicitudes aceptadas de ambos tipos
+    aceptadas = Solicitud.objects.filter(
+        estado='aceptada'
+    ).filter(
+        Q(
+            tipo_espacio='carrera',
+            espacio_id__in=ids_carrera
+        ) |
+        Q(
+            tipo_espacio='campus',
+            espacio_campus_id__in=ids_campus
+        )
+    ).select_related('espacio', 'espacio_campus')
+
+    data = []
+    for s in aceptadas:
+        espacio_nombre = s.get_nombre_espacio()
+        data.append({
+            'fecha': s.fecha_evento.strftime('%Y-%-m-%-d'),
+            'nombre_evento': s.nombre_evento,
+            'espacio__nombre': espacio_nombre,
+        })
+    return JsonResponse(data, safe=False)

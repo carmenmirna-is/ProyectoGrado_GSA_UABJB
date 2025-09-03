@@ -35,6 +35,7 @@
                             <th>Evento</th>
                             <th>Fecha</th>
                             <th>Solicitante</th>
+                            <th>Espacio</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -44,9 +45,9 @@
                             <td>{{ solicitud.nombre_evento }}</td>
                             <td>{{ solicitud.fecha_evento|date:"d/m/Y H:i" }}</td>
                             <td>{{ solicitud.usuario_solicitante.get_full_name|default:solicitud.usuario_solicitante.username }}</td>
+                            <td>{{ solicitud.get_nombre_espacio }}</td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="{% url 'encargados:editar_solicitud' solicitud.id %}" class="btn btn-edit">Editar</a>
                                     <a href="{% url 'encargados:eliminar_solicitud' solicitud.id %}" class="btn btn-delete">Eliminar</a>
                                 </div>
                             </td>
