@@ -153,12 +153,6 @@ class Solicitud(models.Model):
     observaciones = models.TextField(blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
-<<<<<<< HEAD
-    adjunto = models.FileField(upload_to='adjuntos/', blank=True, null=True)  # Para imagen/PDF
-    espacio = models.ForeignKey(Espacio, on_delete=models.CASCADE, related_name='solicitudes')
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='solicitudes')
-    administrador = models.ForeignKey(Administrador, on_delete=models.SET_NULL, null=True, blank=True, related_name='solicitudes_procesadas')
-=======
     archivo_adjunto = models.FileField(upload_to='solicitudes/')
 
     # Campo para determinar el tipo de espacio
@@ -168,7 +162,6 @@ class Solicitud(models.Model):
         default='carrera',
         help_text="Tipo de espacio solicitado"
     )
->>>>>>> recovery
     
     # Archivo adjunto
     archivo_adjunto = models.FileField(
