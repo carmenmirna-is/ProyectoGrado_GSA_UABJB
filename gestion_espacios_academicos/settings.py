@@ -86,6 +86,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'cibanezsanguino@gmail.com'  # Reemplaza con tu correo
 EMAIL_HOST_PASSWORD = 'ofwd qhdu hndd iqbh'  # Usa una contraseña de aplicación si es Gmail
 
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/usuarios/mi-perfil/'
+LOGOUT_REDIRECT_URL = '/'
+
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

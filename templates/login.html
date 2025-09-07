@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="{% static 'css/custom-styles.css' %}">
+
 </head>
 <body class="login-body">
     <div class="login-container">
@@ -23,6 +24,22 @@
                 <h1 class="logo-title">UABJB</h1>
                 <p class="logo-subtitle">Sistema de Gestión</p>
             </div>
+
+            {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            <i class="material-icons">
+                                {% if message.tags == 'error' %}error
+                                {% elif message.tags == 'success' %}check_circle
+                                {% elif message.tags == 'warning' %}warning
+                                {% else %}info{% endif %}
+                            </i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
             
             <form id="loginForm" method="POST" action="{% url 'login' %}">
                 {% csrf_token %}
@@ -34,15 +51,6 @@
                 <div class="input-field">
                     <i class="material-icons">lock</i>
                     <input type="password" id="password" name="password" placeholder="Contraseña" required>
-                </div>
-                
-                <div class="form-options">
-                    <label class="checkbox-field">
-                        <input type="checkbox" id="remember" name="remember">
-                        <span class="checkmark"></span>
-                        Recordarme
-                    </label>
-                    <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
                 </div>
                 
                 <button type="submit" class="btn-login" id="loginBtn">

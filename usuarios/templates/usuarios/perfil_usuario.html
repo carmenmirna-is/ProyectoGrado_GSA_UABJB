@@ -1,0 +1,264 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - UABJB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/perfil_usuario.css' %}">
+</head>
+<body data-theme="light">
+    <!-- Encabezado -->
+    <div class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <div class="header-title">
+                        <i class="fas fa-user-circle"></i>
+                        Mi Perfil
+                    </div>
+                    <div class="header-subtitle">Sistema de Gestión UABJB</div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                    <span id="theme-text">Modo Oscuro</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <div class="container">
+        <a href="{% url 'usuarios:usuario' %}" class="btn-volver">
+            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+        </a>
+
+        <div class="perfil-container">
+            <!-- Mensajes de Django -->
+            {% if messages %}
+                <div style="margin-bottom: 2rem;">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            <i class="fas fa-info-circle"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Header del Perfil -->
+            <div class="perfil-header">
+                <div class="perfil-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h1 class="perfil-nombre">
+                    {% if usuario.first_name or usuario.last_name %}
+                        {{ usuario.first_name }} {{ usuario.last_name }}
+                    {% else %}
+                        {{ usuario.username }}
+                    {% endif %}
+                </h1>
+                <div class="perfil-rol">
+                    <i class="fas fa-user-graduate"></i> Usuario
+                </div>
+            </div>
+
+            <!-- Información Personal -->
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-label">
+                        <i class="fas fa-user"></i> Nombre de Usuario
+                    </div>
+                    <div class="info-value">{{ usuario.username }}</div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-label">
+                        <i class="fas fa-signature"></i> Nombres
+                    </div>
+                    <div class="info-value">
+                        {% if usuario.first_name %}
+                            {{ usuario.first_name }}
+                        {% else %}
+                            <em>No especificado</em>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-label">
+                        <i class="fas fa-signature"></i> Apellidos
+                    </div>
+                    <div class="info-value">
+                        {% if usuario.last_name %}
+                            {{ usuario.last_name }}
+                        {% else %}
+                            <em>No especificado</em>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-label">
+                        <i class="fas fa-envelope"></i> Correo Electrónico
+                    </div>
+                    <div class="info-value">
+                        {% if usuario.email %}
+                            {{ usuario.email }}
+                        {% else %}
+                            <em>No especificado</em>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-label">
+                        <i class="fas fa-phone"></i> Teléfono
+                    </div>
+                    <div class="info-value">
+                        {% if usuario.telefono %}
+                            {{ usuario.telefono }}
+                        {% else %}
+                            <em>No especificado</em>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-label">
+                        <i class="fas fa-id-card"></i> Documento
+                    </div>
+                    <div class="info-value">
+                        {% if usuario.documento %}
+                            {{ usuario.documento }}
+                        {% else %}
+                            <em>No especificado</em>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-label">
+                        <i class="fas fa-university"></i> Facultad
+                    </div>
+                    <div class="info-value">
+                        {% if usuario.facultad %}
+                            {{ usuario.facultad }}
+                        {% else %}
+                            <em>No especificada</em>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-label">
+                        <i class="fas fa-graduation-cap"></i> Carrera
+                    </div>
+                    <div class="info-value">
+                        {% if usuario.carrera %}
+                            {{ usuario.carrera }}
+                        {% else %}
+                            <em>No especificada</em>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cambiar Contraseña -->
+            <div class="cambiar-contrasena">
+                <h3>
+                    <i class="fas fa-lock"></i> Cambiar Contraseña
+                </h3>
+                <!-- Cambiar Contraseña -->
+                    <div class="cambiar-contrasena">
+                        <h3>
+                            <i class="fas fa-lock"></i> Seguridad
+                        </h3>
+                        <p>Mantén tu cuenta segura actualizando tu contraseña regularmente.</p>
+                        
+                        <a href="{% url 'usuarios:cambiar_contrasena' %}" class="btn-cambiar">
+                            <i class="fas fa-key"></i> Cambiar Contraseña
+                        </a>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.setAttribute('data-theme', 'light');
+                themeIcon.className = 'fas fa-moon';
+                themeText.textContent = 'Modo Oscuro';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+                themeText.textContent = 'Modo Claro';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Cargar tema guardado al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.body.setAttribute('data-theme', savedTheme);
+                const themeIcon = document.getElementById('theme-icon');
+                const themeText = document.getElementById('theme-text');
+                
+                if (savedTheme === 'dark') {
+                    themeIcon.className = 'fas fa-sun';
+                    themeText.textContent = 'Modo Claro';
+                } else {
+                    themeIcon.className = 'fas fa-moon';
+                    themeText.textContent = 'Modo Oscuro';
+                }
+            }
+        });
+
+        // Validación del formulario de cambio de contraseña
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const nuevaPassword = document.getElementById('nueva_contrasena').value;
+            const confirmarPassword = document.getElementById('confirmar_contrasena').value;
+            
+            if (nuevaPassword !== confirmarPassword) {
+                e.preventDefault();
+                alert('Las contraseñas no coinciden. Por favor, verifica que hayas escrito la misma contraseña en ambos campos.');
+                return false;
+            }
+            
+            if (nuevaPassword.length < 8) {
+                e.preventDefault();
+                alert('La nueva contraseña debe tener al menos 8 caracteres.');
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>
