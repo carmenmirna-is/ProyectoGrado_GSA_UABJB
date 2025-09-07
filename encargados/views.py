@@ -274,3 +274,25 @@ def solicitudes_aceptadas_json(request):
             'espacio__nombre': espacio_nombre,
         })
     return JsonResponse(data, safe=False)
+
+@login_required
+def perfil_encargado(request):
+    """
+    Vista para mostrar el perfil del encargado con su información personal
+    """
+    # Verificar que el usuario sea encargado
+    if request.user.tipo_usuario != 'encargado':
+        messages.error(request, 'No tienes permisos para acceder a esta página.')
+        return redirect('encargados:dashboard_encargados')
+    
+    # Obtener los espacios que gestiona el encargado
+    # Según tu modelo, estas son las relaciones correctas:
+    espacios_carrera = request.user.espacios_encargados.all()  # Espacio -> encargado
+    espacios_campus = request.user.espacios_campus_encargados.all()  # EspacioCampus -> encargado
+    
+    context = {
+        'encargado': request.user,
+        'espacios_carrera': espacios_carrera,
+        'espacios_campus': espacios_campus,
+    }
+    return render(request, 'encargados/perfil_encargado.html', context)

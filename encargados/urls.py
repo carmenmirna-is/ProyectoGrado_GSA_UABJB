@@ -15,4 +15,5 @@ urlpatterns = [
     path('detalle_solicitud/<int:solicitud_id>/', views.detalle_solicitud, name='detalle_solicitud'),
     path('api/solicitudes-aceptadas/', views.solicitudes_aceptadas_json, name='solicitudes_aceptadas_json'),
     path('descargar/<int:solicitud_id>/', views.descargar_archivo, name='descargar_archivo'),
+    path('perfil/', views.perfil_encargado, name='perfil_encargado'),
 ] 

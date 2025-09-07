@@ -19,6 +19,13 @@
                 </div>
             </div>
             <div class="header-controls">
+                <!-- Nuevo: Enlace al perfil -->
+                <div class="profile-link">
+                    <a href="{% url 'encargados:perfil_encargado' %}" title="Ver mi perfil">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Mi Perfil</span>
+                    </a>
+                </div>
                 <div class="theme-toggle" onclick="toggleTheme()">
                     <i class="fas fa-moon" id="theme-icon"></i>
                     <span id="theme-text">Modo Oscuro</span>
@@ -30,6 +37,7 @@
         <div class="dashboard-container">
             <h1 class="dashboard-title"><i class="fas fa-calendar-alt"></i> Bienvenido, {{ request.user.first_name|default:request.user.username }}</h1>
             <p class="welcome-text">Gestiona el calendario y las solicitudes del mes actual.</p>
+
             <div class="navegacion-mes">
                 <button class="btn-nav" onclick="cambiarMes(-1)"><i class="fas fa-chevron-left"></i> Anterior</button>
                 <span class="titulo-mes" id="titulo-mes">Julio 2025</span>
