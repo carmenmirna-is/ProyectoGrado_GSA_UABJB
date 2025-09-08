@@ -89,6 +89,19 @@ tr:hover { background: var(--bg2); }
 .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
 .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
+@media (max-width: 1024px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+        padding: var(--spacing-sm);
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        text-align: center;
+    }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .header-content { flex-direction: column; text-align: center; }
