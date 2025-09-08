@@ -288,6 +288,50 @@
 }
 
 /* ============================
+   PERFIL USUARIO
+   ============================ */
+
+/* 👤 NUEVO: Estilos para el enlace del perfil en el header */
+        .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+        }
+
+        .profile-link:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        .profile-link i {
+            font-size: 1.2rem;
+        }
+
+        .profile-link span {
+            font-weight: 500;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .profile-link span {
+                display: none;
+            }
+            
+            .header-controls {
+                gap: 0.5rem;
+            }
+        }
+
+/* ============================
    COLORES DE EVENTOS
    ============================ */
 .evento-reunion { --color-evento: var(--uabjb-blue); }
