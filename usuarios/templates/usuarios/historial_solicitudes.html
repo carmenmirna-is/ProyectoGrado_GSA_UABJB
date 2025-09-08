@@ -1,0 +1,103 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Solicitudes - UABJB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+</head>
+<body class="listar-solicitudes">
+    <div class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="logo"><i class="fas fa-graduation-cap"></i></div>
+                <div>
+                    <div class="header-title"><i class="fas fa-history"></i> Mis Solicitudes</div>
+                    <div class="header-subtitle">Sistema de Gestión UABJB</div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                    <span id="theme-text">Modo Oscuro</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="dashboard-container">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre Evento</th>
+                            <th>Espacio</th>
+                            <th>Fecha</th>
+                            <th>Archivo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for solicitud in solicitudes %}
+                        <tr>
+                            <td>{{ solicitud.id }}</td>
+                            <td>{{ solicitud.nombre_evento|default:"No especificado" }}</td>
+                            <td>{{ solicitud.get_nombre_espacio }}</td>
+                            <td>{{ solicitud.fecha_evento|date:"d/m/Y H:i"|default:"No especificada" }}</td>
+                            <td>
+                                {% if solicitud.archivo_adjunto %}
+                                <p>
+                                    <i class="fas fa-file"></i>
+                                    <a href="{{ solicitud.archivo_adjunto.url }}" target="_blank" download>
+                                    Descargar {{ solicitud.archivo_adjunto.name|basename }}
+                                    </a>
+                                    ({{ solicitud.tamano_archivo_legible }})
+                                </p>
+                                {% else %}
+                                <p>Sin archivo adjunto</p>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="estado estado-{{ solicitud.estado }}">
+                                    {{ solicitud.get_estado_display|default:solicitud.estado }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    {% if solicitud.puede_ser_editada %}
+                                        <a href="{% url 'usuarios:editar_solicitud' solicitud.id %}" class="btn btn-edit">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
+                                        <a href="{% url 'usuarios:cancelar_solicitud' solicitud.id %}" class="btn btn-reject">
+                                            <i class="fas fa-times-circle"></i> Cancelar
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">No editable</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% if not solicitudes %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No has enviado solicitudes</h3>
+                    <p>Actualmente no tienes solicitudes registradas en el sistema.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/scripts' %}"></script>
+</body>
+</body>
+</html>

@@ -10,4 +10,7 @@ urlpatterns = [
     path('api/eventos-usuario/', views.eventos_usuario_json, name='eventos_usuario_json'),
     path('mi-perfil/', views.perfil_usuario, name='perfil_usuario'),
     path('cambiar-contrasena/', views.cambiar_contrasena, name='cambiar_contrasena'),
+    path('historial/', views.historial_solicitudes, name='historial_solicitudes'),
+    path('editar/<int:id>/', views.editar_solicitud, name='editar_solicitud'),
+    path('cancelar/<int:id>/', views.cancelar_solicitud, name='cancelar_solicitud'),
 ]

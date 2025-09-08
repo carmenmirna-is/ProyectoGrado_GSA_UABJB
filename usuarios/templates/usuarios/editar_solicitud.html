@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Solicitud - UABJB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+</head>
+<body class="enviar-solicitud">
+    <div class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="logo"><i class="fas fa-graduation-cap"></i></div>
+                <div>
+                    <div class="header-title"><i class="fas fa-edit"></i> Editar Solicitud</div>
+                    <div class="header-subtitle">Sistema de Gestión UABJB</div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                    <span id="theme-text">Modo Oscuro</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <form method="POST" enctype="multipart/form-data" class="form-container">
+            {% csrf_token %}
+            <label><i class="fas fa-tag"></i> Nombre del Evento</label>
+            <input type="text" name="nombre_evento" value="{{ solicitud.nombre_evento }}" required>
+
+            <label><i class="fas fa-align-left"></i> Descripción</label>
+            <textarea name="descripcion_evento">{{ solicitud.descripcion_evento|default:'' }}</textarea>
+
+            <label><i class="fas fa-calendar-alt"></i> Fecha y Hora del Evento</label>
+            <input type="datetime-local" name="fecha_evento" value="{{ solicitud.fecha_evento|date:'Y-m-d\TH:i' }}" required>
+
+            <label><i class="fas fa-calendar-check"></i> Fecha y Hora de Fin (opcional)</label>
+            <input type="datetime-local" name="fecha_fin_evento" value="{{ solicitud.fecha_fin_evento|date:'Y-m-d\TH:i' }}">
+
+            <label><i class="fas fa-map-marker-alt"></i> Tipo de Espacio</label>
+            <select name="tipo_espacio" id="tipo_espacio" onchange="toggleEspacios()" required>
+                <option value="carrera" {% if solicitud.tipo_espacio == 'carrera' %}selected{% endif %}>Espacio de Carrera</option>
+                <option value="campus" {% if solicitud.tipo_espacio == 'campus' %}selected{% endif %}>Espacio de Campus</option>
+            </select>
+
+            <div id="espacio_carrera_group" style="display: {% if solicitud.tipo_espacio == 'carrera' %}block{% else %}none{% endif %};">
+                <label><i class="fas fa-building"></i> Espacio de Carrera</label>
+                <select name="espacio_carrera">
+                    {% for e in espacios_carrera %}
+                        <option value="{{ e.id }}" {% if solicitud.espacio_id == e.id %}selected{% endif %}>{{ e.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="espacio_campus_group" style="display: {% if solicitud.tipo_espacio == 'campus' %}block{% else %}none{% endif %};">
+                <label><i class="fas fa-university"></i> Espacio de Campus</label>
+                <select name="espacio_campus">
+                    {% for e in espacios_campus %}
+                        <option value="{{ e.id }}" {% if solicitud.espacio_campus_id == e.id %}selected{% endif %}>{{ e.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <label><i class="fas fa-paperclip"></i> Archivo Adjunto (opcional)</label>
+            <input type="file" name="archivo_adjunto">
+            {% if solicitud.archivo_adjunto %}
+                <p>Archivo actual: <a href="{{ solicitud.archivo_adjunto.url }}" target="_blank">{{ solicitud.archivo_adjunto.name }}</a></p>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+            <a href="{% url 'usuarios:historial_solicitudes' %}" class="btn btn-cancel">
+                <i class="fas fa-arrow-left"></i> Cancelar
+            </a>
+        </form>
+    </div>
+
+    <script>
+        function toggleEspacios() {
+            const tipo = document.getElementById('tipo_espacio').value;
+            document.getElementById('espacio_carrera_group').style.display = tipo === 'carrera' ? 'block' : 'none';
+            document.getElementById('espacio_campus_group').style.display = tipo === 'campus' ? 'block' : 'none';
+        }
+    </script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>

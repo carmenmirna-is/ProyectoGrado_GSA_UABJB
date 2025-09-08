@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancelar Solicitud - UABJB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+</head>
+<body class="listar-solicitudes">
+    <div class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="logo"><i class="fas fa-graduation-cap"></i></div>
+                <div>
+                    <div class="header-title"><i class="fas fa-times-circle"></i> Cancelar Solicitud</div>
+                    <div class="header-subtitle">Sistema de Gestión UABJB</div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                    <span id="theme-text">Modo Oscuro</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="dashboard-container">
+            <div class="modal" style="display: block; position: static; margin: 2rem auto; max-width: 500px;">
+                <h3><i class="fas fa-exclamation-triangle"></i> ¿Cancelar esta solicitud?</h3>
+                <p>Estás a punto de cancelar la solicitud:</p>
+                <p><strong>{{ solicitud.nombre_evento }}</strong></p>
+                <p>Espacio: <strong>{{ solicitud.get_nombre_espacio }}</strong></p>
+                <p>Fecha: <strong>{{ solicitud.fecha_evento|date:"d/m/Y H:i" }}</strong></p>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="modal-buttons">
+                        <a href="{% url 'usuarios:historial_solicitudes' %}" class="btn btn-cancel">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
+                        <button type="submit" class="btn btn-reject">
+                            <i class="fas fa-ban"></i> Sí, cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>

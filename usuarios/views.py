@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.forms import ValidationError
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
@@ -259,3 +260,112 @@ def cambiar_contrasena(request):
     return render(request, 'usuarios/cambiar_contrasena.html', {
         'usuario': request.user
     })
+
+@login_required
+def historial_solicitudes(request):
+    solicitudes = Solicitud.objects.filter(usuario_solicitante=request.user).order_by('-fecha_creacion')
+    return render(request, 'usuarios/historial_solicitudes.html', {'solicitudes': solicitudes})
+
+@login_required
+def editar_solicitud(request, id):
+    solicitud = get_object_or_404(Solicitud, id=id, usuario_solicitante=request.user)
+
+    if not solicitud.puede_ser_editada():
+        messages.error(request, 'No puedes editar una solicitud que ya fue procesada.')
+        return redirect('usuarios:historial_solicitudes')
+
+    if request.method == 'POST':
+        # Actualizar campos permitidos
+        solicitud.nombre_evento = request.POST.get('nombre_evento', solicitud.nombre_evento)
+        solicitud.descripcion_evento = request.POST.get('descripcion_evento', solicitud.descripcion_evento)
+        solicitud.fecha_evento = request.POST.get('fecha_evento', solicitud.fecha_evento)
+        solicitud.fecha_fin_evento = request.POST.get('fecha_fin_evento') or None
+        solicitud.tipo_espacio = request.POST.get('tipo_espacio', solicitud.tipo_espacio)
+
+        if solicitud.tipo_espacio == 'carrera':
+            solicitud.espacio_id = request.POST.get('espacio_carrera')
+            solicitud.espacio_campus = None
+        else:
+            solicitud.espacio_campus_id = request.POST.get('espacio_campus')
+            solicitud.espacio = None
+
+        if request.FILES.get('archivo_adjunto'):
+            solicitud.archivo_adjunto = request.FILES['archivo_adjunto']
+
+        try:
+            solicitud.save()
+            messages.success(request, 'Solicitud actualizada con éxito.')
+
+            # Notificar al encargado
+            notificar_edicion_solicitud(solicitud)
+
+            return redirect('usuarios:historial_solicitudes')
+        except ValidationError as e:
+            messages.error(request, f'Error al guardar: {e}')
+
+    espacios_carrera = Espacio.objects.filter(activo=True)
+    espacios_campus = EspacioCampus.objects.all()
+
+    return render(request, 'usuarios/editar_solicitud.html', {
+        'solicitud': solicitud,
+        'espacios_carrera': espacios_carrera,
+        'espacios_campus': espacios_campus,
+    })
+
+@login_required
+def cancelar_solicitud(request, id):
+    solicitud = get_object_or_404(Solicitud, id=id, usuario_solicitante=request.user)
+
+    if not solicitud.puede_ser_editada():
+        messages.error(request, 'No puedes cancelar una solicitud que ya fue procesada.')
+        return redirect('usuarios:historial_solicitudes')
+
+    if request.method == 'POST':
+        solicitud.estado = 'rechazada'
+        solicitud.motivo_rechazo = "Cancelada por el usuario"
+        solicitud.save()
+
+        messages.success(request, 'Solicitud cancelada con éxito.')
+
+        # Notificar al encargado
+        notificar_cancelacion_solicitud(solicitud)
+
+        return redirect('usuarios:historial_solicitudes')
+
+    return render(request, 'usuarios/confirmar_cancelacion.html', {'solicitud': solicitud})
+
+def notificar_edicion_solicitud(solicitud):
+    enviar_notificacion_solicitud(solicitud, "🔁 Solicitud Editada", "ha sido editada")
+
+def notificar_cancelacion_solicitud(solicitud):
+    enviar_notificacion_solicitud(solicitud, "❌ Solicitud Cancelada", "ha sido cancelada por el usuario")
+
+def enviar_notificacion_solicitud(solicitud, titulo, accion):
+    try:
+        encargado = None
+        if solicitud.tipo_espacio == 'carrera' and solicitud.espacio:
+            encargado = solicitud.espacio.encargado
+        elif solicitud.tipo_espacio == 'campus' and solicitud.espacio_campus:
+            encargado = solicitud.espacio_campus.encargado
+
+        if not encargado or not encargado.email:
+            return
+
+        subject = f'{titulo} - Sistema UABJB'
+        message = f'''Estimado/a {encargado.first_name or encargado.username},
+
+La solicitud "{solicitud.nombre_evento}" {accion}.
+
+👤 Solicitante: {solicitud.usuario_solicitante.get_full_name() or solicitud.usuario_solicitante.username}
+📅 Fecha del evento: {solicitud.fecha_evento.strftime("%d/%m/%Y %H:%M")}
+📍 Espacio: {solicitud.get_nombre_espacio()}
+
+Por favor, revisa tu dashboard para más detalles.
+
+Saludos,
+Sistema de Gestión UABJB'''
+
+        send_mail(subject, message, 'cibanezsanguino@gmail.com', [encargado.email], fail_silently=True)
+    except Exception as e:
+        print(f'❌ Error enviando notificación: {str(e)}')
+
