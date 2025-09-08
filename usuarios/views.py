@@ -206,10 +206,11 @@ def eventos_usuario_json(request):
     data = []
     for s in eventos:
         data.append({
-            'fecha': s.fecha_evento.strftime('%Y-%-m-%-d'),
+            'fecha': s.fecha_evento.strftime('%Y-%m-%d'),
             'nombre_evento': s.nombre_evento,
             'espacio__nombre': s.get_nombre_espacio(),
         })
+    
     return JsonResponse(data, safe=False)
 
 @login_required

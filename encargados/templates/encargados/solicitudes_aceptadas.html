@@ -55,6 +55,13 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                {% if not solicitudes %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No hay solicitudes</h3>
+                    <p>No se encontraron solicitudes en el sistema.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

@@ -215,6 +215,12 @@ body {
   color: var(--uabjb-blue);
 }
 
+.btn {
+    color: #1e3a8a;
+    background: #1e3a8a;
+    color: white
+}
+
 /* ============================
    CONTENEDORES
    ============================ */
@@ -562,23 +568,6 @@ PERFIL CONTAINER
     font-weight: 500;
 }
 
-.btn-volver {
-    background: #1e3a8a;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    margin-bottom: 2rem;
-    font-weight: 500;
-}
-
 /* ============================
 GRID DE INFORMACIÓN
 ============================ */
@@ -713,6 +702,45 @@ SECCIÓN CAMBIAR CONTRASEÑA
 .btn-cambiar:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+}
+
+/* ============================
+   SELECTORES DINÁMICOS - CORREGIDO
+   ============================ */
+
+/* Asegurar que los divs ocultos no ocupen espacio */
+#espacioCarreraDiv,
+#espacioCampusDiv {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+/* Estados de visibilidad */
+#espacioCarreraDiv[style*="display: none"],
+#espacioCampusDiv[style*="display: none"] {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Estados de visibilidad activa */
+#espacioCarreraDiv[style*="display: block"],
+#espacioCampusDiv[style*="display: block"] {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    height: auto !important;
+}
+
+/* Asegurar que los selects dentro sean funcionales */
+#espacioCarreraDiv select,
+#espacioCampusDiv select {
+    width: 100% !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
 }
 
 /* ============================
