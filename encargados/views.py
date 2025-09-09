@@ -296,3 +296,56 @@ def perfil_encargado(request):
         'espacios_campus': espacios_campus,
     }
     return render(request, 'encargados/perfil_encargado.html', context)
+
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.dateparse import parse_datetime
+
+@login_required
+@require_http_methods(["POST"])
+def editar_fecha_aceptada(request):
+    user = request.user
+    if user.tipo_usuario != 'encargado':
+        return JsonResponse({'status': 'error', 'message': 'Sin permisos'}, status=403)
+
+    solicitud_id = request.POST.get('solicitud_id')
+    nueva_fecha = parse_datetime(request.POST.get('nueva_fecha'))
+
+    if not nueva_fecha:
+        return JsonResponse({'status': 'error', 'message': 'Fecha inválida'}, status=400)
+
+    solicitud = get_object_or_404(
+        Solicitud,
+        id=solicitud_id,
+        estado='aceptada',
+        espacio__encargado=user
+    )  # o espacio_campus__encargado=user si aplica
+
+    fecha_anterior = solicitud.fecha_evento
+    solicitud.fecha_evento = nueva_fecha
+    solicitud.save()
+
+    # Notificar por correo
+    try:
+        send_mail(
+            'Cambio de fecha en solicitud aceptada - UABJB',
+            f'''Hola {solicitud.usuario_solicitante.first_name or solicitud.usuario_solicitante.username},
+
+La fecha de tu solicitud "{solicitud.nombre_evento}" ha sido modificada.
+
+Nueva fecha: {nueva_fecha.strftime('%d/%m/%Y %H:%M')}
+Fecha anterior: {fecha_anterior.strftime('%d/%m/%Y %H:%M')}
+
+Espacio: {solicitud.get_nombre_espacio()}
+
+Si tienes dudas responde a este correo.
+
+Saludos,
+Sistema UABJB''',
+            'cibanezsanguino@gmail.com',
+            [solicitud.usuario_solicitante.email],
+            fail_silently=True
+        )
+    except Exception as e:
+        pass  # ya logueas si quieres
+
+    return JsonResponse({'status': 'success', 'message': 'Fecha actualizada y usuario notificado.'})

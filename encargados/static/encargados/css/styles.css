@@ -552,6 +552,38 @@ textarea {
     background-color: rgba(59, 130, 246, 0.1);
 }
 
+        /* Botón editar fecha */
+        .btn-editar-fecha {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-right: 0.4rem;
+        }
+        .btn-editar-fecha:hover {
+            background: #0066d4;
+        }
+
+        /* Modal rápido */
+        dialog {
+            border: none;
+            border-radius: 8px;
+            padding: 1.5rem;
+            max-width: 400px;
+        }
+        dialog::backdrop {
+            background: rgba(0,0,0,.45);
+        }
+        dialog h3 {
+            margin-top: 0;
+        }
+        dialog .btn {
+            margin-right: 0.5rem;
+        }
+
 /* ============================
    RESPONSIVE DESIGN
    ============================ */

@@ -26,6 +26,7 @@
             </div>
         </div>
     </div>
+
     <div class="container">
         <div class="dashboard-container">
             <div class="table-container">
@@ -41,13 +42,19 @@
                     </thead>
                     <tbody>
                         {% for solicitud in solicitudes %}
-                        <tr>
+                        <tr id="fila-{{ solicitud.id }}">
                             <td>{{ solicitud.nombre_evento }}</td>
-                            <td>{{ solicitud.fecha_evento|date:"d/m/Y H:i" }}</td>
+                            <td id="fecha-{{ solicitud.id }}">{{ solicitud.fecha_evento|date:"d/m/Y H:i" }}</td>
                             <td>{{ solicitud.usuario_solicitante.get_full_name|default:solicitud.usuario_solicitante.username }}</td>
                             <td>{{ solicitud.get_nombre_espacio }}</td>
                             <td>
                                 <div class="action-buttons">
+                                    <button class="btn-editar-fecha"
+                                            data-id="{{ solicitud.id }}"
+                                            data-fecha="{{ solicitud.fecha_evento|date:'Y-m-d\TH:i' }}"
+                                            data-evento="{{ solicitud.nombre_evento }}">
+                                        <i class="fas fa-calendar-alt"></i> Editar fecha
+                                    </button>
                                     <a href="{% url 'encargados:eliminar_solicitud' solicitud.id %}" class="btn btn-delete">Eliminar</a>
                                 </div>
                             </td>
@@ -65,6 +72,46 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal editar fecha -->
+    <dialog id="modalEditarFecha">
+        <form method="dialog" id="formEditarFecha">
+            <h3>Editar fecha - <span id="tituloEvento"></span></h3>
+            <input type="datetime-local" name="nueva_fecha" id="id_nueva_fecha" required>
+            <input type="hidden" name="solicitud_id" id="id_solicitud_id">
+            <div style="margin-top:1rem;">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <button type="button" class="btn btn-secondary" onclick="modalEditarFecha.close()">Cancelar</button>
+            </div>
+        </form>
+    </dialog>
+
     <script src="{% static 'encargados/js/scripts.js' %}"></script>
+    <script>
+        /* Abrir modal y cargar datos */
+        document.addEventListener('click', e => {
+            if (e.target.closest('.btn-editar-fecha')) {
+                const btn = e.target.closest('.btn-editar-fecha');
+                modalEditarFecha.showModal();
+                id_solicitud_id.value = btn.dataset.id;
+                id_nueva_fecha.value = btn.dataset.fecha;
+                tituloEvento.textContent = btn.dataset.evento;
+            }
+        });
+
+        /* Enviar cambio vía AJAX */
+        formEditarFecha.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = new FormData(formEditarFecha);
+            const res = await fetch("{% url 'encargados:editar_fecha_aceptada' %}", {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                body: data
+            });
+            const json = await res.json();
+            alert(json.message);
+            if (json.status === 'success') location.reload();
+        });
+    </script>
 </body>
 </html>

@@ -501,6 +501,31 @@ function formatTime(timeString) {
     return timeString.slice(0, 5); // HH:MM format
 }
 
+// Abrir modal y cargar datos
+document.addEventListener('click', e => {
+  if (e.target.closest('.btn-editar-fecha')) {
+    const btn = e.target.closest('.btn-editar-fecha');
+    modalEditarFecha.showModal();
+    id_solicitud_id.value = btn.dataset.id;
+    id_nueva_fecha.value = btn.dataset.fecha;
+    tituloEvento.textContent = btn.dataset.evento;
+  }
+});
+
+// Enviar cambio vía AJAX
+formEditarFecha.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const data = new FormData(formEditarFecha);
+  const res = await fetch("{% url 'encargados:editar_fecha_aceptada' %}", {
+    method: 'POST',
+    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+    body: data
+  });
+  const json = await res.json();
+  alert(json.message);
+  if (json.status === 'success') location.reload();
+});
+
 // ============================
 // INICIALIZACIÓN
 // ============================
