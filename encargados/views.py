@@ -6,20 +6,33 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from gestion_espacios_academicos.models import Solicitud, Espacio
 from django.utils import timezone
+from datetime import datetime
 from django.core.mail import send_mail
 import json
 from django.db.models import Q
 
+@login_required
 def dashboard_encargados(request):
-    if request.method == 'POST':
-        nombre = request.POST.get('nombre')
-        espacio = request.POST.get('espacio')
-        color = request.POST.get('color')
-        # Lógica para guardar evento (puede integrarse con un modelo Evento si lo creas)
-        messages.success(request, f'Evento "{nombre}" agregado con éxito.')
-        return redirect('encargados:dashboard_encargados')
+    user = request.user
+
+    if user.tipo_usuario != 'encargado':
+        messages.error(request, 'No tienes permiso para acceder a esta página.')
+        return redirect('login')
+
+    # ✅ Obtener solo los espacios que gestiona este encargado
+    espacios_carrera = user.espacios_encargados.all()
+    espacios_campus = user.espacios_campus_encargados.all()
+
+    # ✅ Combinar ambos tipos de espacios
+    espacios = list(espacios_carrera) + list(espacios_campus)
+
+    # ✅ Si solo tiene uno, lo preseleccionamos
+    espacio_preseleccionado = espacios[0] if len(espacios) == 1 else None
+
     context = {
         'mes_actual': timezone.now().strftime('%B %Y'),
+        'espacios': espacios,
+        'espacio_preseleccionado': espacio_preseleccionado,
     }
     return render(request, 'encargados/dashboard_encargados.html', context)
 
@@ -349,3 +362,97 @@ Sistema UABJB''',
         pass  # ya logueas si quieres
 
     return JsonResponse({'status': 'success', 'message': 'Fecha actualizada y usuario notificado.'})
+
+# Agregar esta función a tu views.py de encargados
+
+@login_required
+def crear_evento(request):
+
+    print("✅ Usuario:", request.user)
+    print("✅ Tipo:", request.user.tipo_usuario)
+    print("✅ CSRF Token recibido:", request.headers.get('X-CSRFToken'))
+
+    """
+    Vista para que el encargado cree un evento/solicitud manualmente
+    """
+    user = request.user
+    
+    # Verificar que sea encargado
+    if user.tipo_usuario != 'encargado':
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'No tienes permisos para crear eventos.'
+        }, status=403)
+    
+    try:
+        # Obtener datos del formulario
+        nombre_evento = request.POST.get('nombre_evento', '').strip()
+        nombre_solicitante = request.POST.get('nombre_solicitante', '').strip()
+        fecha_evento = request.POST.get('fecha_evento')
+        hora_evento = request.POST.get('hora_evento')
+        espacio_id = request.POST.get('espacio_id')
+        descripcion = request.POST.get('descripcion', '').strip()
+        
+        # Validaciones
+        if not all([nombre_evento, nombre_solicitante, fecha_evento, hora_evento, espacio_id]):
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Todos los campos obligatorios deben ser completados.'
+            }, status=400)
+        
+        # Determinar tipo de espacio y validar permisos
+        espacio_carrera = None
+        espacio_campus = None
+        tipo_espacio = None
+        
+        # Buscar en espacios de carrera
+        try:
+            espacio_carrera = user.espacios_encargados.get(id=espacio_id)
+            tipo_espacio = 'carrera'
+        except:
+            # Buscar en espacios de campus
+            try:
+                espacio_campus = user.espacios_campus_encargados.get(id=espacio_id)
+                tipo_espacio = 'campus'
+            except:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'El espacio seleccionado no existe o no tienes permisos para gestionarlo.'
+                }, status=400)
+        
+        # Combinar fecha y hora
+        fecha_hora_str = f"{fecha_evento} {hora_evento}"
+        fecha_hora = datetime.strptime(fecha_hora_str, '%Y-%m-%d %H:%M')
+        fecha_hora = timezone.make_aware(fecha_hora)  # ✅ Agrega esta línea
+
+        if fecha_hora < timezone.now():
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No se puede crear un evento en el pasado.'
+            }, status=400)
+        
+        # Crear la solicitud/evento
+        solicitud = Solicitud.objects.create(
+            # Usuario solicitante será el encargado que crea el evento
+            usuario_solicitante=user,
+            nombre_evento=nombre_evento,
+            descripcion_evento=descripcion or f"Evento creado por {user.get_full_name() or user.username} para {nombre_solicitante}",
+            fecha_evento=fecha_hora,
+            tipo_espacio=tipo_espacio,
+            espacio=espacio_carrera if tipo_espacio == 'carrera' else None,
+            espacio_campus=espacio_campus if tipo_espacio == 'campus' else None,
+            estado='aceptada',  # Automáticamente aceptada porque la crea el encargado
+            # Agregar campo personalizado para el nombre del solicitante real si no tienes este campo
+            # solicitante_personalizado=nombre_solicitante
+        )
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': f'Evento "{nombre_evento}" creado exitosamente para {nombre_solicitante}.'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Error al crear el evento: {str(e)}'
+        }, status=500)

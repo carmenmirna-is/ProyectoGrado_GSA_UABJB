@@ -48,8 +48,18 @@
                             <td>{{ solicitud.get_nombre_espacio }}</td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="{% url 'encargados:aprobar_solicitud' solicitud.id %}" class="btn btn-edit">Aprobar</a>
-                                    <a href="{% url 'encargados:rechazar_solicitud' solicitud.id %}" class="btn btn-delete">Rechazar</a>
+                                    <!-- Cambiar los enlaces por botones con onclick -->
+                                    <button class="btn btn-edit btn-accept" 
+                                            data-id="{{ solicitud.id }}" 
+                                            onclick="aceptarSolicitud({{ solicitud.id }})">
+                                        <i class="fas fa-check"></i> Aprobar
+                                    </button>
+                                    <button class="btn btn-delete btn-reject" 
+                                            data-id="{{ solicitud.id }}" 
+                                            data-name="{{ solicitud.usuario_solicitante }}"
+                                            onclick="rechazarSolicitud({{ solicitud.id }}, '{{ solicitud.usuario_solicitante }}')">
+                                        <i class="fas fa-times"></i> Rechazar
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -66,6 +76,38 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal para rechazar solicitud -->
+    <div id="rejectModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Rechazar Solicitud</h3>
+            </div>
+            <div class="modal-body">
+                <p>Vas a rechazar la solicitud de <strong id="solicitanteName"></strong>.</p>
+                <p>Por favor, proporciona el motivo del rechazo:</p>
+                <textarea id="rejectionReason" 
+                          placeholder="Describe las razones por las que se rechaza esta solicitud..." 
+                          rows="4"></textarea>
+                <div id="errorMessage" class="error-message" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Debes proporcionar un motivo de rechazo.</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeRejectModal()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" onclick="confirmReject()">
+                    <i class="fas fa-ban"></i> Rechazar Solicitud
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Token CSRF para las peticiones AJAX -->
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
     <script src="{% static 'encargados/js/scripts.js' %}"></script>
 </body>
 </html>

@@ -254,10 +254,6 @@ class Solicitud(models.Model):
         if self.espacio and self.espacio_campus:
             raise ValidationError('No puede asignar ambos tipos de espacio a la vez.')
        
-        # Validar tipos de usuario
-        if self.usuario_solicitante and not self.usuario_solicitante.is_usuario_regular():
-            raise ValidationError('El solicitante debe ser un usuario regular.')
-       
         if self.administrador and not self.administrador.is_administrador():
             raise ValidationError('Solo un administrador puede procesar solicitudes.')
         

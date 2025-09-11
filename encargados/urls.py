@@ -17,4 +17,5 @@ urlpatterns = [
     path('descargar/<int:solicitud_id>/', views.descargar_archivo, name='descargar_archivo'),
     path('perfil/', views.perfil_encargado, name='perfil_encargado'),
     path('aceptadas/editar-fecha/', views.editar_fecha_aceptada, name='editar_fecha_aceptada'),
+    path('crear-evento/', views.crear_evento, name='crear_evento'),
 ] 

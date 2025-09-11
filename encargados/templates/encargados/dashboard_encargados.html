@@ -62,6 +62,9 @@
                 </table>
             </div>
             <div class="dashboard-actions">
+                <button class="btn-crear-evento" onclick="mostrarModalCrearEvento()">
+                    <i class="fas fa-plus"></i> Crear Evento
+                </button>
                 <a href="{% url 'reportes:generar_reportes' %}" class="btn-action"><i class="fas fa-file-alt"></i> Generar Reportes</a>
                 <a href="{% url 'encargados:lista_solicitudes' %}" class="btn-action"><i class="fas fa-list"></i> Ver Solicitudes</a>
                 <a href="{% url 'encargados:solicitudes_aceptadas' %}" class="btn-action"><i class="fas fa-list"></i> Solicitudes Aceptadas</a>
@@ -70,6 +73,89 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal para crear evento -->
+    <div id="modalCrearEvento" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> Crear Nuevo Evento</h2>
+                <button class="close-btn" onclick="cerrarModalCrearEvento()">&times;</button>
+            </div>
+            <form id="formCrearEvento">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="nombreEvento">
+                        <i class="fas fa-calendar-check"></i> Nombre del Evento
+                    </label>
+                    <input type="text" id="nombreEvento" name="nombre_evento" required 
+                           placeholder="Ej: Conferencia de Ingeniería">
+                </div>
+
+                <div class="form-group">
+                    <label for="nombreSolicitante">
+                        <i class="fas fa-user"></i> Nombre del Solicitante
+                    </label>
+                    <input type="text" id="nombreSolicitante" name="nombre_solicitante" required 
+                           placeholder="Ej: Juan Pérez">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fechaEvento">
+                            <i class="fas fa-calendar"></i> Fecha
+                        </label>
+                        <input type="date" id="fechaEvento" name="fecha_evento" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="horaEvento">
+                            <i class="fas fa-clock"></i> Hora
+                        </label>
+                        <input type="time" id="horaEvento" name="hora_evento" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="espacioEvento">
+                        <i class="fas fa-map-marker-alt"></i> Espacio
+                    </label>
+
+                    {% if espacio_preseleccionado %}
+                        <!-- ✅ Solo un espacio: mostrar como texto plano -->
+                        <input type="hidden" name="espacio_id" value="{{ espacio_preseleccionado.id }}">
+                        <p style="margin: 0; padding: 0.5rem; background-color: #f0f0f0; border-radius: 4px;">
+                            <strong>{{ espacio_preseleccionado.nombre }}</strong>
+                        </p>
+                    {% else %}
+                        <!-- ✅ Más de un espacio: mostrar select -->
+                        <select id="espacioEvento" name="espacio_id" required>
+                            <option value="">Selecciona un espacio...</option>
+                            {% for espacio in espacios %}
+                                <option value="{{ espacio.id }}">{{ espacio.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcionEvento">
+                        <i class="fas fa-align-left"></i> Descripción (Opcional)
+                    </label>
+                    <textarea id="descripcionEvento" name="descripcion" rows="3" 
+                              placeholder="Descripción del evento..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancelar" onclick="cerrarModalCrearEvento()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn-confirmar">
+                        <i class="fas fa-check"></i> Crear Evento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="{% static 'encargados/js/dashboard_encargado.js' %}"></script>
 </body>
 </html>
