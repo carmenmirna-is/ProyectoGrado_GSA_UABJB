@@ -182,7 +182,7 @@ body {
 /* ============================
    BOTONES
    ============================ */
-.btn-nav, .btn-action, .dashboard-btn, .btn {
+.btn-nav, .btn-action, .dashboard-btn, .btn, .btn-crear-evento {
     background: var(--uabjb-blue);
     color: white;
     padding: 12px 20px;
@@ -199,7 +199,7 @@ body {
     box-shadow: var(--shadow);
 }
 
-.btn-nav:hover, .btn-action:hover, .dashboard-btn:hover, .btn:hover {
+.btn-nav:hover, .btn-action:hover, .dashboard-btn:hover, .btn:hover, .btn-crear-evento:hover {
     background: var(--uabjb-light-blue);
     transform: translateY(-2px);
     box-shadow: var(--card-hover);
