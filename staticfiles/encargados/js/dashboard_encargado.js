@@ -36,7 +36,6 @@ async function initDashboardEncargado() {
 
     let eventos = {};
 
-    // ✅ Cargar eventos aceptados desde el backend
     async function cargarSolicitudesAceptadas() {
         try {
             const res = await fetch('/encargados/api/solicitudes-aceptadas/');
@@ -44,7 +43,7 @@ async function initDashboardEncargado() {
             const eventosMap = {};
 
             data.forEach(s => {
-                const key = s.fecha; // 
+                const key = s.fecha;
                 if (!eventosMap[key]) eventosMap[key] = [];
                 eventosMap[key].push({
                     nombre: s.nombre_evento,
@@ -60,7 +59,6 @@ async function initDashboardEncargado() {
         }
     }
 
-    // ✅ Generar calendario
     async function generarCalendario() {
         eventos = await cargarSolicitudesAceptadas();
 
@@ -124,7 +122,6 @@ async function initDashboardEncargado() {
         document.getElementById('titulo-mes').textContent = `${nombresMeses[mesActual]} ${anioActual}`;
     }
 
-    // ✅ Navegación entre meses
     window.cambiarMes = function (direccion) {
         mesActual += direccion;
         if (mesActual > 11) {
@@ -137,9 +134,101 @@ async function initDashboardEncargado() {
         generarCalendario();
     };
 
-    // ✅ Inicializar calendario
     await generarCalendario();
 }
+
+/* ============================
+   FUNCIONES MODAL CREAR EVENTO
+   ============================ */
+
+window.mostrarModalCrearEvento = function () {
+    const modal = document.getElementById('modalCrearEvento');
+    if (modal) {
+        modal.style.display = 'flex';
+    } else {
+        console.error('No se encontró el modal con ID "modalCrearEvento"');
+    }
+};
+
+window.cerrarModalCrearEvento = function () {
+    const modal = document.getElementById('modalCrearEvento');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+};
+
+// Cerrar modal con clic fuera o ESC
+document.addEventListener('click', function (e) {
+    const modal = document.getElementById('modalCrearEvento');
+    if (modal && e.target === modal) {
+        cerrarModalCrearEvento();
+    }
+});
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        cerrarModalCrearEvento();
+    }
+});
+
+/* ============================
+   ENVÍO DEL FORMULARIO CREAR EVENTO
+   ============================ */
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('formCrearEvento');
+    if (!form) return;
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+        if (!csrfToken) {
+            alert('No se encontró el token CSRF');
+            return;
+        }
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+        submitBtn.disabled = true;
+
+        try {
+            const res = await fetch('/encargados/crear-evento/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            });
+
+            if (!res.ok) {
+                const text = await res.text();
+                console.error('Respuesta del servidor:', text);
+                alert('Error del servidor:\n' + text);
+                return;
+            }
+
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                alert(data.message);
+                cerrarModalCrearEvento();
+                form.reset();
+                await initDashboardEncargado(); // ✅ Recarga el calendario
+            } else {
+                alert(data.message || 'Error al crear el evento');
+            }
+        } catch (err) {
+            console.error('Error al crear evento:', err);
+            alert('Error de conexión');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+});
 
 /* ============================
    INICIALIZAR TODO
