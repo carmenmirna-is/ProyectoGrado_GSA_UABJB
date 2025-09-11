@@ -1,3 +1,22 @@
+/* ===== AISLAR TEMA POR ROL ===== */
+const ROL = location.pathname.split('/')[1].replace(/\/$/, '') || 'encargado'; // admin | encargado | usuario
+const THEME_KEY = `theme-${ROL}`;
+
+// Aplicar tema propio al cargar
+(function applyOwnTheme() {
+    const saved = localStorage.getItem(THEME_KEY) || 'light';
+    document.body.setAttribute('data-theme', saved);
+})();
+
+// Sobrescribir toggleTheme() para que use clave propia
+function toggleTheme() {
+    const body = document.body;
+    const esOscuro = body.getAttribute('data-theme') === 'dark';
+    const nuevo = esOscuro ? 'light' : 'dark';
+    body.setAttribute('data-theme', nuevo);
+    localStorage.setItem(THEME_KEY, nuevo);
+}
+
 // ============================
 // FUNCIONES COMUNES
 // ============================

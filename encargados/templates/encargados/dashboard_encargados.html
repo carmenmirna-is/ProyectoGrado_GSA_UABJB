@@ -115,26 +115,26 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="espacioEvento">
-                        <i class="fas fa-map-marker-alt"></i> Espacio
-                    </label>
+                <label for="espacioEvento">
+                    <i class="fas fa-map-marker-alt"></i> Espacio
+                </label>
 
-                    {% if espacio_preseleccionado %}
-                        <!-- ✅ Solo un espacio: mostrar como texto plano -->
-                        <input type="hidden" name="espacio_id" value="{{ espacio_preseleccionado.id }}">
-                        <p style="margin: 0; padding: 0.5rem; background-color: #f0f0f0; border-radius: 4px;">
-                            <strong>{{ espacio_preseleccionado.nombre }}</strong>
-                        </p>
-                    {% else %}
-                        <!-- ✅ Más de un espacio: mostrar select -->
-                        <select id="espacioEvento" name="espacio_id" required>
-                            <option value="">Selecciona un espacio...</option>
-                            {% for espacio in espacios %}
-                                <option value="{{ espacio.id }}">{{ espacio.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                    {% endif %}
-                </div>
+                {% if espacio_preseleccionado %}
+                    <!-- ✅ Solo un espacio: mostrar como texto plano -->
+                    <input type="hidden" name="espacio_id" value="{{ espacio_preseleccionado.id }}">
+                    <p style="margin: 0; padding: 0.5rem; background-color: #f0f0f0; border-radius: 4px;">
+                        <strong>{{ espacio_preseleccionado.nombre }}</strong>
+                    </p>
+                {% else %}
+                    <!-- ✅ Más de un espacio: mostrar select -->
+                    <select id="espacioEvento" name="espacio_id" required>
+                        <option value="">Selecciona un espacio...</option>
+                        {% for espacio in espacios %}
+                            <option value="{{ espacio.id }}">{{ espacio.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+            </div>
 
                 <div class="form-group">
                     <label for="descripcionEvento">
