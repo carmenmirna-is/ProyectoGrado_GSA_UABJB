@@ -353,12 +353,15 @@ input:focus, select:focus, textarea:focus {
     box-shadow: var(--shadow);
     border: 1px solid var(--border-color);
     margin-bottom: 2rem;
+    overflow-x: auto;
 }
 
 .calendario-minimalista table {
     width: 100%;
     border-collapse: collapse;
     font-family: inherit;
+    min-width: 320px;          /* ← anchura mínima para que no se colapse */
+    font-size: clamp(0.75rem, 1.8vw, 0.9rem); /* ← tamaño fluido */
 }
 
 .dias-semana {
@@ -391,6 +394,8 @@ input:focus, select:focus, textarea:focus {
     position: relative;
     height: 80px;
     transition: all 0.3s ease;
+    height: clamp(50px, 12vw, 80px); /* ← altura proporcional */
+    padding: clamp(6px, 1vw, 12px) clamp(2px, 0.5vw, 8px);
 }
 
 .calendario-minimalista td:hover {

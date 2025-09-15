@@ -182,7 +182,7 @@ body {
 /* ============================
    BOTONES
    ============================ */
-.btn-nav, .btn-action, .dashboard-btn, .btn {
+.btn-nav, .btn-action, .dashboard-btn, .btn, .btn-crear-evento {
     background: var(--uabjb-blue);
     color: white;
     padding: 12px 20px;
@@ -199,7 +199,7 @@ body {
     box-shadow: var(--shadow);
 }
 
-.btn-nav:hover, .btn-action:hover, .dashboard-btn:hover, .btn:hover {
+.btn-nav:hover, .btn-action:hover, .dashboard-btn:hover, .btn:hover, .btn-crear-evento:hover {
     background: var(--uabjb-light-blue);
     transform: translateY(-2px);
     box-shadow: var(--card-hover);
@@ -238,11 +238,14 @@ body {
     box-shadow: var(--shadow);
     border: 1px solid var(--border-color);
     margin-bottom: 2rem;
+    overflow-x: auto;
 }
 
 .calendario-minimalista table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 320px;          /* ← anchura mínima para que no se colapse */
+    font-size: clamp(0.75rem, 1.8vw, 0.9rem); /* ← tamaño fluido */
 }
 
 .dias-semana {
@@ -270,6 +273,8 @@ body {
     position: relative;
     height: 80px;
     transition: all 0.3s ease;
+    height: clamp(50px, 12vw, 80px); /* ← altura proporcional */
+    padding: clamp(6px, 1vw, 12px) clamp(2px, 0.5vw, 8px);
 }
 
 .calendario-minimalista td:hover {
@@ -489,432 +494,6 @@ textarea {
     transform: translateY(-5px);
 }
 
-/* ============================
-   NOTIFICACIONES Y EXTRAS
-   ============================ */
-.user-info-card {
-    background: var(--uabjb-blue);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    color: white;
-    box-shadow: var(--shadow);
-}
-
-.user-avatar {
-    background: rgba(255, 255, 255, 0.2);
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-}
-
-.notification {
-    animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
-.empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: var(--text-muted);
-}
-
-.empty-state i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: var(--border-color);
-}
-
-.archivo-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--uabjb-light-blue);
-    text-decoration: none;
-    font-size: 0.875rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-}
-
-.archivo-link:hover {
-    background-color: rgba(59, 130, 246, 0.1);
-}
-
-        /* Botón editar fecha */
-        .btn-editar-fecha {
-            background: #007bff;
-            color: #fff;
-            border: none;
-            padding: 0.4rem 0.8rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            margin-right: 0.4rem;
-        }
-        .btn-editar-fecha:hover {
-            background: #0066d4;
-        }
-
-        /* Modal rápido */
-        dialog {
-            border: none;
-            border-radius: 8px;
-            padding: 1.5rem;
-            max-width: 400px;
-        }
-        dialog::backdrop {
-            background: rgba(0,0,0,.45);
-        }
-        dialog h3 {
-            margin-top: 0;
-        }
-        dialog .btn {
-            margin-right: 0.5rem;
-        }
-
-/* ============================
-   ESTILOS PARA MODALES
-   ============================ */
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(3px);
-    z-index: 10000;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-}
-
-.modal-overlay[style*="flex"] {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal {
-    background: var(--bg-primary);
-    border-radius: 12px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-    max-width: 500px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-    transform: scale(0.9) translateY(20px);
-    transition: all 0.3s ease;
-}
-
-.modal-overlay[style*="flex"] .modal {
-    transform: scale(1) translateY(0);
-}
-
-.modal.show {
-    transform: scale(1) translateY(0);
-}
-
-.modal-header {
-    padding: 20px 25px 15px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.modal-header h3 {
-    margin: 0;
-    color: var(--danger-color);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.25rem;
-}
-
-.modal-body {
-    padding: 20px 25px;
-}
-
-.modal-body p {
-    margin: 0 0 15px 0;
-    color: var(--text-secondary);
-    line-height: 1.5;
-}
-
-.modal-body p:last-of-type {
-    margin-bottom: 10px;
-}
-
-.modal-body textarea {
-    width: 100%;
-    min-height: 100px;
-    padding: 12px;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    font-family: inherit;
-    font-size: 14px;
-    resize: vertical;
-    box-sizing: border-box;
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    transition: border-color 0.2s ease;
-}
-
-.modal-body textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-}
-
-.modal-body textarea.error {
-    border-color: var(--danger-color);
-    background-color: #fef2f2;
-}
-
-[data-theme="dark"] .modal-body textarea.error {
-    background-color: rgba(239, 68, 68, 0.1);
-}
-
-.error-message {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--danger-color);
-    font-size: 14px;
-    margin-top: 10px;
-    padding: 8px 12px;
-    background: rgba(239, 68, 68, 0.1);
-    border-radius: 6px;
-    border-left: 3px solid var(--danger-color);
-}
-
-.modal-footer {
-    padding: 15px 25px 20px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    border-top: 1px solid var(--border-color);
-}
-
-/* ============================
-   ESTILOS PARA NOTIFICACIONES
-   ============================ */
-
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 16px 20px;
-    border-radius: 8px;
-    box-shadow: var(--shadow-lg);
-    z-index: 9999;
-    max-width: 350px;
-    min-width: 300px;
-    border-left: 4px solid;
-    transform: translateX(100%);
-    transition: all 0.3s ease;
-    animation: slideIn 0.3s ease-out forwards;
-}
-
-.notification-success {
-    background: #d1fae5;
-    border-left-color: #10b981;
-    color: #065f46;
-}
-
-.notification-error {
-    background: #fecaca;
-    border-left-color: #ef4444;
-    color: #991b1b;
-}
-
-.notification-info {
-    background: #dbeafe;
-    border-left-color: #3b82f6;
-    color: #1e3a8a;
-}
-
-[data-theme="dark"] .notification-success {
-    background: rgba(16, 185, 129, 0.2);
-    color: #6ee7b7;
-    border-left-color: #10b981;
-}
-
-[data-theme="dark"] .notification-error {
-    background: rgba(239, 68, 68, 0.2);
-    color: #fca5a5;
-    border-left-color: #ef4444;
-}
-
-[data-theme="dark"] .notification-info {
-    background: rgba(59, 130, 246, 0.2);
-    color: #93c5fd;
-    border-left-color: #3b82f6;
-}
-
-.notification-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 10px;
-}
-
-.notification-close {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    color: inherit;
-    opacity: 0.7;
-    padding: 0;
-    line-height: 1;
-    flex-shrink: 0;
-}
-
-.notification-close:hover {
-    opacity: 1;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* ============================
-   MEJORAS PARA BOTONES DE ACCIÓN
-   ============================ */
-
-.action-buttons {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.btn-accept {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
-    border: none;
-    transition: all 0.2s ease;
-}
-
-.btn-accept:hover {
-    background: linear-gradient(135deg, #059669, #047857);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
-}
-
-.btn-reject {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: white;
-    border: none;
-    transition: all 0.2s ease;
-}
-
-.btn-reject:hover {
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
-}
-
-.btn-secondary {
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
-    border: 1px solid var(--border-color);
-    transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-    background: var(--bg-tertiary);
-    transform: translateY(-1px);
-}
-
-.btn-danger {
-    background: linear-gradient(135deg, #dc3545, #c82333);
-    color: white;
-    border: none;
-    transition: all 0.2s ease;
-}
-
-.btn-danger:hover {
-    background: linear-gradient(135deg, #c82333, #a71e2a);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-}
-
-/* ============================
-   RESPONSIVE
-   ============================ */
-
-@media (max-width: 768px) {
-    .modal {
-        width: 95%;
-        margin: 10px;
-    }
-    
-    .modal-header,
-    .modal-body,
-    .modal-footer {
-        padding-left: 20px;
-        padding-right: 20px;
-    }
-    
-    .notification {
-        right: 10px;
-        left: 10px;
-        max-width: none;
-        min-width: auto;
-    }
-    
-    .action-buttons {
-        flex-direction: column;
-    }
-    
-    .btn-accept,
-    .btn-reject {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-/* Estilos para el botón crear evento */
-.btn-crear-evento {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-    margin-left: auto;
-}
-
-.btn-crear-evento:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
 /* Estilos para el modal */
 .modal-overlay {
     position: fixed;
@@ -1061,6 +640,101 @@ textarea {
     cursor: not-allowed;
     transform: none;
 }
+
+/* ============================
+   NOTIFICACIONES Y EXTRAS
+   ============================ */
+.user-info-card {
+    background: var(--uabjb-blue);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: white;
+    box-shadow: var(--shadow);
+}
+
+.user-avatar {
+    background: rgba(255, 255, 255, 0.2);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+}
+
+.notification {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--border-color);
+}
+
+.archivo-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--uabjb-light-blue);
+    text-decoration: none;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.archivo-link:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+        /* Botón editar fecha */
+        .btn-editar-fecha {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-right: 0.4rem;
+        }
+        .btn-editar-fecha:hover {
+            background: #0066d4;
+        }
+
+        /* Modal rápido */
+        dialog {
+            border: none;
+            border-radius: 8px;
+            padding: 1.5rem;
+            max-width: 400px;
+        }
+        dialog::backdrop {
+            background: rgba(0,0,0,.45);
+        }
+        dialog h3 {
+            margin-top: 0;
+        }
+        dialog .btn {
+            margin-right: 0.5rem;
+        }
 
 /* ============================
    RESPONSIVE DESIGN
