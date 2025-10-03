@@ -48,6 +48,16 @@
       <button type="submit" class="btn waves-effect waves-light btn-login">Iniciar Sesión</button>
     </form>
 
+    <div class="center-align" style="margin-top: 10px;">
+      <a href="{% url 'recuperar_contrasena' %}" class="grey-text text-darken-1" style="font-size: 0.9rem;">
+        ¿Olvidaste tu contraseña?
+      </a>
+      <br>
+      <a href="{% url 'reenviar_verificacion' %}" class="grey-text text-darken-1" style="font-size: 0.9rem;">
+        ¿No llegó el correo de verificación?
+      </a>
+    </div>
+
     <div class="divider"><span>o</span></div>
 
     <div class="register-link center-align">

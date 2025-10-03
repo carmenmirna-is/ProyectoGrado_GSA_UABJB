@@ -30,4 +30,9 @@ urlpatterns = [
     path('encargados/', include('encargados.urls')),          # ← Y aquí
     path('reportes/', include('reportes.urls')),
     path('usuarios/', include('usuarios.urls')),
+    path('registro/', views.registro, name='registro'),
+    path('verificar/<str:token>/', views.verificar_cuenta, name='verificar_cuenta'),
+    path('recuperar/', views.recuperar_contrasena, name='recuperar_contrasena'),
+    path('restablecer/<str:token>/', views.restablecer_contrasena, name='restablecer_contrasena'),
+    path('reenviar-verificacion/', views.reenviar_verificacion, name='reenviar_verificacion'),
 ]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

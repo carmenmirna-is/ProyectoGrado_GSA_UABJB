@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificación exitosa - UABJB</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/materialize_styles.css' %}">
+</head>
+<body>
+  <div class="login-card z-depth-1" style="max-width:480px;">
+    <div class="logo-section center-align">
+      <i class="material-icons" style="color:#28a745;">check_circle</i>
+      <div class="logo-title">¡Cuenta verificada!</div>
+      <div class="logo-subtitle">Ahora puedes iniciar sesión</div>
+    </div>
+
+    <div class="center-align">
+      <a href="{% url 'login' %}" class="btn waves-effect waves-light btn-login">Ir al login</a>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>

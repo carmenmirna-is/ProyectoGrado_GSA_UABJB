@@ -28,6 +28,9 @@ class CustomUser(AbstractUser):
     # Campos adicionales
     activo = models.BooleanField(default=True, help_text="Indica si el usuario está activo")
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    token_verificacion = models.CharField(max_length=100, blank=True, null=True)
+    token_expira = models.DateTimeField(blank=True, null=True)
+    verificado = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'Usuario'

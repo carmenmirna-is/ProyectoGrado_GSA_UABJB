@@ -1,11 +1,12 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from .models import Facultad, Carrera, Espacio, CustomUser, EspacioCampus, Solicitud
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import get_user_model
+import uuid
 
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(
@@ -14,6 +15,8 @@ class CustomAuthenticationForm(AuthenticationForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'})
     )
+
+User = get_user_model()
 
 class CustomRegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=True,
@@ -27,14 +30,12 @@ class CustomRegistrationForm(UserCreationForm):
     documento = forms.CharField(max_length=20, required=True,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Cédula/CI'}))
 
-    # Solo carrera
     carrera = forms.ModelChoiceField(
         queryset=Carrera.objects.all(),
         empty_label="Seleccionar Carrera",
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
-    # Contraseñas
     password1 = forms.CharField(
         label='Contraseña',
         widget=forms.PasswordInput(attrs={
@@ -53,30 +54,26 @@ class CustomRegistrationForm(UserCreationForm):
     )
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = (
             'username', 'first_name', 'last_name', 'email',
             'telefono', 'documento', 'carrera',
             'password1', 'password2'
         )
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.tipo_usuario = 'usuario'
-
-        # Rellenar campos adicionales
-        user.first_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
-        user.email = self.cleaned_data['email']
-        user.telefono = self.cleaned_data['telefono']
-        user.documento = self.cleaned_data['documento']
-        user.carrera = self.cleaned_data['carrera']
-
-        # Extraer facultad automáticamente
         user.facultad = self.cleaned_data['carrera'].facultad
-        
-        # AGREGAR ESTAS LÍNEAS IMPORTANTES:
-        user.is_active = True  # Activar usuario para Django
-        user.activo = True     # Tu campo personalizado
+
+        # ❗ Desactivar hasta verificar correo
+        user.is_active = False
+        user.activo = False
+        user.verificado = False
+
+        # Generar token y expiración
+        user.token_verificacion = str(uuid.uuid4())
+        user.token_expira = timezone.now() + timedelta(hours=24)
 
         if commit:
             user.save()

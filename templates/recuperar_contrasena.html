@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar Contraseña - UABJB</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/materialize_styles.css' %}">
+</head>
+<body>
+  <div class="login-card z-depth-1" style="max-width:480px;">
+    <div class="logo-section center-align">
+      <i class="material-icons">lock_reset</i>
+      <div class="logo-title">Recuperar Contraseña</div>
+      <div class="logo-subtitle">Te enviaremos un enlace a tu correo</div>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="card-panel {{ message.tags }} lighten-4 black-text">
+          <i class="material-icons tiny left">info</i>{{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="input-field">
+        <i class="material-icons prefix">email</i>
+        <input type="email" name="email" id="id_email" required>
+        <label for="id_email">Correo electrónico institucional</label>
+      </div>
+      <button type="submit" class="btn waves-effect waves-light btn-login">Enviar enlace</button>
+    </form>
+
+    <div class="register-link center-align">
+      ¿Ya tienes cuenta? <a href="{% url 'login' %}">Iniciar sesión</a>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>
