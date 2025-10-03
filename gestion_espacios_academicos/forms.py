@@ -158,7 +158,7 @@ class EspacioForm(forms.ModelForm):
             'capacidad': 'Capacidad',
             'ubicacion': 'Ubicación',
             'activo': 'Activo',
-            'carrera': 'Carrera (opcional, dejar en blanco para espacios comunes)',
+            'carrera': 'Carrera',
             'encargado': 'Encargado',
         }
 
