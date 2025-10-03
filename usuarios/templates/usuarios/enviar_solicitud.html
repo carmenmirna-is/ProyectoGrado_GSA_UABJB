@@ -28,125 +28,128 @@
     </div>
 
     <div class="main-container">
-        <div class="form-container">
-            <h1><i class="fas fa-paper-plane"></i> Enviar Solicitud</h1>
+        <div class="container-box"
+             style="max-width: 800px; margin: 2rem auto; padding: 2rem; background: #fff; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.05);">
+            <div class="form-container">
+                <h1><i class="fas fa-paper-plane"></i> Enviar Solicitud</h1>
 
-            <form method="post" enctype="multipart/form-data" onsubmit="return validarFormulario()" id="solicitudForm">
-                {% csrf_token %}
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
-                <!-- Nombre del Evento -->
-                <div class="input-group" style="--animation-order: 0">
-                    <label><i class="fas fa-calendar-alt"></i> Nombre del evento</label>
-                    <input type="text" name="nombre_evento" required>
-                </div>
-
-                <!-- Descripción del Evento -->
-                <div class="input-group" style="--animation-order: 1">
-                    <label><i class="fas fa-align-left"></i> Descripción</label>
-                    <textarea name="descripcion_evento" rows="4" placeholder="Describe tu evento..."></textarea>
-                </div>
-
-                <!-- Fecha de Inicio -->
-                <div class="input-group" style="--animation-order: 2">
-                    <label><i class="fas fa-clock"></i> Fecha de inicio</label>
-                    <input type="datetime-local" name="fecha_evento" required>
-                </div>
-
-                <!-- Fecha de Finalización -->
-                <div class="input-group" style="--animation-order: 3">
-                    <label><i class="fas fa-clock"></i> Fecha de finalización (opcional)</label>
-                    <input type="datetime-local" name="fecha_fin_evento">
-                </div>
-
-                <!-- Tipo de espacio -->
-                <div class="input-group" style="--animation-order: 4">
-                    <label><i class="fas fa-list"></i> Tipo de espacio</label>
-                    <select name="tipo_espacio" required onchange="toggleEspacios(this.value)">
-                        <option value="">---</option>
-                        <option value="carrera">Espacio de Carrera</option>
-                        <option value="campus">Espacio de Campus</option>
-                    </select>
-                </div>
-
-                <!-- Espacio de carrera -->
-                <div class="input-group" id="espacioCarreraDiv" style="display:none; opacity: 0; --animation-order: 5">
-                    <label><i class="fas fa-map-marker-alt"></i> Espacio de carrera</label>
-                    <select name="espacio_carrera">
-                        <option value="">---</option>
-                        {% for e in espacios_carrera %}
-                            <option value="{{ e.id }}">{{ e.nombre }}</option>
+                <form method="post" enctype="multipart/form-data" onsubmit="return validarFormulario()" id="solicitudForm">
+                    {% csrf_token %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                                {{ message }}
+                            </div>
                         {% endfor %}
-                    </select>
-                </div>
+                    {% endif %}
 
-                <!-- Espacio de campus -->
-                <div class="input-group" id="espacioCampusDiv" style="display:none; opacity: 0; --animation-order: 5">
-                    <label><i class="fas fa-university"></i> Espacio de campus</label>
-                    <select name="espacio_campus">
-                        <option value="">---</option>
-                        {% for e in espacios_campus %}
-                            <option value="{{ e.id }}">{{ e.nombre }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                    <!-- Nombre del Evento -->
+                    <div class="input-group" style="--animation-order: 0">
+                        <label><i class="fas fa-calendar-alt"></i> Nombre del evento</label>
+                        <input type="text" name="nombre_evento" required>
+                    </div>
 
-                <!-- Archivo Adjunto (Sistema personalizado) -->
-                <div class="input-group" style="--animation-order: 6">
-                    <label>
-                        <i class="fas fa-paperclip"></i> Archivo adjunto (obligatorio)
-                    </label>
-                    <div class="file-upload-container">
-                        <input type="file" 
-                               name="archivo_adjunto" 
-                               id="archivo_adjunto" 
-                               required 
-                               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-                        
-                        <div class="file-upload-area" onclick="document.getElementById('archivo_adjunto').click()">
-                            <div class="upload-content">
-                                <div class="upload-icon">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                </div>
-                                <div class="upload-sub">
-                                    Formatos: PDF, JPG, PNG, DOC, DOCX
+                    <!-- Descripción del Evento -->
+                    <div class="input-group" style="--animation-order: 1">
+                        <label><i class="fas fa-align-left"></i> Descripción</label>
+                        <textarea name="descripcion_evento" rows="4" placeholder="Describe tu evento..."></textarea>
+                    </div>
+
+                    <!-- Fecha de Inicio -->
+                    <div class="input-group" style="--animation-order: 2">
+                        <label><i class="fas fa-clock"></i> Fecha de inicio</label>
+                        <input type="datetime-local" name="fecha_evento" required>
+                    </div>
+
+                    <!-- Fecha de Finalización -->
+                    <div class="input-group" style="--animation-order: 3">
+                        <label><i class="fas fa-clock"></i> Fecha de finalización (opcional)</label>
+                        <input type="datetime-local" name="fecha_fin_evento">
+                    </div>
+
+                    <!-- Tipo de espacio -->
+                    <div class="input-group" style="--animation-order: 4">
+                        <label><i class="fas fa-list"></i> Tipo de espacio</label>
+                        <select name="tipo_espacio" required onchange="toggleEspacios(this.value)">
+                            <option value="">---</option>
+                            <option value="carrera">Espacio de Carrera</option>
+                            <option value="campus">Espacio de Campus</option>
+                        </select>
+                    </div>
+
+                    <!-- Espacio de carrera -->
+                    <div class="input-group" id="espacioCarreraDiv" style="display:none; opacity: 0; --animation-order: 5">
+                        <label><i class="fas fa-map-marker-alt"></i> Espacio de carrera</label>
+                        <select name="espacio_carrera">
+                            <option value="">---</option>
+                            {% for e in espacios_carrera %}
+                                <option value="{{ e.id }}">{{ e.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Espacio de campus -->
+                    <div class="input-group" id="espacioCampusDiv" style="display:none; opacity: 0; --animation-order: 5">
+                        <label><i class="fas fa-university"></i> Espacio de campus</label>
+                        <select name="espacio_campus">
+                            <option value="">---</option>
+                            {% for e in espacios_campus %}
+                                <option value="{{ e.id }}">{{ e.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Archivo Adjunto (Sistema personalizado) -->
+                    <div class="input-group" style="--animation-order: 6">
+                        <label>
+                            <i class="fas fa-paperclip"></i> Archivo adjunto (obligatorio)
+                        </label>
+                        <div class="file-upload-container">
+                            <input type="file" 
+                                   name="archivo_adjunto" 
+                                   id="archivo_adjunto" 
+                                   required 
+                                   accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                            
+                            <div class="file-upload-area" onclick="document.getElementById('archivo_adjunto').click()">
+                                <div class="upload-content">
+                                    <div class="upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <div class="upload-sub">
+                                        Formatos: PDF, JPG, PNG, DOC, DOCX
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="file-info" id="fileInfo" style="display: none;">
-                            <div class="file-preview">
-                                <div class="file-icon">
-                                    <i class="fas fa-file"></i>
+                            
+                            <div class="file-info" id="fileInfo" style="display: none;">
+                                <div class="file-preview">
+                                    <div class="file-icon">
+                                        <i class="fas fa-file"></i>
+                                    </div>
+                                    <div class="file-details">
+                                        <div class="file-name" id="fileName"></div>
+                                        <div class="file-size" id="fileSize"></div>
+                                    </div>
+                                    <button type="button" class="remove-file" onclick="removeFile()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
                                 </div>
-                                <div class="file-details">
-                                    <div class="file-name" id="fileName"></div>
-                                    <div class="file-size" id="fileSize"></div>
-                                </div>
-                                <button type="button" class="remove-file" onclick="removeFile()">
-                                    <i class="fas fa-times"></i>
-                                </button>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Observaciones -->
-                <div class="input-group" style="--animation-order: 7">
-                    <label><i class="fas fa-sticky-note"></i> Observaciones (opcional)</label>
-                    <textarea name="observaciones" rows="3" placeholder="Observaciones adicionales..."></textarea>
-                </div>
+                    <!-- Observaciones -->
+                    <div class="input-group" style="--animation-order: 7">
+                        <label><i class="fas fa-sticky-note"></i> Observaciones (opcional)</label>
+                        <textarea name="observaciones" rows="3" placeholder="Observaciones adicionales..."></textarea>
+                    </div>
 
-                <button type="submit" class="btn" style="--animation-order: 8">
-                    <i class="fas fa-paper-plane"></i> Enviar Solicitud
-                </button>
-            </form>
+                    <button type="submit" class="btn" style="--animation-order: 8">
+                        <i class="fas fa-paper-plane"></i> Enviar Solicitud
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 

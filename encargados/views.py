@@ -285,6 +285,9 @@ def solicitudes_aceptadas_json(request):
             'fecha': s.fecha_evento.strftime('%Y-%-m-%-d'),
             'nombre_evento': s.nombre_evento,
             'espacio__nombre': espacio_nombre,
+            'tipo_espacio': s.get_tipo_espacio_display(),
+            'nombre_usuario': s.usuario_solicitante.get_full_name() or s.usuario_solicitante.username,
+            'hora': s.fecha_evento.strftime('%H:%M'),
         })
     return JsonResponse(data, safe=False)
 
@@ -441,9 +444,7 @@ def crear_evento(request):
             tipo_espacio=tipo_espacio,
             espacio=espacio_carrera if tipo_espacio == 'carrera' else None,
             espacio_campus=espacio_campus if tipo_espacio == 'campus' else None,
-            estado='aceptada',  # Automáticamente aceptada porque la crea el encargado
-            # Agregar campo personalizado para el nombre del solicitante real si no tienes este campo
-            # solicitante_personalizado=nombre_solicitante
+            estado='aceptada',  
         )
         
         return JsonResponse({

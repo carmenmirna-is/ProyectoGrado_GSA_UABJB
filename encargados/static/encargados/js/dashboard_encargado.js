@@ -48,6 +48,9 @@ async function initDashboardEncargado() {
                 eventosMap[key].push({
                     nombre: s.nombre_evento,
                     espacio: s.espacio__nombre || s.espacio,
+                    tipo_espacio: s.tipo_espacio,
+                    usuario: s.nombre_usuario,
+                    hora: s.hora,
                     color: '#10b981'
                 });
             });

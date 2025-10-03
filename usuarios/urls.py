@@ -13,4 +13,5 @@ urlpatterns = [
     path('historial/', views.historial_solicitudes, name='historial_solicitudes'),
     path('editar/<int:id>/', views.editar_solicitud, name='editar_solicitud'),
     path('cancelar/<int:id>/', views.cancelar_solicitud, name='cancelar_solicitud'),
+    path('editar-perfil/', views.editar_perfil, name='editar_perfil'),
 ]

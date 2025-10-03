@@ -3,10 +3,13 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from gestion_espacios_academicos import settings
 from gestion_espacios_academicos.models import Espacio, EspacioCampus, Solicitud
 from django.http import JsonResponse
 from django.db.models import Q
-from django.core.mail import send_mail  # 👈 NUEVA IMPORTACIÓN
+from django.core.mail import send_mail
+
+from usuarios.forms import EditarPerfilForm  # 👈 NUEVA IMPORTACIÓN
 
 def notificar_nueva_solicitud(solicitud):
     """
@@ -179,6 +182,7 @@ def enviar_solicitud(request):
             print(f'📧 Enviando notificación para nueva solicitud: {nueva_solicitud.nombre_evento}')
             notificar_nueva_solicitud(nueva_solicitud)
             
+            notificar_confirmacion_solicitud(nueva_solicitud, request)
             messages.success(request, '¡Solicitud enviada con éxito!')
             return redirect('usuarios:usuario')
 
@@ -223,6 +227,19 @@ def perfil_usuario(request):
         'usuario': request.user,
     }
     return render(request, 'usuarios/perfil_usuario.html', context)
+
+@login_required
+def editar_perfil(request):
+    if request.method == 'POST':
+        form = EditarPerfilForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '✅ Perfil actualizado con éxito.')
+            return redirect('usuarios:perfil_usuario')
+    else:
+        form = EditarPerfilForm(instance=request.user)
+
+    return render(request, 'usuarios/editar_perfil.html', {'form': form})
 
 @login_required
 def cambiar_contrasena(request):
@@ -369,3 +386,44 @@ Sistema de Gestión UABJB'''
     except Exception as e:
         print(f'❌ Error enviando notificación: {str(e)}')
 
+from django.template.loader import render_to_string
+
+def notificar_confirmacion_solicitud(solicitud, request):
+    try:
+        user = solicitud.usuario_solicitante
+        if not user.email:
+            print("⚠️ El usuario no tiene email configurado")
+            return False
+
+        protocol = 'https' if request.is_secure() else 'http'
+        domain = request.get_host()
+        enlace_estado = f"{protocol}://{domain}/usuarios/historial-solicitudes/"
+
+        fecha_evento = solicitud.fecha_evento.strftime("%d/%m/%Y a las %H:%M")
+        espacio_nombre = solicitud.get_nombre_espacio()
+        tiene_archivo = bool(solicitud.archivo_adjunto)
+
+        html_message = render_to_string('emails/confirmacion_solicitud.html', {
+            'solicitud': solicitud,
+            'user': user,
+            'enlace_estado': enlace_estado,
+            'fecha_evento': fecha_evento,
+            'espacio_nombre': espacio_nombre,
+            'tiene_archivo': tiene_archivo,
+        })
+
+        subject = "✅ Solicitud recibida - Sistema UABJB"
+
+        send_mail(
+            subject,
+            None,  # texto plano (opcional)
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            html_message=html_message,
+            fail_silently=True,
+        )
+        print(f"✅ Confirmación HTML enviada a {user.email}")
+        return True
+    except Exception as e:
+        print(f"❌ Error enviando confirmación HTML: {str(e)}")
+        return False

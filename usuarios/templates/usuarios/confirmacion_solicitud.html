@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirmación de solicitud - UABJB</title>
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h2>✅ Solicitud recibida</h2>
+    </div>
+    <div class="body">
+      <p>Hola <strong>{{ user.first_name|default:user.username }}</strong>,</p>
+      <p>Tu solicitud ha sido enviada exitosamente y está en revisión.</p>
+
+      <h3>📋 Resumen de tu solicitud</h3>
+      <ul>
+        <li><strong>Evento:</strong> {{ solicitud.nombre_evento }}</li>
+        <li><strong>Fecha y hora:</strong> {{ fecha_evento }}</li>
+        <li><strong>Espacio solicitado:</strong> {{ espacio_nombre }}</li>
+        <li><strong>Archivo adjunto:</strong> {{ tiene_archivo|yesno:"Sí,No" }}</li>
+      </ul>
+
+      <h3>📬 ¿Qué sigue?</h3>
+      <p>Recibirás una notificación cuando el encargado la revise.</p>
+      <div style="text-align:center">
+        <a href="{{ enlace_estado }}" class="btn">Ver estado de mi solicitud</a>
+      </div>
+
+      <p>Si el botón no funciona, copia y pega este enlace:</p>
+      <p><a href="{{ enlace_estado }}">{{ enlace_estado }}</a></p>
+    </div>
+    <div class="footer">
+      © 2025 UABJB - Todos los derechos reservados
+    </div>
+  </div>
+</body>
+</html>

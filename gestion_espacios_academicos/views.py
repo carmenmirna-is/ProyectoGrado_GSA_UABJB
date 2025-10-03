@@ -52,8 +52,6 @@ def registro(request):
             messages.error(request, 'Error en el registro. Verifica los datos.')
     else:
         form = CustomRegistrationForm()
-        print("Errores del formulario:", form.errors)  # ← verás todo en docker logs
-        messages.error(request, 'Error en el registro. Verifica los datos.')
 
     
     return render(request, 'registro.html', {'form': form})
