@@ -14,7 +14,7 @@ function toggleTheme() {
         localStorage.setItem('theme', 'light');
     } else {
         html.setAttribute('data-theme', 'dark');
-        themeIcon.className = 'fas fa-sun';
+        themeIcon.className = 'fas faz-sun';
         themeText.textContent = 'Modo Claro';
         localStorage.setItem('theme', 'dark');
     }
@@ -48,6 +48,9 @@ async function initDashboardEncargado() {
                 eventosMap[key].push({
                     nombre: s.nombre_evento,
                     espacio: s.espacio__nombre || s.espacio,
+                    tipo_espacio: s.tipo_espacio,
+                    usuario: s.nombre_usuario,
+                    hora: s.hora,
                     color: '#10b981'
                 });
             });
