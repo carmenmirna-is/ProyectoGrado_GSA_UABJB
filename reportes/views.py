@@ -9,10 +9,13 @@ import io
 import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from docx import Document
+from docx.shared import Inches, Pt, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 from gestion_espacios_academicos.models import Solicitud
 
 @login_required
@@ -76,6 +79,8 @@ def generar_reportes(request):
             return generar_pdf(data, summary, estado, fecha_inicio, fecha_fin, tipo_reporte)
         elif formato == 'excel':
             return generar_excel_openpyxl(data, summary, estado, fecha_inicio, fecha_fin, tipo_reporte)
+        elif formato == 'word':
+            return generar_word(data, summary, estado, fecha_inicio, fecha_fin, tipo_reporte)
         else:
             messages.error(request, 'Formato no válido.')
             return render(request, 'reportes/generar_reportes.html')
@@ -167,7 +172,7 @@ def preparar_datos_facultades(solicitudes):
 def generar_pdf(data, summary, estado, fecha_inicio, fecha_fin, tipo_reporte):
     """Generar reporte en formato PDF"""
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(A4))
     elements = []
 
     # Estilos
@@ -238,16 +243,29 @@ def generar_pdf(data, summary, estado, fecha_inicio, fecha_fin, tipo_reporte):
         'facultades': ['Facultad', 'Carrera', 'Total Solicitudes', 'Aprobadas']
     }
     table_data = [headers[tipo_reporte]] + data
-    table = Table(table_data)
+    
+    # Ajustar anchos de columnas según el tipo de reporte
+    if tipo_reporte == 'solicitudes':
+        table = Table(table_data, colWidths=[30, 100, 90, 140, 110, 70, 100])
+    elif tipo_reporte == 'ocupacion':
+        table = Table(table_data, colWidths=[200, 120, 120, 120])
+    elif tipo_reporte == 'facultades':
+        table = Table(table_data, colWidths=[150, 150, 120, 120])
+    else:
+        table = Table(table_data)
+    
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('FONTSIZE', (0, 0), (-1, 0), 9),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
         ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('WORDWRAP', (0, 0), (-1, -1), True)
     ]))
     elements.append(table)
     doc.build(elements)
@@ -371,4 +389,164 @@ def generar_excel_openpyxl(data, summary, estado, fecha_inicio, fecha_fin, tipo_
     )
     timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')
     response['Content-Disposition'] = f'attachment; filename="reporte_{tipo_reporte}_{timestamp}.xlsx"'
+    return response
+
+def generar_word(data, summary, estado, fecha_inicio, fecha_fin, tipo_reporte):
+    """Generar reporte en formato Word"""
+    doc = Document()
+    
+    # Configurar márgenes y orientación horizontal
+    sections = doc.sections
+    for section in sections:
+        section.page_width = Inches(11)
+        section.page_height = Inches(8.5)
+        section.left_margin = Inches(0.5)
+        section.right_margin = Inches(0.5)
+    
+    # Título
+    title_text = {
+        'solicitudes': 'Reporte de Solicitudes - UABJB',
+        'ocupacion': 'Reporte de Ocupación de Espacios - UABJB',
+        'facultades': 'Reporte de Uso por Facultades - UABJB'
+    }
+    title = doc.add_heading(title_text[tipo_reporte], level=1)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    
+    # Filtros
+    filter_info = f"Estado: {estado.title()}"
+    if fecha_inicio:
+        filter_info += f" | Desde: {fecha_inicio}"
+    if fecha_fin:
+        filter_info += f" | Hasta: {fecha_fin}"
+    filter_info += f" | Generado: {timezone.now().strftime('%Y-%m-%d %H:%M')}"
+    filter_paragraph = doc.add_paragraph(filter_info)
+    filter_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    
+    doc.add_paragraph()  # Espacio
+    
+    # Resumen Estadístico
+    doc.add_heading('Resumen Estadístico', level=2)
+    
+    if tipo_reporte == 'solicitudes':
+        summary_data = [
+            ['Total Solicitudes', str(summary['total_solicitudes'])],
+            ['Aprobadas', str(summary['aprobadas'])],
+            ['Rechazadas', str(summary['rechazadas'])],
+            ['Tasa de Aprobación', summary['tasa_aprobacion']],
+            ['Tasa de Rechazo', summary['tasa_rechazo']],
+        ]
+        
+        # Tabla de resumen
+        table = doc.add_table(rows=len(summary_data), cols=2)
+        table.style = 'Light Grid Accent 1'
+        
+        for i, (label, value) in enumerate(summary_data):
+            table.rows[i].cells[0].text = label
+            table.rows[i].cells[1].text = str(value)
+        
+        # Motivos de rechazo
+        if summary['motivos_rechazo']:
+            doc.add_paragraph()
+            doc.add_heading('Motivos de Rechazo:', level=3)
+            motivos_table = doc.add_table(rows=len(summary['motivos_rechazo']) + 1, cols=2)
+            motivos_table.style = 'Light Grid Accent 1'
+            motivos_table.rows[0].cells[0].text = 'Motivo'
+            motivos_table.rows[0].cells[1].text = 'Total'
+            for i, (motivo, total) in enumerate(summary['motivos_rechazo'], 1):
+                motivos_table.rows[i].cells[0].text = str(motivo)
+                motivos_table.rows[i].cells[1].text = str(total)
+        
+        # Patrones temporales
+        if summary['patrones_temporales']:
+            doc.add_paragraph()
+            doc.add_heading('Patrones Temporales:', level=3)
+            patrones_table = doc.add_table(rows=len(summary['patrones_temporales']) + 1, cols=2)
+            patrones_table.style = 'Light Grid Accent 1'
+            patrones_table.rows[0].cells[0].text = 'Hora'
+            patrones_table.rows[0].cells[1].text = 'Total'
+            for i, (hora, total) in enumerate(summary['patrones_temporales'], 1):
+                patrones_table.rows[i].cells[0].text = str(hora)
+                patrones_table.rows[i].cells[1].text = str(total)
+    
+    elif tipo_reporte == 'ocupacion':
+        # Espacios más demandados
+        doc.add_heading('Espacios Más Demandados:', level=3)
+        table = doc.add_table(rows=len(summary['espacios_mas_demandados']) + 1, cols=2)
+        table.style = 'Light Grid Accent 1'
+        table.rows[0].cells[0].text = 'Espacio'
+        table.rows[0].cells[1].text = 'Solicitudes'
+        for i, (espacio, total) in enumerate(summary['espacios_mas_demandados'], 1):
+            table.rows[i].cells[0].text = str(espacio)
+            table.rows[i].cells[1].text = str(total)
+        
+        # Espacios menos demandados
+        doc.add_paragraph()
+        doc.add_heading('Espacios Menos Demandados:', level=3)
+        table2 = doc.add_table(rows=len(summary['espacios_menos_demandados']) + 1, cols=2)
+        table2.style = 'Light Grid Accent 1'
+        table2.rows[0].cells[0].text = 'Espacio'
+        table2.rows[0].cells[1].text = 'Solicitudes'
+        for i, (espacio, total) in enumerate(summary['espacios_menos_demandados'], 1):
+            table2.rows[i].cells[0].text = str(espacio)
+            table2.rows[i].cells[1].text = str(total)
+        
+        # Picos de actividad
+        doc.add_paragraph()
+        doc.add_heading('Picos de Actividad:', level=3)
+        table3 = doc.add_table(rows=len(summary['picos_actividad']) + 1, cols=2)
+        table3.style = 'Light Grid Accent 1'
+        table3.rows[0].cells[0].text = 'Fecha'
+        table3.rows[0].cells[1].text = 'Solicitudes'
+        for i, (fecha, total) in enumerate(summary['picos_actividad'], 1):
+            table3.rows[i].cells[0].text = str(fecha)
+            table3.rows[i].cells[1].text = str(total)
+    
+    elif tipo_reporte == 'facultades':
+        doc.add_heading('Facultades Más Activas:', level=3)
+        table = doc.add_table(rows=len(summary['facultades_mas_activas']) + 1, cols=2)
+        table.style = 'Light Grid Accent 1'
+        table.rows[0].cells[0].text = 'Facultad'
+        table.rows[0].cells[1].text = 'Solicitudes'
+        for i, (facultad, total) in enumerate(summary['facultades_mas_activas'], 1):
+            table.rows[i].cells[0].text = str(facultad)
+            table.rows[i].cells[1].text = str(total)
+    
+    doc.add_paragraph()  # Espacio
+    
+    # Tabla de datos principales
+    doc.add_heading('Datos Detallados', level=2)
+    
+    headers = {
+        'solicitudes': ['ID', 'Evento', 'Fecha/Hora', 'Usuario', 'Espacio', 'Estado', 'Motivo Rechazo'],
+        'ocupacion': ['Espacio', 'Total Solicitudes', 'Aprobadas', 'Tasa Aprobación'],
+        'facultades': ['Facultad', 'Carrera', 'Total Solicitudes', 'Aprobadas']
+    }
+    
+    table = doc.add_table(rows=len(data) + 1, cols=len(headers[tipo_reporte]))
+    table.style = 'Light Grid Accent 1'
+    
+    # Encabezados
+    for i, header in enumerate(headers[tipo_reporte]):
+        table.rows[0].cells[i].text = header
+        # Hacer encabezados en negrita
+        for paragraph in table.rows[0].cells[i].paragraphs:
+            for run in paragraph.runs:
+                run.font.bold = True
+    
+    # Datos
+    for row_idx, row_data in enumerate(data, 1):
+        for col_idx, value in enumerate(row_data):
+            table.rows[row_idx].cells[col_idx].text = str(value)
+    
+    # Guardar en buffer
+    buffer = io.BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+    
+    response = HttpResponse(
+        buffer.getvalue(),
+        content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    )
+    timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')
+    response['Content-Disposition'] = f'attachment; filename="reporte_{tipo_reporte}_{timestamp}.docx"'
     return response
