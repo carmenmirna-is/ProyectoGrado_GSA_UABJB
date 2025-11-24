@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div class="header-controls">
-                <!-- 👤 NUEVO: Enlace al perfil del usuario -->
+                <!-- 👤 Enlace al perfil del usuario -->
                 <a href="{% url 'usuarios:perfil_usuario' %}" class="profile-link" title="Mi Perfil">
                     <i class="fas fa-user-circle"></i>
                     <span>{{ request.user.first_name|default:request.user.username }}</span>
@@ -52,7 +52,7 @@
                 <button class="btn-nav" onclick="cambiarMes(-1)">
                     <i class="fas fa-chevron-left"></i> Anterior
                 </button>
-                <span class="titulo-mes" id="titulo-mes">Agosto 2025</span> <!-- Actualizado a la fecha actual -->
+                <span class="titulo-mes" id="titulo-mes">Noviembre 2025</span>
                 <button class="btn-nav" onclick="cambiarMes(1)">
                     Siguiente <i class="fas fa-chevron-right"></i>
                 </button>
@@ -77,6 +77,41 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- 📊 NUEVO: Estadísticas del mes -->
+            <div id="calendario-stats" class="calendario-stats-container">
+                <!-- Se llenará automáticamente con JavaScript -->
+            </div>
+
+            <!-- 📖 NUEVO: Leyenda de colores -->
+            <div class="leyenda-calendario">
+                <h3 class="leyenda-titulo">
+                    <i class="fas fa-info-circle"></i> Leyenda del Calendario
+                </h3>
+                <div class="leyenda-items">
+                    <div class="leyenda-item">
+                        <div class="leyenda-color" style="background-color: #3b82f6;"></div>
+                        <span>Tus reservas</span>
+                    </div>
+                    <div class="leyenda-item">
+                        <div class="leyenda-color" style="background-color: #94a3b8;"></div>
+                        <span>Reservas de otros usuarios</span>
+                    </div>
+                    <div class="leyenda-item">
+                        <div class="leyenda-color-border"></div>
+                        <span>Día actual</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 💡 NUEVO: Información adicional -->
+            <div class="info-calendario">
+                <i class="fas fa-lightbulb"></i>
+                <div>
+                    <strong>Consejo:</strong> Pasa el cursor sobre los días marcados para ver los detalles de cada evento.
+                    El calendario muestra todas las reservas de espacios de tu carrera, facultad y campus.
+                </div>
+            </div>
             
             <!-- Acciones del Dashboard -->
             <div class="dashboard-actions">
@@ -84,7 +119,7 @@
                     <i class="fas fa-plus"></i> Nueva Solicitud
                 </a>
                 <a href="{% url 'usuarios:historial_solicitudes' %}" class="dashboard-btn">
-                    <i class="fas fa-building"></i> Historial de Solicitudes
+                    <i class="fas fa-history"></i> Historial de Solicitudes
                 </a>
                 <a href="{% url 'usuarios:listar_espacios' %}" class="dashboard-btn">
                     <i class="fas fa-building"></i> Espacios Disponibles

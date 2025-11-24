@@ -208,6 +208,23 @@ class Solicitud(models.Model):
         limit_choices_to={'tipo_usuario': 'administrador'},
         help_text="Administrador que procesa la solicitud"
     )
+        # ⭐ NUEVOS CAMPOS PARA CONFIRMACIÓN
+    token_confirmacion = models.CharField(
+        max_length=16, 
+        blank=True, 
+        null=True,
+        help_text="Token único de confirmación"
+    )
+    fecha_confirmacion = models.DateTimeField(
+        blank=True, 
+        null=True,
+        help_text="Fecha cuando se envió la confirmación"
+    )
+    fecha_aprobacion = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text="Fecha cuando el encargado aprobó la solicitud"
+    )
    
     class Meta:
         db_table = 'solicitud'

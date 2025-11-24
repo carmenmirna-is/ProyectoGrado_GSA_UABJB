@@ -6,372 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Perfil - Encargado UABJB</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 2rem 1rem;
-        }
-
-        .header-bar {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 1rem 2rem;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: white;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .header-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .btn-volver {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 0.7rem 1.5rem;
-            border-radius: 8px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-volver:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .theme-toggle {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.7rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .perfil-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .perfil-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 3rem 2rem;
-            text-align: center;
-            color: white;
-            position: relative;
-        }
-
-        .perfil-avatar {
-            width: 100px;
-            height: 100px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            margin: 0 auto 1rem;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .perfil-nombre {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .perfil-rol {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .info-content {
-            padding: 2rem;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .info-card {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 12px;
-            border-left: 4px solid #e9ecef;
-            transition: all 0.3s ease;
-        }
-
-        .info-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .info-label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: #666;
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.5px;
-        }
-
-        .info-label i {
-            color: #667eea;
-        }
-
-        .info-value {
-            font-size: 1rem;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .info-value em {
-            color: #999;
-            font-style: italic;
-        }
-
-        .espacios-section {
-            margin-bottom: 2rem;
-        }
-
-        .espacios-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .espacios-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
-        }
-
-        .espacio-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .espacio-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .espacio-card.campus {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
-        }
-
-        .espacio-card.campus:hover {
-            box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
-        }
-
-        .espacio-card h4 {
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-
-        .espacio-card p {
-            opacity: 0.9;
-            font-size: 0.9rem;
-        }
-
-        .seguridad-section {
-            background: #f8f9fa;
-            padding: 2rem;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid #e9ecef;
-        }
-
-        .seguridad-section h3 {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            color: #333;
-            font-size: 1.2rem;
-        }
-
-        .seguridad-section p {
-            color: #666;
-            margin-bottom: 1.5rem;
-        }
-
-        .btn-cambiar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 0.8rem 2rem;
-            border-radius: 8px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-cambiar:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .alert {
-            background: #d1ecf1;
-            border: 1px solid #bee5eb;
-            color: #0c5460;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .alert.alert-error {
-            background: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
-        }
-
-        /* Tema oscuro */
-        body[data-theme="dark"] {
-            background: linear-gradient(135deg, #2c3e50 0%, #4a6741 100%);
-        }
-
-        body[data-theme="dark"] .perfil-container {
-            background: #1a1a1a;
-            color: #fff;
-        }
-
-        body[data-theme="dark"] .info-card {
-            background: #2d2d2d;
-            border-left-color: #444;
-        }
-
-        body[data-theme="dark"] .info-label {
-            color: #ccc;
-        }
-
-        body[data-theme="dark"] .info-value {
-            color: #fff;
-        }
-
-        body[data-theme="dark"] .espacios-title {
-            color: #fff;
-            border-bottom-color: #444;
-        }
-
-        body[data-theme="dark"] .seguridad-section {
-            background: #2d2d2d;
-            border-color: #444;
-        }
-
-        body[data-theme="dark"] .seguridad-section h3,
-        body[data-theme="dark"] .seguridad-section p {
-            color: #ccc;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-            
-            .header-bar {
-                padding: 1rem;
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .espacios-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .perfil-header {
-                padding: 2rem 1rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'encargados/css/perfil_encargado.css' %}">
 </head>
 <body data-theme="light">
     <!-- Header Bar -->
-    <div class="header-bar">
-        <div class="header-title">
-            <i class="fas fa-user-tie"></i>
-            Mi Perfil - Encargado
-        </div>
-        <div style="display: flex; gap: 1rem; align-items: center;">
-            <a href="{% url 'encargados:dashboard_encargados' %}" class="btn-volver">
-                <i class="fas fa-arrow-left"></i> Volver al Dashboard
-            </a>
-            <div class="theme-toggle" onclick="toggleTheme()">
-                <i class="fas fa-moon" id="theme-icon"></i>
-                <span id="theme-text">Modo Oscuro</span>
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="header-info">
+                    <h1 class="header-title">
+                        <i class="fas fa-user-tie"></i>
+                        Mi Perfil - Encargado
+                    </h1>
+                    <p class="header-subtitle">Sistema de Gestión UABJB</p>
+                </div>
+            </div>
+            <div class="header-controls">
+                <a href="{% url 'encargados:dashboard_encargados' %}" class="btn-volver">
+                    <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                </a>
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                    <span id="theme-text">Modo Oscuro</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="perfil-container">
+    <div class="container">
         <!-- Mensajes de Django -->
         {% if messages %}
-            <div style="padding: 1rem;">
+            <div class="messages-container">
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }}">
                         <i class="fas fa-info-circle"></i>
@@ -381,131 +49,150 @@
             </div>
         {% endif %}
 
-        <!-- Header del Perfil -->
-        <div class="perfil-header">
-            <div class="perfil-avatar">
-                <i class="fas fa-user-tie"></i>
+        <div class="perfil-container">
+            <!-- Header del Perfil -->
+            <div class="perfil-header">
+                <div class="perfil-avatar">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h1 class="perfil-nombre">
+                    {% if encargado.first_name or encargado.last_name %}
+                        {{ encargado.first_name }} {{ encargado.last_name }}
+                    {% else %}
+                        {{ encargado.username }}
+                    {% endif %}
+                </h1>
+                <div class="perfil-rol">
+                    <i class="fas fa-user-cog"></i> Encargado
+                </div>
             </div>
-            <h1 class="perfil-nombre">
-                {% if encargado.first_name or encargado.last_name %}
-                    {{ encargado.first_name }} {{ encargado.last_name }}
-                {% else %}
-                    {{ encargado.username }}
+
+            <!-- Contenido del perfil -->
+            <div class="info-content">
+                <!-- Información Personal -->
+                <div class="info-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-id-card"></i>
+                        Información Personal
+                    </h2>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <div class="info-label">
+                                <i class="fas fa-user"></i> Nombre de Usuario
+                            </div>
+                            <div class="info-value">{{ encargado.username }}</div>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="info-label">
+                                <i class="fas fa-signature"></i> Nombres
+                            </div>
+                            <div class="info-value">
+                                {% if encargado.first_name %}
+                                    {{ encargado.first_name }}
+                                {% else %}
+                                    <em>No especificado</em>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="info-label">
+                                <i class="fas fa-signature"></i> Apellidos
+                            </div>
+                            <div class="info-value">
+                                {% if encargado.last_name %}
+                                    {{ encargado.last_name }}
+                                {% else %}
+                                    <em>No especificado</em>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="info-label">
+                                <i class="fas fa-envelope"></i> Correo Electrónico
+                            </div>
+                            <div class="info-value">
+                                {% if encargado.email %}
+                                    {{ encargado.email }}
+                                {% else %}
+                                    <em>No especificado</em>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="info-label">
+                                <i class="fas fa-phone"></i> Teléfono
+                            </div>
+                            <div class="info-value">
+                                {% if encargado.telefono %}
+                                    {{ encargado.telefono }}
+                                {% else %}
+                                    <em>No especificado</em>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="info-label">
+                                <i class="fas fa-id-card"></i> Documento
+                            </div>
+                            <div class="info-value">
+                                {% if encargado.documento %}
+                                    {{ encargado.documento }}
+                                {% else %}
+                                    <em>No especificado</em>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Espacios a Cargo -->
+                {% if espacios_carrera or espacios_campus %}
+                <div class="espacios-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-building"></i>
+                        Espacios a Cargo
+                    </h2>
+                    
+                    <div class="espacios-grid">
+                        {% for espacio in espacios_carrera %}
+                        <div class="espacio-card">
+                            <div class="espacio-icon">
+                                <i class="fas fa-door-open"></i>
+                            </div>
+                            <h4 class="espacio-nombre">{{ espacio.nombre }}</h4>
+                            <div class="espacio-info">
+                                <p><i class="fas fa-graduation-cap"></i> <strong>Carrera:</strong> {{ espacio.carrera.nombre }}</p>
+                                <p><i class="fas fa-university"></i> <strong>Facultad:</strong> {{ espacio.carrera.facultad.nombre }}</p>
+                                {% if espacio.ubicacion %}
+                                    <p><i class="fas fa-map-marker-alt"></i> <strong>Ubicación:</strong> {{ espacio.ubicacion }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        {% for espacio in espacios_campus %}
+                        <div class="espacio-card espacio-campus">
+                            <div class="espacio-icon">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <h4 class="espacio-nombre">{{ espacio.nombre }}</h4>
+                            <div class="espacio-info">
+                                <p><i class="fas fa-tag"></i> <strong>Tipo:</strong> Espacio de Campus</p>
+                                {% if espacio.ubicacion %}
+                                    <p><i class="fas fa-map-marker-alt"></i> <strong>Ubicación:</strong> {{ espacio.ubicacion }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
                 {% endif %}
-            </h1>
-            <div class="perfil-rol">
-                <i class="fas fa-user-cog"></i> Encargado
             </div>
-        </div>
-
-        <!-- Contenido del perfil -->
-        <div class="info-content">
-            <!-- Información Personal -->
-            <div class="info-grid">
-                <div class="info-card">
-                    <div class="info-label">
-                        <i class="fas fa-user"></i> Nombre de Usuario
-                    </div>
-                    <div class="info-value">{{ encargado.username }}</div>
-                </div>
-
-                <div class="info-card">
-                    <div class="info-label">
-                        <i class="fas fa-signature"></i> Nombres
-                    </div>
-                    <div class="info-value">
-                        {% if encargado.first_name %}
-                            {{ encargado.first_name }}
-                        {% else %}
-                            <em>No especificado</em>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="info-card">
-                    <div class="info-label">
-                        <i class="fas fa-signature"></i> Apellidos
-                    </div>
-                    <div class="info-value">
-                        {% if encargado.last_name %}
-                            {{ encargado.last_name }}
-                        {% else %}
-                            <em>No especificado</em>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="info-card">
-                    <div class="info-label">
-                        <i class="fas fa-envelope"></i> Correo Electrónico
-                    </div>
-                    <div class="info-value">
-                        {% if encargado.email %}
-                            {{ encargado.email }}
-                        {% else %}
-                            <em>No especificado</em>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="info-card">
-                    <div class="info-label">
-                        <i class="fas fa-phone"></i> Teléfono
-                    </div>
-                    <div class="info-value">
-                        {% if encargado.telefono %}
-                            {{ encargado.telefono }}
-                        {% else %}
-                            <em>No especificado</em>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="info-card">
-                    <div class="info-label">
-                        <i class="fas fa-id-card"></i> Documento
-                    </div>
-                    <div class="info-value">
-                        {% if encargado.documento %}
-                            {{ encargado.documento }}
-                        {% else %}
-                            <em>No especificado</em>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Espacios a Cargo -->
-            {% if espacios_carrera or espacios_campus %}
-            <div class="espacios-section">
-                <h2 class="espacios-title">
-                    <i class="fas fa-building"></i> Espacios a Cargo
-                </h2>
-                
-                <div class="espacios-grid">
-                    {% for espacio in espacios_carrera %}
-                    <div class="espacio-card">
-                        <h4><i class="fas fa-door-open"></i> {{ espacio.nombre }}</h4>
-                        <p><strong>Carrera:</strong> {{ espacio.carrera.nombre }}</p>
-                        <p><strong>Facultad:</strong> {{ espacio.carrera.facultad.nombre }}</p>
-                        {% if espacio.ubicacion %}
-                            <p><strong>Ubicación:</strong> {{ espacio.ubicacion }}</p>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-
-                    {% for espacio in espacios_campus %}
-                    <div class="espacio-card campus">
-                        <h4><i class="fas fa-university"></i> {{ espacio.nombre }}</h4>
-                        <p><strong>Tipo:</strong> Espacio de Campus</p>
-                        {% if espacio.ubicacion %}
-                            <p><strong>Ubicación:</strong> {{ espacio.ubicacion }}</p>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
         </div>
     </div>
 
@@ -546,5 +233,17 @@
             }
         });
     </script>
+    <script>
+// Script para hacer el header más pequeño al hacer scroll en móvil
+window.addEventListener('scroll', () => {
+    const header = document.querySelector('.header');
+    
+    if (window.pageYOffset > 50) {
+        header.classList.add('scrolled');
+    } else {
+        header.classList.remove('scrolled');
+    }
+});
+</script>
 </body>
 </html>

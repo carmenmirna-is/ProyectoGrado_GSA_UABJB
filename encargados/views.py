@@ -10,6 +10,7 @@ from datetime import datetime
 from django.core.mail import send_mail
 import json
 from django.db.models import Q
+from usuarios.views import notificar_aceptacion_solicitud
 
 @login_required
 def dashboard_encargados(request):
@@ -102,46 +103,32 @@ def solicitudes_aceptadas(request):
 
 @login_required
 def aprobar_solicitud(request, solicitud_id):
+    """
+    Aprueba una solicitud y envía correo con token + QR al solicitante
+    """
     try:
         solicitud = get_object_or_404(Solicitud, id=solicitud_id)
+        
+        # 1️⃣ CAMBIAR ESTADO A ACEPTADA
         solicitud.estado = 'aceptada'
-        solicitud.fecha_aprobacion = timezone.now()  # Si tienes este campo
+        solicitud.fecha_aprobacion = timezone.now()
         solicitud.save()
         
-        # Enviar notificación por correo
-        try:
-            subject = 'Solicitud Aceptada - UABJB'
-            message = f'''Estimado/a {solicitud.usuario_solicitante.first_name or solicitud.usuario_solicitante.username},
-
-Tu solicitud "{solicitud.nombre_evento}" ha sido aceptada.
-
-Detalles:
-- Fecha: {solicitud.fecha_evento.strftime("%d/%m/%Y %H:%M")}
-- Espacio: {solicitud.get_nombre_espacio()}
-- Tipo de espacio: {solicitud.get_tipo_espacio_display()}
-
-Gracias por usar nuestro sistema.
-
-Saludos,
-Sistema de Gestión UABJB'''
-            
-            send_mail(
-                subject,
-                message,
-                'cibanezsanguino@gmail.com',
-                [solicitud.usuario_solicitante.email],
-                fail_silently=True,  # Cambiado a True para evitar errores de email
-            )
-        except Exception as e:
-            print(f'Error enviando correo: {str(e)}')  # Log del error
+        # 2️⃣ 🔔 ENVIAR CORREO CON TOKEN Y QR
+        print(f"📧 Enviando confirmación de aceptación para solicitud {solicitud_id}...")
+        notificar_aceptacion_solicitud(solicitud, encargado=request.user)
         
-        # Siempre devolver JSON para requests AJAX
+        # 3️⃣ DEVOLVER JSON
         return JsonResponse({
             'status': 'success', 
-            'message': 'Solicitud aprobada con éxito.'
+            'message': '✅ Solicitud aprobada y notificación enviada al solicitante.'
         })
         
     except Exception as e:
+        print(f"❌ Error al aprobar solicitud: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
         return JsonResponse({
             'status': 'error', 
             'message': f'Error al aprobar la solicitud: {str(e)}'

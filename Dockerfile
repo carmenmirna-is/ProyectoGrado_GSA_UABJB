@@ -8,13 +8,20 @@ ENV PYTHONUNBUFFERED=1
 # Crear y establecer el directorio de trabajo
 WORKDIR /app
 
-# Instalar dependencias del sistema necesarias para PostgreSQL
+# Instalar dependencias del sistema necesarias para PostgreSQL y Pillow/QRCode
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         postgresql-client \
         gcc \
         python3-dev \
         libpq-dev \
+        libjpeg-dev \
+        zlib1g-dev \
+        libfreetype6-dev \
+        liblcms2-dev \
+        libopenjp2-7-dev \
+        libtiff5-dev \
+        libwebp-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar requirements.txt y instalar dependencias de Python

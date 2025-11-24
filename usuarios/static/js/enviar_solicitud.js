@@ -12,14 +12,32 @@ function toggleTheme() {
 }
 
 // ============================
-// MOSTRAR/OCULTAR ESPACIOS
+// MOSTRAR/OCULTAR ESPACIOS CON ANIMACIÓN
 // ============================
 function toggleEspacios(tipo) {
   const carrera = document.getElementById('espacioCarreraDiv');
-  const campus  = document.getElementById('espacioCampusDiv');
+  const campus = document.getElementById('espacioCampusDiv');
+  
   if (!carrera || !campus) return;
-  carrera.style.display = (tipo === 'carrera') ? 'block' : 'none';
-  campus.style.display  = (tipo === 'campus')  ? 'block' : 'none';
+
+  // Ocultar ambos primero
+  carrera.style.display = 'none';
+  carrera.style.opacity = '0';
+  campus.style.display = 'none';
+  campus.style.opacity = '0';
+
+  // Mostrar el seleccionado con animación
+  if (tipo === 'carrera') {
+    carrera.style.display = 'block';
+    // Forzar reflow para activar animación
+    void carrera.offsetWidth;
+    carrera.style.opacity = '1';
+  } else if (tipo === 'campus') {
+    campus.style.display = 'block';
+    // Forzar reflow para activar animación
+    void campus.offsetWidth;
+    campus.style.opacity = '1';
+  }
 }
 
 // ============================

@@ -54,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'gestion_espacios_academicos.middleware.TimezoneMiddleware',
 ]
 
 ROOT_URLCONF = 'gestion_espacios_academicos.urls'
@@ -126,17 +127,30 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
+# ============================
+# INTERNATIONALIZATION & TIMEZONE
+# ============================
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-bo'  # Español de Bolivia
 
 USE_I18N = True
+USE_L10N = True
 
+# ⏰ CONFIGURACIÓN DE TIMEZONE - BOLIVIA
 USE_TZ = True
+TIME_ZONE = 'America/La_Paz'  # UTC-4
 
-USE_TZ = True
-TIME_ZONE = 'America/La_Paz'
+# Formato de fecha y hora personalizado
+DATETIME_FORMAT = 'd/m/Y H:i'
+DATE_FORMAT = 'd/m/Y'
+TIME_FORMAT = 'H:i'
+
+DATETIME_INPUT_FORMATS = [
+    '%Y-%m-%d %H:%M:%S',
+    '%Y-%m-%d %H:%M',
+    '%d/%m/%Y %H:%M:%S',
+    '%d/%m/%Y %H:%M',
+]
 
 
 # Static files (CSS, JavaScript, Images)

@@ -35,6 +35,7 @@
 
                 <form method="post" enctype="multipart/form-data" onsubmit="return validarFormulario()" id="solicitudForm">
                     {% csrf_token %}
+                    <input type="hidden" name="form_token" value="{{ form_token }}">
                     {% if messages %}
                         {% for message in messages %}
                             <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
@@ -145,10 +146,55 @@
                         <textarea name="observaciones" rows="3" placeholder="Observaciones adicionales..."></textarea>
                     </div>
 
-                    <button type="submit" class="btn" style="--animation-order: 8">
+                    <button type="submit" class="btn-primary" id="btn-enviar">
                         <i class="fas fa-paper-plane"></i> Enviar Solicitud
                     </button>
                 </form>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const form = document.getElementById('form-solicitud');
+                        const btnEnviar = document.getElementById('btn-enviar');
+                        let enviando = false;
+                        
+                        form.addEventListener('submit', function(e) {
+                            if (enviando) {
+                                e.preventDefault();
+                                return false;
+                            }
+                            
+                            // Validar que hay archivo
+                            const archivo = document.querySelector('input[type="file"]');
+                            if (!archivo || !archivo.files.length) {
+                                e.preventDefault();
+                                alert('⚠️ Por favor adjunta un archivo antes de enviar la solicitud.');
+                                return false;
+                            }
+                            
+                            // Deshabilitar botón y cambiar texto
+                            enviando = true;
+                            btnEnviar.disabled = true;
+                            btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+                            btnEnviar.style.opacity = '0.6';
+                            btnEnviar.style.cursor = 'not-allowed';
+                            
+                            // Si hay error, reactivar después de 3 segundos
+                            setTimeout(function() {
+                                if (enviando) {
+                                    enviando = false;
+                                    btnEnviar.disabled = false;
+                                    btnEnviar.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Solicitud';
+                                    btnEnviar.style.opacity = '1';
+                                    btnEnviar.style.cursor = 'pointer';
+                                }
+                            }, 3000);
+                        });
+                        
+                        // Prevenir reenvío al refrescar la página
+                        if (window.history.replaceState) {
+                            window.history.replaceState(null, null, window.location.href);
+                        }
+                    });
+                    </script>
             </div>
         </div>
     </div>
