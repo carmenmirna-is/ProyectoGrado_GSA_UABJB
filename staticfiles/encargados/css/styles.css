@@ -372,6 +372,8 @@ tr:hover { background: var(--bg-secondary); }
 .estado-aceptada { background-color: #d1fae5; color: #065f46; }
 .estado-rechazada { background-color: #fecaca; color: #991b1b; }
 
+
+
 /* ============================
    MODALES Y TOOLTIPS
    ============================ */

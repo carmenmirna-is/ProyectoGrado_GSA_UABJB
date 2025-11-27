@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -140,6 +141,7 @@ class Solicitud(models.Model):
         ('pendiente', 'Pendiente'),
         ('aceptada', 'Aceptada'),
         ('rechazada', 'Rechazada'),
+        ('cancelada', 'Cancelada'),
     ]
 
     TIPOS_ESPACIO = [
@@ -157,6 +159,14 @@ class Solicitud(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     archivo_adjunto = models.FileField(upload_to='solicitudes/')
+    eliminada = models.BooleanField(default=False)
+    fecha_eliminacion = models.DateTimeField(null=True, blank=True)
+    fecha_aprobacion = models.DateTimeField(null=True, blank=True)
+    acepta_condiciones_uso = models.BooleanField(default=False)
+    acepta_ley_259 = models.BooleanField(default=False)
+    firma_digital = models.ImageField(upload_to='firmas/', null=True, blank=True)
+    fecha_aceptacion_terminos = models.DateTimeField(null=True, blank=True)
+    ip_aceptacion = models.GenericIPAddressField(null=True, blank=True)
 
     # Campo para determinar el tipo de espacio
     tipo_espacio = models.CharField(
@@ -288,6 +298,7 @@ class Solicitud(models.Model):
                 raise ValidationError(f'Tipo de archivo no permitido. Formatos permitidos: {", ".join(allowed_extensions)}')
    
     def save(self, *args, **kwargs):
+        # Ejecutar validaciones antes de guardar
         self.clean()
         super().save(*args, **kwargs)
    

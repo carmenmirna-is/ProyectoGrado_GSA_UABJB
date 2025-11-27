@@ -5,8 +5,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitudes Aceptadas - UABJB</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{% static 'encargados/css/styles.css' %}">
+    <style>
+        .btn-cancelar {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .btn-cancelar:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        /* Estilos para modales dialog */
+        dialog {
+            border: none;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        dialog::backdrop {
+            background: rgba(0,0,0,0.5);
+        }
+        dialog h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        dialog textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        dialog textarea:focus {
+            outline: none;
+            border-color: #dc3545;
+        }
+        .modal-buttons {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+        #modalCancelar h3 {
+            color: #dc3545;
+        }
+    </style>
 </head>
 <body class="solicitudes-aceptadas">
     <div class="header">
@@ -33,6 +95,7 @@
                 <table>
                     <thead>
                         <tr>
+                            <th>Token</th>
                             <th>Evento</th>
                             <th>Fecha</th>
                             <th>Solicitante</th>
@@ -43,6 +106,12 @@
                     <tbody>
                         {% for solicitud in solicitudes %}
                         <tr id="fila-{{ solicitud.id }}">
+                            <td>
+                                <div class="token-display-large">
+                                    <i class="fas fa-qrcode"></i>
+                                    <span>{{ solicitud.token_confirmacion|default:"Sin Token" }}</span>
+                                </div>
+                            </td>
                             <td>{{ solicitud.nombre_evento }}</td>
                             <td id="fecha-{{ solicitud.id }}">{{ solicitud.fecha_evento|date:"d/m/Y H:i" }}</td>
                             <td>{{ solicitud.usuario_solicitante.get_full_name|default:solicitud.usuario_solicitante.username }}</td>
@@ -55,7 +124,16 @@
                                             data-evento="{{ solicitud.nombre_evento }}">
                                         <i class="fas fa-calendar-alt"></i> Editar fecha
                                     </button>
-                                    <a href="{% url 'encargados:eliminar_solicitud' solicitud.id %}" class="btn btn-delete">Eliminar</a>
+                                    <button class="btn-cancelar"
+                                            data-id="{{ solicitud.id }}"
+                                            data-evento="{{ solicitud.nombre_evento }}">
+                                        <i class="fas fa-ban"></i> Cancelar evento
+                                    </button>
+                                    <button class="btn btn-delete"
+                                            data-id="{{ solicitud.id }}"
+                                            data-evento="{{ solicitud.nombre_evento }}">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -76,42 +154,234 @@
     <!-- Modal editar fecha -->
     <dialog id="modalEditarFecha">
         <form method="dialog" id="formEditarFecha">
-            <h3>Editar fecha - <span id="tituloEvento"></span></h3>
+            <h3><i class="fas fa-calendar-alt"></i> Editar fecha - <span id="tituloEvento"></span></h3>
             <input type="datetime-local" name="nueva_fecha" id="id_nueva_fecha" required>
             <input type="hidden" name="solicitud_id" id="id_solicitud_id">
-            <div style="margin-top:1rem;">
-                <button type="submit" class="btn btn-primary">Guardar</button>
+            <div class="modal-buttons">
                 <button type="button" class="btn btn-secondary" onclick="modalEditarFecha.close()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
             </div>
         </form>
     </dialog>
 
+    <!-- Modal cancelar evento -->
+    <dialog id="modalCancelar">
+        <form method="dialog" id="formCancelar">
+            <h3><i class="fas fa-exclamation-triangle"></i> Cancelar Evento</h3>
+            <p><strong>Evento:</strong> <span id="eventoACancelar"></span></p>
+            <p style="margin: 1rem 0; color: #666;">¿Estás seguro de que deseas cancelar este evento?</p>
+            <label for="motivoCancelacion" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                Motivo de cancelación (opcional):
+            </label>
+            <textarea id="motivoCancelacion" name="motivo" placeholder="Describe el motivo de la cancelación..."></textarea>
+            <input type="hidden" name="solicitud_id" id="id_solicitud_cancelar">
+            <div class="modal-buttons">
+                <button type="button" class="btn btn-secondary" onclick="modalCancelar.close()">
+                    <i class="fas fa-times"></i> No, volver
+                </button>
+                <button type="submit" class="btn-cancelar">
+                    <i class="fas fa-ban"></i> Sí, cancelar evento
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Modal eliminar evento -->
+    <dialog id="modalEliminar">
+        <form method="dialog" id="formEliminar">
+            <h3 style="color: #dc3545;"><i class="fas fa-trash"></i> Eliminar Solicitud</h3>
+            <p><strong>Evento:</strong> <span id="eventoAEliminar"></span></p>
+            <p style="margin: 1rem 0; color: #dc3545; font-weight: 500;">
+                ⚠️ Esta acción no se puede deshacer. ¿Estás seguro de que deseas eliminar permanentemente esta solicitud?
+            </p>
+            <input type="hidden" name="solicitud_id" id="id_solicitud_eliminar">
+            <div class="modal-buttons">
+                <button type="button" class="btn btn-secondary" onclick="modalEliminar.close()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="submit" class="btn btn-delete">
+                    <i class="fas fa-trash"></i> Sí, eliminar
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{% static 'encargados/js/scripts.js' %}"></script>
     <script>
-        /* Abrir modal y cargar datos */
-        document.addEventListener('click', e => {
-            if (e.target.closest('.btn-editar-fecha')) {
-                const btn = e.target.closest('.btn-editar-fecha');
-                modalEditarFecha.showModal();
-                id_solicitud_id.value = btn.dataset.id;
-                id_nueva_fecha.value = btn.dataset.fecha;
-                tituloEvento.textContent = btn.dataset.evento;
-            }
-        });
+    // Función auxiliar para obtener CSRF token
+    function getCSRF() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
+    }
 
-        /* Enviar cambio vía AJAX */
-        formEditarFecha.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const data = new FormData(formEditarFecha);
+    // Función para mostrar notificaciones tipo toast
+    function showToast(message, type = 'success') {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: type,
+            title: message,
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+    }
+
+    // ===== MODAL EDITAR FECHA =====
+    document.addEventListener('click', e => {
+        if (e.target.closest('.btn-editar-fecha')) {
+            const btn = e.target.closest('.btn-editar-fecha');
+            modalEditarFecha.showModal();
+            id_solicitud_id.value = btn.dataset.id;
+            id_nueva_fecha.value = btn.dataset.fecha;
+            tituloEvento.textContent = btn.dataset.evento;
+        }
+    });
+
+    formEditarFecha.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = new FormData(formEditarFecha);
+        
+        try {
             const res = await fetch("{% url 'encargados:editar_fecha_aceptada' %}", {
                 method: 'POST',
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                headers: { 'X-CSRFToken': getCSRF() },
                 body: data
             });
             const json = await res.json();
-            alert(json.message);
-            if (json.status === 'success') location.reload();
+            
+            modalEditarFecha.close();
+            
+            if (json.status === 'success') {
+                showToast(json.message, 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showToast(json.message || 'Error al editar la fecha', 'error');
+            }
+        } catch (error) {
+            modalEditarFecha.close();
+            showToast('Error al procesar la solicitud', 'error');
+            console.error(error);
+        }
+    });
+
+    // ===== MODAL CANCELAR EVENTO =====
+    document.addEventListener('click', e => {
+        if (e.target.closest('.btn-cancelar')) {
+            const btn = e.target.closest('.btn-cancelar');
+            const solicitudId = btn.dataset.id;
+            const eventoNombre = btn.dataset.evento;
+            
+            console.log('🔍 ID Solicitud:', solicitudId);
+            console.log('📋 Nombre Evento:', eventoNombre);
+            
+            if (!solicitudId || solicitudId === 'undefined') {
+                showToast('Error: No se pudo obtener el ID de la solicitud', 'error');
+                return;
+            }
+            
+            modalCancelar.showModal();
+            id_solicitud_cancelar.value = solicitudId;
+            eventoACancelar.textContent = eventoNombre;
+            motivoCancelacion.value = '';
+        }
+    });
+
+    formCancelar.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const solicitudId = id_solicitud_cancelar.value;
+        const motivo = motivoCancelacion.value.trim();
+        
+        if (!solicitudId || solicitudId === 'undefined') {
+            showToast('Error: ID de solicitud no válido', 'error');
+            modalCancelar.close();
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('solicitud_id', solicitudId);
+        formData.append('motivo', motivo);
+        
+        console.log('📤 Enviando:', {
+            solicitud_id: solicitudId,
+            motivo: motivo
         });
-    </script>
+        
+        try {
+            const res = await fetch("{% url 'encargados:cancelar_evento' %}", {
+                method: 'POST',
+                headers: { 
+                    'X-CSRFToken': getCSRF()
+                },
+                body: formData
+            });
+            
+            const json = await res.json();
+            
+            modalCancelar.close();
+            
+            if (json.status === 'success') {
+                showToast(json.message, 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showToast(json.message || 'Error al cancelar el evento', 'error');
+            }
+        } catch (error) {
+            modalCancelar.close();
+            showToast('Error al procesar la solicitud', 'error');
+            console.error('❌ Error:', error);
+        }
+    });
+
+    // ===== MODAL ELIMINAR SOLICITUD =====
+    document.addEventListener('click', e => {
+        if (e.target.closest('.btn-delete')) {
+            e.preventDefault();
+            const btn = e.target.closest('.btn-delete');
+            modalEliminar.showModal();
+            id_solicitud_eliminar.value = btn.dataset.id;
+            eventoAEliminar.textContent = btn.dataset.evento;
+        }
+    });
+
+    formEliminar.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const solicitudId = id_solicitud_eliminar.value;
+        
+        try {
+            const res = await fetch(`{% url 'encargados:eliminar_solicitud' 0 %}`.replace('0', solicitudId), {
+                method: 'POST',
+                headers: { 
+                    'X-CSRFToken': getCSRF(),
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            modalEliminar.close();
+            
+            if (res.ok) {
+                const json = await res.json();
+                showToast(json.message || 'Solicitud eliminada exitosamente', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showToast('Error al eliminar la solicitud', 'error');
+            }
+        } catch (error) {
+            modalEliminar.close();
+            showToast('Error al procesar la solicitud', 'error');
+            console.error(error);
+        }
+    });
+
+    // Cerrar modales con ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            modalEditarFecha.close();
+            modalCancelar.close();
+            modalEliminar.close();
+        }
+    });
+</script>
 </body>
 </html>

@@ -1,14 +1,12 @@
 /* ===== AISLAR TEMA POR ROL ===== */
-const ROL = location.pathname.split('/')[1].replace(/\/$/, '') || 'encargado'; // admin | encargado | usuario
+const ROL = location.pathname.split('/')[1].replace(/\/$/, '') || 'encargado';
 const THEME_KEY = `theme-${ROL}`;
 
-// Aplicar tema propio al cargar
 (function applyOwnTheme() {
     const saved = localStorage.getItem(THEME_KEY) || 'light';
     document.body.setAttribute('data-theme', saved);
 })();
 
-// Sobrescribir toggleTheme() para que use clave propia
 function toggleTheme() {
     const body = document.body;
     const esOscuro = body.getAttribute('data-theme') === 'dark';
@@ -17,30 +15,6 @@ function toggleTheme() {
     localStorage.setItem(THEME_KEY, nuevo);
 }
 
-// ============================
-// FUNCIONES COMUNES
-// ============================
-function toggleTheme() {
-    const html = document.documentElement;
-    const themeIcon = document.getElementById('theme-icon');
-    const themeText = document.getElementById('theme-text');
-
-    if (html.getAttribute('data-theme') === 'dark') {
-        html.removeAttribute('data-theme');
-        themeIcon.className = 'fas fa-moon';
-        themeText.textContent = 'Modo Oscuro';
-        localStorage.setItem('theme', 'light');
-    } else {
-        html.setAttribute('data-theme', 'dark');
-        themeIcon.className = 'fas fa-sun';
-        themeText.textContent = 'Modo Claro';
-        localStorage.setItem('theme', 'dark');
-    }
-}
-
-// ============================
-// FUNCIONES UTILES (MOVIDAS ANTES)
-// ============================
 function getCSRFToken() {
     let csrfToken = null;
     const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
@@ -116,9 +90,6 @@ function showNotification(message, type = 'info') {
     }, 5000);
 }
 
-// ============================
-// FUNCIONES GLOBALES DE ACCIONES (DEFINIDAS GLOBALMENTE)
-// ============================
 window.confirmarEliminar = function (solicitudId, solicitante) {
     if (confirm(`¿Estás seguro de que deseas eliminar la solicitud de ${solicitante}?`)) {
         const csrfToken = getCSRFToken();
@@ -149,35 +120,242 @@ window.confirmarEliminar = function (solicitudId, solicitante) {
     }
 };
 
-window.aceptarSolicitud = function (solicitudId) {
-    if (confirm('¿Confirmas que deseas aceptar esta solicitud?')) {
-        const csrfToken = getCSRFToken();
-        if (!csrfToken) {
-            showNotification('Error: No se pudo obtener el token CSRF', 'error');
-            return;
-        }
-
-        fetch(`/encargados/aprobar_solicitud/${solicitudId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrfToken,
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-        }).then(data => {
-            showNotification('Solicitud aceptada correctamente', 'success');
-            setTimeout(() => location.reload(), 1000);
-        }).catch(error => {
-            console.error('Error:', error);
-            showNotification('Error al aceptar la solicitud', 'error');
-        });
+// ✅ CORRECCIÓN PRINCIPAL: Cambiar URL de aprobar
+window.aceptarSolicitud = function(solicitudId) {
+    const csrftoken = getCSRFToken();
+    
+    if (!csrftoken) {
+        showNotification('Error: No se pudo obtener el token CSRF', 'error');
+        return;
     }
+    
+    // ✅ URL CORREGIDA
+    fetch(`/encargados/aprobar_solicitud/${solicitudId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'warning') {
+            mostrarAlertaConflicto(solicitudId, data.conflictos);
+        } else if (data.status === 'success') {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Solicitud Aprobada!',
+                    text: data.message,
+                    confirmButtonColor: '#10b981'
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                showNotification('Solicitud aceptada correctamente', 'success');
+                setTimeout(() => location.reload(), 1000);
+            }
+        } else {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message,
+                    confirmButtonColor: '#ef4444'
+                });
+            } else {
+                showNotification(data.message || 'Error al aceptar la solicitud', 'error');
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Ocurrió un error al procesar la solicitud, verifica la fecha y hora.',
+                confirmButtonColor: '#ef4444'
+            });
+        } else {
+            showNotification('Error al procesar la solicitud', 'error');
+        }
+    });
 };
+
+window.aprobarSolicitud = window.aceptarSolicitud;
+
+function mostrarAlertaConflicto(solicitudId, conflictos) {
+    let conflictosHTML = '<div class="text-left mt-3">';
+    conflictosHTML += '<p class="font-semibold mb-2">Reservas en conflicto:</p>';
+    conflictosHTML += '<ul class="list-disc pl-5 space-y-2">';
+    
+    conflictos.forEach(conflicto => {
+        let duracionTexto = conflicto.duracion;
+        if (duracionTexto % 1 === 0) {
+            duracionTexto = `${duracionTexto} hora${duracionTexto !== 1 ? 's' : ''}`;
+        } else {
+            duracionTexto = `${duracionTexto} horas`;
+        }
+        
+        conflictosHTML += `
+            <li>
+                <strong>${conflicto.nombre_evento}</strong><br>
+                <span class="text-sm text-gray-600">
+                    📅 ${conflicto.fecha} a las ${conflicto.hora}<br>
+                    ⏱️ Duración: ${duracionTexto}<br>
+                    👤 Solicitante: ${conflicto.solicitante}
+                </span>
+            </li>
+        `;
+    });
+    
+    conflictosHTML += '</ul></div>';
+    
+    Swal.fire({
+        icon: 'warning',
+        title: '⚠️ Conflicto de Horario',
+        html: `
+            <p class="mb-2">Ya existe(n) <strong>${conflictos.length}</strong> reserva(s) aceptada(s) para este espacio en el mismo horario.</p>
+            ${conflictosHTML}
+            <p class="mt-4 text-sm text-gray-700">
+                ¿Deseas aprobar esta solicitud de todas formas?<br>
+                <span class="text-red-600">Esto puede causar sobreposición de eventos.</span>
+            </p>
+        `,
+        showCancelButton: true,
+        showDenyButton: true,
+        confirmButtonText: 'Aprobar de todas formas',
+        denyButtonText: 'Rechazar solicitud',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#f59e0b',
+        denyButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        width: '600px'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            aprobarConConflicto(solicitudId);
+        } else if (result.isDenied) {
+            solicitarMotivoRechazo(solicitudId, 'Conflicto de horario con otra reserva aceptada.');
+        }
+    });
+}
+
+function aprobarConConflicto(solicitudId) {
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    fetch(`/encargados/aprobar-con-conflicto/${solicitudId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Aprobada!',
+                text: data.message,
+                confirmButtonColor: '#10b981'
+            }).then(() => {
+                location.reload();
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message,
+                confirmButtonColor: '#ef4444'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al aprobar la solicitud.',
+            confirmButtonColor: '#ef4444'
+        });
+    });
+}
+
+function solicitarMotivoRechazo(solicitudId, motivoPredefenido = '') {
+    Swal.fire({
+        title: 'Rechazar Solicitud',
+        html: `
+            <textarea 
+                id="motivo-rechazo" 
+                class="swal2-textarea w-full" 
+                placeholder="Explica el motivo del rechazo..."
+                rows="4"
+            >${motivoPredefenido}</textarea>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Rechazar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#ef4444',
+        preConfirm: () => {
+            const motivo = document.getElementById('motivo-rechazo').value;
+            if (!motivo.trim()) {
+                Swal.showValidationMessage('Debes ingresar un motivo');
+            }
+            return motivo;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            rechazarSolicitudDirecta(solicitudId, result.value);
+        }
+    });
+}
+
+// ✅ CORRECCIÓN: Nueva función con URL correcta
+function rechazarSolicitudDirecta(solicitudId, motivo) {
+    const csrftoken = getCSRFToken();
+    
+    // ✅ URL CORREGIDA
+    fetch(`/encargados/rechazar_solicitud/${solicitudId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            motivo_rechazo: motivo
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Solicitud Rechazada',
+                text: data.message,
+                confirmButtonColor: '#10b981'
+            }).then(() => {
+                location.reload();
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message,
+                confirmButtonColor: '#ef4444'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al rechazar la solicitud.',
+            confirmButtonColor: '#ef4444'
+        });
+    });
+}
 
 window.rechazarSolicitud = function (solicitudId, solicitante) {
     openRejectModal(solicitudId, solicitante);
@@ -249,211 +427,47 @@ window.confirmReject = function () {
     });
 };
 
-// ============================
-// SCRIPTS DEL DASHBOARD ENCARGADO
-// ============================
-function initDashboardEncargado() {
-    if (!document.getElementById('calendario-body')) return;
-
-    const hoy = new Date();
-    let mesActual = hoy.getMonth();
-    let anioActual = hoy.getFullYear();
-    const nombresMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-
-    async function cargarSolicitudesAceptadas() {
-        try {
-            const res = await fetch('/encargados/api/solicitudes-aceptadas/');
-            const data = await res.json();
-            const eventosMap = {};
-            data.forEach(s => {
-                const key = s.fecha.replace(/-0/g, '-');
-                if (!eventosMap[key]) eventosMap[key] = [];
-                eventosMap[key].push({
-                    nombre: s.nombre_evento,
-                    espacio: s.espacio__nombre,
-                    color: '#10b981'
-                });
-            });
-            return eventosMap;
-        } catch (err) {
-            console.error('No se pudieron cargar las solicitudes aceptadas', err);
-            return {};
-        }
-    }
-
-    let eventos = {};
-
-    cargarSolicitudesAceptadas().then(map => {
-        eventos = map;
-        generarCalendario();
-    });
-
-    function generarCalendario() {
-        const primerDia = new Date(anioActual, mesActual, 1);
-        const ultimoDia = new Date(anioActual, mesActual + 1, 0);
-        const diasEnMes = ultimoDia.getDate();
-        const diaSemanaInicio = primerDia.getDay();
-        const calendarioBody = document.getElementById('calendario-body');
-        calendarioBody.innerHTML = '';
-
-        let fecha = 1;
-        const semanas = Math.ceil((diasEnMes + diaSemanaInicio) / 7);
-
-        for (let semana = 0; semana < semanas; semana++) {
-            const fila = calendarioBody.insertRow();
-            for (let dia = 0; dia < 7; dia++) {
-                const celda = fila.insertCell();
-                if (semana === 0 && dia < diaSemanaInicio) {
-                    celda.classList.add('dia-vacio');
-                } else if (fecha > diasEnMes) {
-                    celda.classList.add('dia-vacio');
-                } else {
-                    const esDiaActual = (fecha === hoy.getDate() && mesActual === hoy.getMonth() && anioActual === hoy.getFullYear());
-                    if (esDiaActual) celda.classList.add('dia-actual');
-
-                    const numeroDia = document.createElement('div');
-                    numeroDia.className = 'numero-dia';
-                    numeroDia.textContent = fecha;
-
-                    const fechaKey = `${anioActual}-${mesActual + 1}-${fecha}`;
-                    const eventosDelDia = eventos[fechaKey] || [];
-
-                    if (eventosDelDia.length) {
-                        numeroDia.classList.add('evento-presente');
-                        eventosDelDia.forEach(evento => {
-                            const tooltip = document.createElement('div');
-                            tooltip.className = 'tooltip';
-
-                            const marker = document.createElement('div');
-                            marker.className = 'evento-marker';
-                            marker.style.backgroundColor = evento.color;
-
-                            const tooltipText = document.createElement('span');
-                            tooltipText.className = 'tooltip-text';
-                            tooltipText.textContent = `${evento.nombre} | ${evento.espacio}`;
-
-                            tooltip.appendChild(marker);
-                            tooltip.appendChild(tooltipText);
-                            celda.appendChild(tooltip);
-                        });
-                    }
-
-                    celda.appendChild(numeroDia);
-                    celda.dataset.fecha = fechaKey;
-                    celda.addEventListener('click', () => mostrarModal('editar', celda.dataset.fecha));
-                    fecha++;
-                }
-            }
-        }
-
-        document.getElementById('titulo-mes').textContent = `${nombresMeses[mesActual]} ${anioActual}`;
-    }
-
-    window.cambiarMes = function (direccion) {
-        mesActual += direccion;
-        if (mesActual > 11) {
-            mesActual = 0;
-            anioActual++;
-        } else if (mesActual < 0) {
-            mesActual = 11;
-            anioActual--;
-        }
-        generarCalendario();
-    };
-
-    window.mostrarModal = function (accion, fecha = null) {
-        const modal = document.getElementById('modal');
-        const modalTitle = document.getElementById('modal-title');
-        const nombreInput = document.getElementById('nombre');
-        const espacioInput = document.getElementById('espacio');
-        const colorInput = document.getElementById('color');
-
-        modal.style.display = 'block';
-
-        if (accion === 'agregar') {
-            modalTitle.textContent = 'Agregar Evento';
-            nombreInput.value = '';
-            espacioInput.value = '';
-            colorInput.value = '#1e3a8a';
-        } else if (accion === 'editar' && fecha) {
-            modalTitle.textContent = 'Editar Evento';
-            const eventosDelDia = eventos[fecha] || [];
-            if (eventosDelDia.length) {
-                const evento = eventosDelDia[0];
-                nombreInput.value = evento.nombre;
-                espacioInput.value = evento.espacio;
-                colorInput.value = evento.color;
-            }
-        }
-
-        document.getElementById('evento-form').onsubmit = (e) => {
-            e.preventDefault();
-            const nombre = nombreInput.value;
-            const espacio = espacioInput.value;
-            const color = colorInput.value;
-
-            if (accion === 'agregar' && fecha === null) {
-                const hoy = new Date();
-                const fechaKey = `${hoy.getFullYear()}-${hoy.getMonth() + 1}-${hoy.getDate()}`;
-                if (!eventos[fechaKey]) eventos[fechaKey] = [];
-                eventos[fechaKey].push({ nombre, espacio, color });
-            } else if (accion === 'editar' && fecha) {
-                if (!eventos[fecha]) eventos[fecha] = [];
-                if (eventos[fecha].length === 0) {
-                    eventos[fecha].push({ nombre, espacio, color });
-                } else {
-                    eventos[fecha][0] = { nombre, espacio, color };
-                }
-            }
-
-            cerrarModal();
-            generarCalendario();
-        };
-    };
-
-    window.cerrarModal = function () {
-        document.getElementById('modal').style.display = 'none';
-    };
-
-    window.onclick = function (event) {
-        const modal = document.getElementById('modal');
-        if (event.target === modal) {
-            cerrarModal();
-        }
-    };
-
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-            cerrarModal();
-        }
-    });
-
-    generarCalendario();
-}
-
-// ============================
-// SCRIPTS DE LISTAR SOLICITUDES
-// ============================
 function initListarSolicitudes() {
-    if (!document.getElementById('rejectModal')) return;
+    const rejectModal = document.getElementById('rejectModal');
+    if (!rejectModal) return;
 
-    // Event listeners para modal
-    document.getElementById('rejectModal').addEventListener('click', function (e) {
+    rejectModal.addEventListener('click', function (e) {
         if (e.target === this) {
             closeRejectModal();
         }
     });
-
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-            closeRejectModal();
-        }
-    });
 }
 
-// ============================
-// SCRIPTS DE SOLICITUDES ACEPTADAS
-// ============================
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        if (typeof closeRejectModal === 'function') {
+            const modal = document.getElementById('rejectModal');
+            if (modal && modal.style.display === 'flex') {
+                closeRejectModal();
+            }
+        }
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modals = document.querySelectorAll('[id*="Modal"], .modal-overlay, [class*="modal"]');
+        modals.forEach(modal => {
+            if (modal.style.display === 'flex' || modal.style.display === 'block') {
+                modal.style.display = 'none';
+                const innerModal = modal.querySelector('.modal');
+                if (innerModal) {
+                    innerModal.classList.remove('show');
+                }
+            }
+        });
+        
+        if (typeof closeRejectModal === 'function') {
+            closeRejectModal();
+        }
+    }
+});
+
 function initSolicitudesAceptadas() {
     if (!document.querySelector('.solicitudes-aceptadas')) return;
 
@@ -467,9 +481,6 @@ function initSolicitudesAceptadas() {
     });
 }
 
-// ============================
-// SCRIPTS DE SOLICITUDES PENDIENTES
-// ============================
 function initSolicitudesPendientes() {
     if (!document.querySelector('.solicitudes-pendientes')) return;
 
@@ -491,9 +502,6 @@ function initSolicitudesPendientes() {
     });
 }
 
-// ============================
-// FUNCIONES DE FORMATO (MOVIDAS AL FINAL)
-// ============================
 function formatDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleDateString('es-ES', {
@@ -507,9 +515,6 @@ function formatTime(timeString) {
     return timeString.slice(0, 5);
 }
 
-// ============================
-// INICIALIZACIÓN
-// ============================
 document.addEventListener('DOMContentLoaded', function () {
     initDashboardEncargado();
     initListarSolicitudes();

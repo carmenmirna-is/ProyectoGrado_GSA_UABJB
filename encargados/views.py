@@ -1,10 +1,12 @@
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from gestion_espacios_academicos.models import Solicitud, Espacio
+from gestion_espacios_academicos.models import Solicitud
 from django.utils import timezone
 from datetime import datetime
 from django.core.mail import send_mail
@@ -102,12 +104,197 @@ def solicitudes_aceptadas(request):
     return render(request, 'encargados/solicitudes_aceptadas.html', {'solicitudes': solicitudes})
 
 @login_required
+@require_POST
+def cancelar_evento(request):
+    user = request.user
+    
+    try:
+        # 🔧 FIX: Obtener el ID correctamente (puede venir como JSON o POST)
+        if request.content_type == 'application/json':
+            import json
+            data = json.loads(request.body)
+            solicitud_id = data.get('solicitud_id')
+            motivo = data.get('motivo', '')
+        else:
+            solicitud_id = request.POST.get('solicitud_id')
+            motivo = request.POST.get('motivo', '')
+        
+        # Validar que tenemos el ID
+        if not solicitud_id:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No se proporcionó el ID de la solicitud.'
+            }, status=400)
+        
+        solicitud = Solicitud.objects.get(id=solicitud_id)
+        
+        # Verificar permisos
+        if user.tipo_usuario != 'encargado':
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No tienes permiso para realizar esta acción.'
+            })
+        
+        es_encargado = (
+            (solicitud.espacio and solicitud.espacio.encargado == user) or
+            (solicitud.espacio_campus and solicitud.espacio_campus.encargado == user)
+        )
+        
+        if not es_encargado:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No eres encargado de este espacio.'
+            })
+        
+        # Cancelar el evento
+        solicitud.estado = 'cancelada'
+        if motivo:
+            solicitud.observaciones = f"Cancelado: {motivo}"
+        else:
+            solicitud.observaciones = "Cancelado por el encargado del espacio"
+        solicitud.save()
+        
+        # 📧 ENVIAR CORREO DE NOTIFICACIÓN AL USUARIO
+        enviar_correo_cancelacion(solicitud, motivo, user)
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Evento cancelado exitosamente. Se ha notificado al solicitante por correo.'
+        })
+        
+    except Solicitud.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Solicitud no encontrada.'
+        }, status=404)
+    except Exception as e:
+        print(f"❌ Error al cancelar: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Error al cancelar: {str(e)}'
+        }, status=500)
+
+def enviar_correo_cancelacion(solicitud, motivo, encargado):
+    """
+    Envía un correo HTML al solicitante notificando la cancelación del evento.
+    """
+    try:
+        from django.core.mail import EmailMultiAlternatives
+        from django.template.loader import render_to_string
+        # ❌ ELIMINADO: from usuarios.views import to_bolivia
+        
+        user = solicitud.usuario_solicitante
+        
+        if not user.email:
+            print(f"⚠️ El usuario {user.username} no tiene email configurado")
+            return False
+        
+        # Preparar información
+        nombre_solicitante = user.get_full_name() or user.username
+        encargado_nombre = encargado.get_full_name() or encargado.username
+        
+        # ✅ Django ya maneja la zona horaria de Bolivia automáticamente
+        fecha_evento_str = solicitud.fecha_evento.strftime("%d/%m/%Y a las %H:%M")
+        
+        espacio_nombre = solicitud.get_nombre_espacio()
+        motivo_texto = motivo if motivo else "No se especificó un motivo"
+        
+        # Preparar contexto para el template
+        context = {
+            'solicitud': solicitud,
+            'user': user,
+            'nombre_solicitante': nombre_solicitante,
+            'nombre_evento': solicitud.nombre_evento,
+            'fecha_evento': fecha_evento_str,
+            'espacio_nombre': espacio_nombre,
+            'tipo_espacio': solicitud.get_tipo_espacio_display(),
+            'encargado_nombre': encargado_nombre,
+            'motivo': motivo_texto,
+        }
+        
+        # ✅ Renderizar HTML del correo (con extensión .html)
+        html_message = render_to_string('encargados/confirmacion_cancelacion.html', context)
+        
+        # Crear correo
+        subject = f"⚠️ Evento Cancelado - {solicitud.nombre_evento}"
+        
+        # Texto plano alternativo
+        text_message = f"""
+Estimado/a {nombre_solicitante},
+
+Lamentamos informarte que tu evento ha sido CANCELADO por el encargado del espacio.
+
+DETALLES DEL EVENTO:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 Evento: {solicitud.nombre_evento}
+📅 Fecha: {fecha_evento_str}
+📍 Espacio: {espacio_nombre}
+👤 Cancelado por: {encargado_nombre}
+
+MOTIVO DE LA CANCELACIÓN:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{motivo_texto}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Si tienes alguna pregunta o necesitas más información, por favor contacta al encargado del espacio.
+
+Puedes realizar una nueva solicitud en cualquier momento a través del sistema.
+
+---
+Sistema de Gestión de Espacios - UABJB
+Universidad Autónoma del Beni José Ballivián
+        """
+        
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=text_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[user.email],
+        )
+        
+        email.attach_alternative(html_message, "text/html")
+        email.send(fail_silently=False)
+        
+        print(f"✅ Correo de cancelación enviado a {user.email}")
+        print(f"   Evento: {solicitud.nombre_evento}")
+        print(f"   Motivo: {motivo_texto}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error al enviar correo de cancelación: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+@login_required
 def aprobar_solicitud(request, solicitud_id):
     """
-    Aprueba una solicitud y envía correo con token + QR al solicitante
+    Aprueba una solicitud verificando conflictos de horario
     """
     try:
         solicitud = get_object_or_404(Solicitud, id=solicitud_id)
+        
+        # 🔍 VERIFICAR CONFLICTOS DE HORARIO (AHORA EXCLUYE ELIMINADAS)
+        conflictos = verificar_conflictos_horario(solicitud)
+        
+        if conflictos:
+            # Si hay conflictos, devolver información detallada
+            conflictos_info = [{
+                'nombre_evento': c.nombre_evento,
+                'fecha': c.fecha_evento.strftime('%d/%m/%Y'),
+                'hora': c.fecha_evento.strftime('%H:%M'),
+                'solicitante': c.usuario_solicitante.get_full_name() or c.usuario_solicitante.username
+            } for c in conflictos]
+            
+            return JsonResponse({
+                'status': 'warning',
+                'message': '⚠️ Hay conflictos de horario con otras reservas aceptadas.',
+                'conflictos': conflictos_info
+            })
         
         # 1️⃣ CAMBIAR ESTADO A ACEPTADA
         solicitud.estado = 'aceptada'
@@ -125,10 +312,107 @@ def aprobar_solicitud(request, solicitud_id):
         })
         
     except Exception as e:
-        print(f"❌ Error al aprobar solicitud: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        return JsonResponse({
+            'status': 'error', 
+            'message': f'Error al aprobar la solicitud: {str(e)}'
+        }, status=500)
+
+def verificar_conflictos_horario(solicitud):
+    """
+    Verifica si hay conflictos de horario en el mismo espacio
+    Retorna una lista de solicitudes que tienen conflicto
+    SOLO considera solicitudes con estado 'aceptada' y NO eliminadas
+    """
+    from datetime import timedelta
+    
+    # ✅ Determinar inicio y fin del evento
+    inicio = solicitud.fecha_evento
+    
+    # Si tiene fecha_fin_evento, usarla; sino asumir 2 horas
+    if solicitud.fecha_fin_evento:
+        fin = solicitud.fecha_fin_evento
+    else:
+        fin = solicitud.fecha_evento + timedelta(hours=2)
+    
+    # ✅ IMPORTANTE: Solo buscar solicitudes ACEPTADAS y NO ELIMINADAS
+    query_base = Solicitud.objects.filter(
+        estado='aceptada',  # ⭐ SOLO ACEPTADAS
+        eliminada=False     # ⭐ NO ELIMINADAS
+    ).exclude(
+        id=solicitud.id     # Excluir la solicitud actual
+    )
+    
+    # Filtrar por el mismo espacio
+    if solicitud.tipo_espacio == 'carrera' and solicitud.espacio:
+        query_base = query_base.filter(
+            tipo_espacio='carrera',
+            espacio=solicitud.espacio
+        )
+    elif solicitud.tipo_espacio == 'campus' and solicitud.espacio_campus:
+        query_base = query_base.filter(
+            tipo_espacio='campus',
+            espacio_campus=solicitud.espacio_campus
+        )
+    else:
+        return []  # Si no hay espacio definido, no hay conflictos
+    
+    # ✅ LÓGICA MEJORADA: Buscar conflictos de horario
+    conflictos = []
+    
+    for otra_solicitud in query_base:
+        # Determinar rango de la otra solicitud
+        otro_inicio = otra_solicitud.fecha_evento
         
+        if otra_solicitud.fecha_fin_evento:
+            otro_fin = otra_solicitud.fecha_fin_evento
+        else:
+            otro_fin = otra_solicitud.fecha_evento + timedelta(hours=2)
+        
+        # ✅ VERIFICAR SI HAY SOLAPAMIENTO
+        # Hay conflicto si:
+        # - El nuevo evento empieza antes de que termine el otro
+        # - Y el nuevo evento termina después de que empiece el otro
+        if inicio < otro_fin and fin > otro_inicio:
+            conflictos.append(otra_solicitud)
+    
+    # ✅ DEBUG: Imprimir para verificar
+    print(f"🔍 Verificando conflictos para solicitud #{solicitud.id}")
+    print(f"   📅 Inicio: {inicio}")
+    print(f"   📅 Fin: {fin}")
+    print(f"   📍 Espacio: {solicitud.get_nombre_espacio()}")
+    print(f"   ⚠️ Conflictos encontrados: {len(conflictos)}")
+    
+    for c in conflictos:
+        c_fin = c.fecha_fin_evento or c.fecha_evento + timedelta(hours=2)
+        print(f"      - {c.nombre_evento}")
+        print(f"        Inicio: {c.fecha_evento} | Fin: {c_fin}")
+        print(f"        Estado: {c.estado} | Eliminada: {c.eliminada}")
+    
+    return conflictos
+
+@login_required
+def aprobar_con_conflicto(request, solicitud_id):
+    """
+    Aprueba una solicitud ignorando los conflictos de horario
+    (solo si el encargado confirma explícitamente)
+    """
+    try:
+        solicitud = get_object_or_404(Solicitud, id=solicitud_id)
+        
+        # Cambiar estado a aceptada
+        solicitud.estado = 'aceptada'
+        solicitud.fecha_aprobacion = timezone.now()
+        solicitud.save()
+        
+        # Enviar correo con token y QR
+        notificar_aceptacion_solicitud(solicitud, encargado=request.user)
+        
+        return JsonResponse({
+            'status': 'success', 
+            'message': '✅ Solicitud aprobada (conflicto ignorado) y notificación enviada.'
+        })
+        
+    except Exception as e:
         return JsonResponse({
             'status': 'error', 
             'message': f'Error al aprobar la solicitud: {str(e)}'
@@ -198,22 +482,52 @@ Sistema de Gestión UABJB'''
         }, status=500)
 
 @login_required
+@require_POST
 def eliminar_solicitud(request, solicitud_id):
+    user = request.user
+    
     try:
-        solicitud = get_object_or_404(Solicitud, id=solicitud_id)
-        nombre_evento = solicitud.nombre_evento
-        solicitud.delete()
+        solicitud = Solicitud.objects.get(id=solicitud_id)
+        
+        # Verificar permisos
+        if user.tipo_usuario != 'encargado':
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No tienes permiso para realizar esta acción.'
+            })
+        
+        es_encargado = (
+            (solicitud.espacio and solicitud.espacio.encargado == user) or
+            (solicitud.espacio_campus and solicitud.espacio_campus.encargado == user)
+        )
+        
+        if not es_encargado:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No eres encargado de este espacio.'
+            })
+        
+        # ✅ MARCAR COMO ELIMINADA EN LUGAR DE BORRAR
+        solicitud.eliminada = True
+        solicitud.fecha_eliminacion = timezone.now()
+        solicitud.estado = 'eliminada'  # Opcional: cambiar el estado
+        solicitud.save()
         
         return JsonResponse({
-            'status': 'success', 
-            'message': f'Solicitud "{nombre_evento}" eliminada con éxito.'
+            'status': 'success',
+            'message': f'La solicitud fue eliminada exitosamente.'
         })
         
+    except Solicitud.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Solicitud no encontrada.'
+        })
     except Exception as e:
         return JsonResponse({
-            'status': 'error', 
-            'message': f'Error al eliminar la solicitud: {str(e)}'
-        }, status=500)
+            'status': 'error',
+            'message': f'Error al eliminar: {str(e)}'
+        })
 
 @login_required
 def detalle_solicitud(request, solicitud_id):

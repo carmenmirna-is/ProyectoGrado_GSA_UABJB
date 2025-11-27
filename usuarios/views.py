@@ -23,6 +23,14 @@ from base64 import b64encode
 from django.core.mail import EmailMultiAlternatives
 import hashlib
 from zoneinfo import ZoneInfo
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+from io import BytesIO
+from django.core.files.base import ContentFile
 
 # Zona horaria fija de Bolivia (una sola vez)
 TZ_BOLIVIA = ZoneInfo("America/La_Paz")
@@ -372,6 +380,278 @@ def generar_token_solicitud(user_id, nombre_evento, fecha_evento, espacio_id):
     data = f"{user_id}-{nombre_evento}-{fecha_evento}-{espacio_id}"
     return hashlib.md5(data.encode()).hexdigest()
 
+def generar_pdf_terminos_aceptados(solicitud):
+    """
+    Genera un PDF con los términos aceptados, firma digital y código QR de verificación
+    Retorna el PDF como BytesIO
+    """
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, 
+                           rightMargin=72, leftMargin=72,
+                           topMargin=72, bottomMargin=18)
+    
+    # Contenedor para los elementos
+    elementos = []
+    styles = getSampleStyleSheet()
+    
+    # Estilo personalizado para el título
+    titulo_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=18,
+        textColor=colors.HexColor('#667eea'),
+        spaceAfter=30,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold'
+    )
+    
+    # Estilo para subtítulos
+    subtitulo_style = ParagraphStyle(
+        'Subtitle',
+        parent=styles['Heading2'],
+        fontSize=14,
+        textColor=colors.HexColor('#4a5568'),
+        spaceAfter=12,
+        spaceBefore=20,
+        fontName='Helvetica-Bold'
+    )
+    
+    # Estilo para texto normal
+    normal_style = ParagraphStyle(
+        'CustomNormal',
+        parent=styles['Normal'],
+        fontSize=10,
+        textColor=colors.HexColor('#2d3748'),
+        alignment=TA_JUSTIFY,
+        spaceAfter=10
+    )
+    
+    # === ENCABEZADO ===
+    elementos.append(Paragraph("UNIVERSIDAD AUTÓNOMA DEL BENI<br/>JOSÉ BALLIVIÁN", titulo_style))
+    elementos.append(Spacer(1, 0.3*inch))
+    
+    elementos.append(Paragraph("CONSTANCIA DE ACEPTACIÓN DE TÉRMINOS Y CONDICIONES", subtitulo_style))
+    elementos.append(Spacer(1, 0.2*inch))
+    
+    # === INFORMACIÓN DEL EVENTO ===
+    fecha_evento = to_bolivia(solicitud.fecha_evento).strftime("%d/%m/%Y %H:%M")
+    fecha_aceptacion = to_bolivia(solicitud.fecha_aceptacion_terminos).strftime("%d/%m/%Y %H:%M:%S")
+    
+    info_data = [
+        ['Solicitud ID:', str(solicitud.id)],
+        ['Evento:', solicitud.nombre_evento],
+        ['Solicitante:', solicitud.usuario_solicitante.get_full_name() or solicitud.usuario_solicitante.username],
+        ['Email:', solicitud.usuario_solicitante.email],
+        ['Carrera:', solicitud.usuario_solicitante.carrera or 'N/A'],
+        ['Espacio:', solicitud.get_nombre_espacio()],
+        ['Fecha del Evento:', fecha_evento],
+        ['Fecha de Aceptación:', fecha_aceptacion],
+        ['Dirección IP:', solicitud.ip_aceptacion or 'N/A'],
+    ]
+    
+    tabla_info = Table(info_data, colWidths=[2*inch, 4*inch])
+    tabla_info.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#e2e8f0')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#2d3748')),
+        ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cbd5e0')),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+    ]))
+    
+    elementos.append(tabla_info)
+    elementos.append(Spacer(1, 0.3*inch))
+    
+    # === DOCUMENTOS ACEPTADOS ===
+    elementos.append(Paragraph("DOCUMENTOS ACEPTADOS", subtitulo_style))
+    
+    documentos_data = [
+        ['✓', 'Condiciones de Uso de Espacios del Campus'],
+        ['✓', 'Ley 259 - Control al Expendio y Consumo de Bebidas Alcohólicas'],
+    ]
+    
+    tabla_docs = Table(documentos_data, colWidths=[0.5*inch, 5.5*inch])
+    tabla_docs.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f0fff4')),
+        ('TEXTCOLOR', (0, 0), (0, -1), colors.HexColor('#38a169')),
+        ('TEXTCOLOR', (1, 0), (1, -1), colors.HexColor('#2d3748')),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (0, -1), 16),
+        ('FONTSIZE', (1, 0), (1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#9ae6b4')),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+    ]))
+    
+    elementos.append(tabla_docs)
+    elementos.append(Spacer(1, 0.3*inch))
+    
+    # === FIRMA DIGITAL ===
+    elementos.append(Paragraph("FIRMA DIGITAL DEL SOLICITANTE", subtitulo_style))
+    
+    if solicitud.firma_digital:
+        try:
+            # Agregar la firma como imagen
+            firma_img = Image(solicitud.firma_digital.path, width=3*inch, height=1.5*inch)
+            firma_img.hAlign = 'CENTER'
+            elementos.append(firma_img)
+        except Exception as e:
+            print(f"⚠️ No se pudo cargar la firma: {e}")
+            elementos.append(Paragraph("Firma no disponible", normal_style))
+    else:
+        elementos.append(Paragraph("Sin firma digital", normal_style))
+    
+    elementos.append(Spacer(1, 0.2*inch))
+    
+    # Línea de firma
+    firma_line = Table([['_' * 50]], colWidths=[4*inch])
+    firma_line.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'BOTTOM'),
+    ]))
+    elementos.append(firma_line)
+    
+    firma_texto = Paragraph(
+        f"<b>{solicitud.usuario_solicitante.get_full_name() or solicitud.usuario_solicitante.username}</b><br/>"
+        f"<i>Firma Digital Electrónica</i>",
+        normal_style
+    )
+    elementos.append(firma_texto)
+    elementos.append(Spacer(1, 0.3*inch))
+    
+    # === CÓDIGO QR DE VERIFICACIÓN ===
+    elementos.append(Paragraph("CÓDIGO DE VERIFICACIÓN", subtitulo_style))
+    
+    # Generar QR con datos de verificación
+    qr_data = f"VERIFY:{solicitud.id}|USER:{solicitud.usuario_solicitante.username}|DATE:{fecha_aceptacion}|IP:{solicitud.ip_aceptacion}"
+    
+    qr = qrcode.QRCode(version=1, box_size=10, border=2)
+    qr.add_data(qr_data)
+    qr.make(fit=True)
+    qr_img = qr.make_image(fill_color="black", back_color="white")
+    
+    # Guardar QR en buffer
+    qr_buffer = BytesIO()
+    qr_img.save(qr_buffer, format='PNG')
+    qr_buffer.seek(0)
+    
+    # Agregar QR al PDF
+    qr_image = Image(qr_buffer, width=2*inch, height=2*inch)
+    qr_image.hAlign = 'CENTER'
+    elementos.append(qr_image)
+    
+    elementos.append(Spacer(1, 0.1*inch))
+    
+    verificacion_texto = Paragraph(
+        "<i>Escanea este código QR para verificar la autenticidad de este documento</i>",
+        ParagraphStyle('Center', parent=normal_style, alignment=TA_CENTER, fontSize=8)
+    )
+    elementos.append(verificacion_texto)
+    elementos.append(Spacer(1, 0.3*inch))
+    
+    # === PIE DE PÁGINA ===
+    pie_texto = Paragraph(
+        f"<i>Documento generado electrónicamente el {ahora_bolivia().strftime('%d/%m/%Y %H:%M:%S')} (Hora de Bolivia)<br/>"
+        f"Este documento tiene validez legal conforme a la normativa vigente de la UABJB.<br/>"
+        f"ID de Verificación: {solicitud.id}-{solicitud.usuario_solicitante.id}</i>",
+        ParagraphStyle('Footer', parent=normal_style, fontSize=8, textColor=colors.HexColor('#718096'), alignment=TA_CENTER)
+    )
+    elementos.append(pie_texto)
+    
+    # Construir PDF
+    doc.build(elementos)
+    
+    buffer.seek(0)
+    return buffer
+
+
+def enviar_email_terminos_aceptados(solicitud, encargado=None):
+    """
+    Envía email al usuario con PDF de términos aceptados
+    También copia al encargado del espacio
+    """
+    try:
+        user = solicitud.usuario_solicitante
+        
+        if not user.email:
+            print(f"⚠️ El usuario {user.username} no tiene email")
+            return False
+        
+        # Generar PDF
+        pdf_buffer = generar_pdf_terminos_aceptados(solicitud)
+        
+        # Preparar el email
+        fecha_evento = to_bolivia(solicitud.fecha_evento).strftime("%d/%m/%Y %H:%M")
+        
+        subject = f"📄 Términos Aceptados - {solicitud.nombre_evento}"
+        
+        body = f"""Estimado/a {user.get_full_name() or user.username},
+
+Confirmamos que has aceptado los términos y condiciones para el uso del espacio:
+
+📋 DETALLES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Evento: {solicitud.nombre_evento}
+• Espacio: {solicitud.get_nombre_espacio()}
+• Fecha: {fecha_evento}
+
+✅ DOCUMENTOS ACEPTADOS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Condiciones de Uso de Espacios del Campus
+• Ley 259 - Control al Expendio y Consumo de Bebidas Alcohólicas
+
+✍️ FIRMA DIGITAL:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Tu firma digital ha sido registrada exitosamente.
+
+📎 DOCUMENTO ADJUNTO:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Adjuntamos una constancia en PDF con tu firma digital y código QR 
+de verificación. Este documento es tu comprobante oficial.
+
+IMPORTANTE: Conserva este documento como respaldo de tu compromiso 
+con las normativas del campus universitario.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Saludos cordiales,
+Sistema de Gestión UABJB"""
+        
+        # Crear email con alternativas
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=body,
+            from_email='cibanezsanguino@gmail.com',
+            to=[user.email],
+        )
+        
+        # Adjuntar PDF
+        pdf_filename = f"terminos_aceptados_{solicitud.id}_{user.username}.pdf"
+        email.attach(pdf_filename, pdf_buffer.getvalue(), 'application/pdf')
+        
+        # Si hay encargado, agregarlo en copia
+        if encargado and encargado.email:
+            email.cc = [encargado.email]
+        
+        email.send(fail_silently=False)
+        
+        print(f"✅ Email con PDF enviado a {user.email}")
+        if encargado and encargado.email:
+            print(f"   📋 Copia enviada a encargado: {encargado.email}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error enviando email con PDF: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return False
+
 @login_required
 def enviar_solicitud(request):
     espacios_carrera = Espacio.objects.filter(activo=True)
@@ -385,28 +665,43 @@ def enviar_solicitud(request):
         espacio_campus     = request.POST.get('espacio_campus')
         archivo_adjunto    = request.FILES.get('archivo_adjunto')
         
-        # 🔒 VERIFICAR TOKEN DE FORMULARIO PARA PREVENIR DOBLE ENVÍO
+        # 🆕 NUEVOS CAMPOS PARA TÉRMINOS Y CONDICIONES
+        acepta_condiciones = request.POST.get('acepta_condiciones_uso') == 'on'
+        acepta_ley = request.POST.get('acepta_ley_259') == 'on'
+        firma_digital_base64 = request.POST.get('firma_digital', '')
+        
+        # 🔒 VERIFICAR TOKEN DE FORMULARIO
         token_form = request.POST.get('form_token')
         token_session = request.session.get('last_form_token')
         
         if token_form and token_form == token_session:
-            messages.warning(request, '⚠️ Esta solicitud ya fue enviada. Por favor verifica tu historial.')
+            messages.warning(request, '⚠️ Esta solicitud ya fue enviada.')
             return redirect('usuarios:historial_solicitudes')
 
         errores = []
         if not nombre_evento: errores.append('Nombre obligatorio.')
         if not fecha_evento:  errores.append('Fecha obligatoria.')
         if not archivo_adjunto: errores.append('Archivo obligatorio.')
-        if tipo_espacio == 'carrera' and not espacio_carrera: errores.append('Selecciona carrera.')
-        if tipo_espacio == 'campus' and not espacio_campus:   errores.append('Selecciona campus.')
+        if tipo_espacio == 'carrera' and not espacio_carrera: 
+            errores.append('Selecciona carrera.')
+        if tipo_espacio == 'campus' and not espacio_campus:   
+            errores.append('Selecciona campus.')
+        
+        # 🆕 VALIDACIÓN ESPECIAL PARA ESPACIOS DE CAMPUS
+        if tipo_espacio == 'campus' and espacio_campus:
+            if not acepta_condiciones:
+                errores.append('❌ Debes aceptar las Condiciones de Uso.')
+            if not firma_digital_base64:
+                errores.append('❌ Debes firmar digitalmente el documento.')
 
         if errores:
-            for e in errores: messages.error(request, e)
+            for e in errores: 
+                messages.error(request, e)
         else:
             # Determinar el espacio ID para el token
             espacio_id = espacio_carrera if tipo_espacio == 'carrera' else espacio_campus
             
-            # 🔍 VERIFICAR SI YA EXISTE UNA SOLICITUD IDÉNTICA RECIENTE (últimos 5 minutos)
+            # 🔍 VERIFICAR SI YA EXISTE UNA SOLICITUD IDÉNTICA
             cinco_minutos_atras = timezone.now() - timezone.timedelta(minutes=5)
             solicitud_existente = Solicitud.objects.filter(
                 usuario_solicitante=request.user,
@@ -423,9 +718,28 @@ def enviar_solicitud(request):
             
             if solicitud_existente.exists():
                 messages.warning(request, 
-                    '⚠️ Ya enviaste una solicitud idéntica hace menos de 5 minutos. '
-                    'Por favor verifica tu historial antes de enviar nuevamente.')
+                    '⚠️ Ya enviaste una solicitud idéntica hace menos de 5 minutos.')
                 return redirect('usuarios:historial_solicitudes')
+            
+            # 🆕 PROCESAR FIRMA DIGITAL (si existe)
+            firma_archivo = None
+            if firma_digital_base64 and tipo_espacio == 'campus':
+                try:
+                    # Remover el prefijo "data:image/png;base64,"
+                    import base64
+                    from django.core.files.base import ContentFile
+                    
+                    formato, imgstr = firma_digital_base64.split(';base64,')
+                    ext = formato.split('/')[-1]
+                    
+                    # Decodificar y crear archivo
+                    data = base64.b64decode(imgstr)
+                    firma_archivo = ContentFile(
+                        data, 
+                        name=f'firma_{request.user.username}_{timezone.now().strftime("%Y%m%d_%H%M%S")}.{ext}'
+                    )
+                except Exception as e:
+                    print(f'❌ Error procesando firma: {e}')
             
             # Crear la solicitud
             nueva_solicitud = Solicitud.objects.create(
@@ -439,9 +753,14 @@ def enviar_solicitud(request):
                 espacio_campus_id=espacio_campus if tipo_espacio == 'campus' else None,
                 archivo_adjunto=archivo_adjunto,
                 estado='pendiente',
+                # 🆕 NUEVOS CAMPOS
+                acepta_condiciones_uso=acepta_condiciones if tipo_espacio == 'campus' else False,
+                firma_digital=firma_archivo if tipo_espacio == 'campus' else None,
+                fecha_aceptacion_terminos=timezone.now() if tipo_espacio == 'campus' else None,
+                ip_aceptacion=obtener_ip_cliente(request) if tipo_espacio == 'campus' else None,
             )
             
-            # 🔐 GENERAR Y GUARDAR TOKEN ÚNICO DE LA SOLICITUD
+            # 🔐 GENERAR TOKEN ÚNICO
             token_unico = generar_token_solicitud(
                 request.user.id,
                 nombre_evento,
@@ -449,31 +768,55 @@ def enviar_solicitud(request):
                 espacio_id
             )
             
-            # Guardar token en la sesión para prevenir reenvío
             request.session['last_form_token'] = token_unico
             request.session['last_solicitud_id'] = nueva_solicitud.id
-            
-            # 🔔 ENVIAR NOTIFICACIÓN AL ENCARGADO
-            print(f'📧 Enviando notificación para nueva solicitud: {nueva_solicitud.nombre_evento}')
+
+            # Si es campus y aceptó términos, enviar PDF
+            if tipo_espacio == 'campus' and acepta_condiciones and acepta_ley:
+                # Obtener encargado
+                encargado = None
+                if espacio_campus:
+                    try:
+                        espacio_obj = EspacioCampus.objects.get(id=espacio_campus)
+                        encargado = espacio_obj.encargado
+                    except:
+                        pass
+                
+                # Enviar email con PDF de términos aceptados
+                enviar_email_terminos_aceptados(nueva_solicitud, encargado)
+                        
+            # 🔔 NOTIFICACIONES
+            print(f'📧 Enviando notificación para: {nueva_solicitud.nombre_evento}')
             notificar_nueva_solicitud(nueva_solicitud)
-            
-            # 📧 ENVIAR CONFIRMACIÓN AL USUARIO
             notificar_confirmacion_solicitud(nueva_solicitud, request)
             
-            messages.success(request, 
-                f'✅ ¡Solicitud enviada con éxito! '
-                f'Tu solicitud ha sido registrada y notificada al encargado.')
+            mensaje_exito = '✅ ¡Solicitud enviada con éxito!'
+            if tipo_espacio == 'campus':
+                mensaje_exito += ' Términos y condiciones aceptados.'
+            
+            messages.success(request, mensaje_exito)
             return redirect('usuarios:historial_solicitudes')
     
-    # 🎫 GENERAR TOKEN ÚNICO PARA EL FORMULARIO (prevenir doble envío)
+    # 🎫 GENERAR TOKEN ÚNICO PARA EL FORMULARIO
     import uuid
     form_token = str(uuid.uuid4())
 
     return render(request, 'usuarios/enviar_solicitud.html', {
         'espacios_carrera': espacios_carrera,
         'espacios_campus': espacios_campus,
-        'form_token': form_token,  # 👈 Pasar token al template
+        'form_token': form_token,
     })
+
+
+# 🆕 FUNCIÓN AUXILIAR PARA OBTENER IP
+def obtener_ip_cliente(request):
+    """Obtiene la IP real del cliente (incluso detrás de proxies)"""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 @login_required
 def eventos_usuario_json(request):

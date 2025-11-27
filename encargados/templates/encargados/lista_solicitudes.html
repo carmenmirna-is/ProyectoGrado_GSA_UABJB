@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listar Solicitudes - UABJB</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{% static 'encargados/css/styles.css' %}">
 </head>
@@ -33,7 +34,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>Token/ID</th>
                             <th>Nombre Evento</th>
                             <th>Espacio</th>
                             <th>Solicitante</th>
@@ -46,7 +47,18 @@
                     <tbody>
                         {% for solicitud in solicitudes %}
                         <tr>
-                            <td>{{ solicitud.id }}</td>
+                            <td>
+                                {% if solicitud.estado == 'aceptada' and solicitud.token_confirmacion %}
+                                    <div class="token-display">
+                                        <i class="fas fa-shield-check"></i>
+                                        <span>{{ solicitud.token_confirmacion }}</span>
+                                    </div>
+                                {% elif solicitud.estado == 'pendiente' %}
+                                    <span class="id-badge pending">#{{ solicitud.id }}</span>
+                                {% else %}
+                                    <span class="id-badge rejected">#{{ solicitud.id }}</span>
+                                {% endif %}
+                            </td>
                             <td>{{ solicitud.nombre_evento|default:"No especificado" }}</td>
                             <td>{{ solicitud.get_nombre_espacio }}</td>
                             <td>{{ solicitud.usuario_solicitante.username|default:"No especificado" }}</td>
@@ -133,6 +145,7 @@
     <!-- Token CSRF para las peticiones AJAX -->
     {% csrf_token %}
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{% static 'encargados/js/scripts.js' %}"></script>
 </body>
 </html>
