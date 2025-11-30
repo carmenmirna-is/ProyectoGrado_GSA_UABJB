@@ -3,14 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evento Cancelado</title>
+    <title>Evento Cancelado - UABJB</title>
     <style>
+        :root {
+            --uabjb-blue: #1e3a8a;
+            --uabjb-light-blue: #3b82f6;
+            --uabjb-yellow: #fbbf24;
+            --uabjb-red: #dc2626;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f5f5f5;
             margin: 0;
             padding: 20px;
         }
+        
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -19,75 +27,149 @@
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
+        
         .header {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             color: white;
             padding: 30px;
             text-align: center;
+            border-top: 4px solid #fbbf24;
         }
+        
         .header h1 {
             margin: 0;
             font-size: 24px;
+            font-weight: 600;
         }
+        
+        .header .subtitle {
+            margin-top: 8px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
         .content {
             padding: 30px;
         }
+        
         .alert {
             background-color: #fef2f2;
-            border-left: 4px solid #ef4444;
+            border-left: 4px solid #dc2626;
             padding: 15px;
             margin: 20px 0;
             border-radius: 4px;
+            color: #991b1b;
         }
+        
+        .alert strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
         .info-box {
-            background-color: #f9fafb;
+            background-color: #f0f9ff;
+            border: 2px solid #3b82f6;
             border-radius: 8px;
             padding: 20px;
             margin: 20px 0;
         }
+        
+        .info-box h3 {
+            margin-top: 0;
+            color: #1e3a8a;
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #fbbf24;
+        }
+        
         .info-row {
             display: flex;
             margin-bottom: 12px;
             align-items: flex-start;
+            padding: 8px 0;
         }
+        
         .info-label {
             font-weight: 600;
-            color: #374151;
-            min-width: 120px;
+            color: #1e3a8a;
+            min-width: 140px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
+        
         .info-value {
-            color: #6b7280;
+            color: #374151;
             flex: 1;
+            font-weight: 500;
         }
+        
         .motivo-box {
             background-color: #fef2f2;
-            border: 1px solid #fecaca;
+            border: 2px solid #dc2626;
             border-radius: 8px;
-            padding: 15px;
+            padding: 20px;
             margin: 20px 0;
         }
+        
         .motivo-box h3 {
-            color: #991b1b;
+            color: #dc2626;
             margin-top: 0;
             font-size: 16px;
+            margin-bottom: 10px;
         }
-        .footer {
-            background-color: #f9fafb;
-            padding: 20px;
-            text-align: center;
-            color: #6b7280;
-            font-size: 14px;
+        
+        .motivo-box p {
+            margin: 5px 0;
+            color: #374151;
+            line-height: 1.6;
         }
+        
         .button {
             display: inline-block;
-            background-color: #3b82f6;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             color: white;
-            padding: 12px 24px;
+            padding: 14px 28px;
             text-decoration: none;
             border-radius: 6px;
+            margin: 20px 0;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(30, 58, 138, 0.3);
+            transition: transform 0.2s;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(30, 58, 138, 0.4);
+        }
+        
+        .footer {
+            background-color: #1e3a8a;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+        }
+        
+        .footer .university {
+            font-weight: 600;
+            font-size: 16px;
+            color: #fbbf24;
+        }
+        
+        .footer .disclaimer {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 15px;
+        }
+        
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, #1e3a8a 0%, #fbbf24 50%, #1e3a8a 100%);
             margin: 20px 0;
         }
     </style>
@@ -96,30 +178,34 @@
     <div class="container">
         <div class="header">
             <h1>⚠️ Evento Cancelado</h1>
+            <div class="subtitle">Sistema de Gestión de Espacios Académicos</div>
         </div>
         
         <div class="content">
-            <p>Estimado/a <strong>{{ nombre_solicitante }}</strong>,</p>
+            <p style="color: #374151; font-size: 16px;">
+                Estimado/a <strong style="color: #1e3a8a;">{{ nombre_solicitante }}</strong>,
+            </p>
             
             <div class="alert">
-                <strong>Lamentamos informarte que tu evento ha sido cancelado por el encargado del espacio.</strong>
+                <strong>Lamentamos informarte que tu evento ha sido cancelado</strong>
+                <span>El encargado del espacio ha cancelado tu reserva. A continuación encontrarás los detalles.</span>
             </div>
             
             <div class="info-box">
-                <h3 style="margin-top: 0; color: #1f2937;">📋 Detalles del Evento</h3>
+                <h3>📋 Detalles del Evento Cancelado</h3>
                 
                 <div class="info-row">
                     <div class="info-label">
                         📌 Evento:
                     </div>
                     <div class="info-value">
-                        <strong>{{ nombre_evento }}</strong>
+                        {{ nombre_evento }}
                     </div>
                 </div>
                 
                 <div class="info-row">
                     <div class="info-label">
-                        📅 Fecha:
+                        📅 Fecha programada:
                     </div>
                     <div class="info-value">
                         {{ fecha_evento }}
@@ -131,7 +217,16 @@
                         📍 Espacio:
                     </div>
                     <div class="info-value">
-                        {{ espacio_nombre }} ({{ tipo_espacio }})
+                        {{ espacio_nombre }}
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">
+                        🏢 Tipo de espacio:
+                    </div>
+                    <div class="info-value">
+                        {{ tipo_espacio }}
                     </div>
                 </div>
                 
@@ -146,30 +241,34 @@
             </div>
             
             <div class="motivo-box">
-                <h3>💬 Motivo de la Cancelación:</h3>
-                <p style="margin: 5px 0; color: #374151;">{{ motivo }}</p>
+                <h3>💬 Motivo de la Cancelación</h3>
+                <p>{{ motivo }}</p>
             </div>
             
-            <p style="color: #6b7280;">
-                Si tienes alguna pregunta o necesitas más información, por favor contacta al encargado del espacio.
+            <div class="divider"></div>
+            
+            <p style="color: #6b7280; line-height: 1.6;">
+                Si tienes alguna pregunta o necesitas más información sobre esta cancelación, 
+                por favor contacta directamente al encargado del espacio.
             </p>
             
-            <p style="color: #6b7280;">
+            <p style="color: #6b7280; line-height: 1.6;">
                 Puedes realizar una nueva solicitud en cualquier momento a través del sistema.
             </p>
             
             <div style="text-align: center; margin-top: 30px;">
                 <a href="{{ protocol }}://{{ domain }}/usuarios/enviar-solicitud/" class="button">
-                    Nueva Solicitud
+                    📝 Crear Nueva Solicitud
                 </a>
             </div>
         </div>
         
         <div class="footer">
-            <p style="margin: 5px 0;">Sistema de Gestión de Espacios Académicos</p>
-            <p style="margin: 5px 0;"><strong>Universidad Autónoma del Beni José Ballivián</strong></p>
-            <p style="margin: 5px 0; font-size: 12px; color: #9ca3af;">
-                Este es un correo automático, por favor no respondas a este mensaje.
+            <p class="university">Universidad Autónoma del Beni José Ballivián</p>
+            <p style="font-size: 14px;">Sistema de Gestión de Espacios Académicos</p>
+            <p class="disclaimer">
+                Este es un correo automático, por favor no respondas a este mensaje.<br>
+                Para consultas, contacta al encargado del espacio correspondiente.
             </p>
         </div>
     </div>

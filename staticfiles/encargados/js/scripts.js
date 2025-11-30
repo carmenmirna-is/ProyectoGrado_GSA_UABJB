@@ -201,11 +201,6 @@ function mostrarAlertaConflicto(solicitudId, conflictos) {
         conflictosHTML += `
             <li>
                 <strong>${conflicto.nombre_evento}</strong><br>
-                <span class="text-sm text-gray-600">
-                    📅 ${conflicto.fecha} a las ${conflicto.hora}<br>
-                    ⏱️ Duración: ${duracionTexto}<br>
-                    👤 Solicitante: ${conflicto.solicitante}
-                </span>
             </li>
         `;
     });
@@ -220,7 +215,6 @@ function mostrarAlertaConflicto(solicitudId, conflictos) {
             ${conflictosHTML}
             <p class="mt-4 text-sm text-gray-700">
                 ¿Deseas aprobar esta solicitud de todas formas?<br>
-                <span class="text-red-600">Esto puede causar sobreposición de eventos.</span>
             </p>
         `,
         showCancelButton: true,

@@ -459,32 +459,35 @@ input:focus, select:focus, textarea:focus {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 50%;
+  height: 50%;
   pointer-events: none;
-  z-index: 10;
+  z-index: 5;
 }
 
 .tooltip-text {
   visibility: hidden;
-  width: 260px;
-  background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 100%);
-  color: #fff;
+  width: 300px;
+  max-width: 90vw;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  color: #1e293b;
   text-align: left;
-  padding: 14px;
+  padding: 16px;
   border-radius: 12px;
   position: absolute;
-  z-index: 1000;
-  bottom: calc(100% + 15px);
+  z-index: 10000;
+  bottom: calc(100% + 25px);
   left: 50%;
   transform: translateX(-50%);
   opacity: 0;
   transition: all 0.3s ease;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.7;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.3);
+  border: 3px solid #3b82f6;
   white-space: normal;
+  word-wrap: break-word;
+  pointer-events: none;
 }
 
 .tooltip-text::after {
@@ -534,6 +537,17 @@ input:focus, select:focus, textarea:focus {
 .tooltip-text small[style*="color: #94a3b8"] {
   background: rgba(148, 163, 184, 0.3);
   border-left: 3px solid #94a3b8;
+}
+/* Primera fila - tooltip hacia abajo */
+tbody tr:first-child .tooltip-text {
+  bottom: auto;
+  top: calc(100% + 25px);  /* Aparece debajo */
+}
+
+/* Flecha invertida */
+tbody tr:first-child .tooltip-text::after {
+  bottom: 100%;  /* Flecha arriba */
+  border-color: transparent transparent #3b82f6 transparent;
 }
 
 /* ============================
@@ -987,4 +1001,675 @@ input:focus, select:focus, textarea:focus {
     font-size: 10px;
     padding: 2px 6px;
   }
+}
+/**/
+/* ============================
+   TÉRMINOS Y CONDICIONES - PALETA UABJB
+   ============================ */
+
+/* Sección principal de términos */
+.terminos-section {
+    display: none;
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 0; /* ✅ Eliminar margen para evitar espacios */
+    color: var(--text) !important;
+    animation: slideDown 0.3s ease;
+    border: 2px solid var(--uabjb-light-blue);
+    border-top: 4px solid #fbbf24;
+    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.1);
+}
+
+/* ✅ FORZAR COLOR DE TEXTO EN TODOS LOS ELEMENTOS */
+.terminos-section * {
+    color: inherit;
+}
+
+.terminos-section h2,
+.terminos-section h3,
+.terminos-section p,
+.terminos-section span,
+.terminos-section div {
+    color: var(--text) !important;
+}
+
+@keyframes slideDown {
+    from { 
+        opacity: 0; 
+        transform: translateY(-20px);
+        max-height: 0;
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0);
+        max-height: 2000px;
+    }
+}
+
+.terminos-section.visible {
+    display: block;
+    margin-top: 1.5rem; /* ✅ Solo margen superior cuando está visible */
+}
+
+/* Header de términos */
+.terminos-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--uabjb-light-blue);
+}
+
+.terminos-header i {
+    font-size: 2rem;
+    color: var(--uabjb-blue);
+}
+
+.terminos-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--uabjb-blue) !important;
+}
+
+.terminos-subtitle {
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+    color: var(--text-alt) !important;
+}
+
+/* Grid de documentos */
+.documentos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Tarjeta de documento */
+.documento-card {
+    background: var(--bg-alt);
+    border-radius: 10px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+.documento-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--uabjb-light-blue);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+}
+
+.documento-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--uabjb-red);
+}
+
+.documento-nombre {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text) !important;
+}
+
+.documento-descripcion {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+    color: var(--text-alt) !important;
+}
+
+/* Botón de descarga */
+.btn-descargar {
+    background: var(--uabjb-light-blue);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+}
+
+.btn-descargar:hover {
+    background: var(--uabjb-blue);
+    transform: scale(1.05);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Contenedor de aceptación */
+.aceptacion-container {
+    background: var(--bg-alt);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    border: 2px solid var(--border);
+}
+
+/* Checkbox personalizado */
+.checkbox-custom {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    padding: 1rem;
+    background: var(--bg);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    border: 2px solid var(--border);
+}
+
+.checkbox-custom:hover {
+    border-color: var(--uabjb-light-blue);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.checkbox-custom input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    margin-top: 2px;
+    accent-color: var(--uabjb-light-blue);
+}
+
+.checkbox-label {
+    flex: 1;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text) !important;
+}
+
+.checkbox-label strong {
+    color: var(--uabjb-blue) !important;
+    font-weight: 700;
+}
+
+/* Sección de firma digital */
+.firma-section {
+    margin-top: 2rem;
+    background: var(--bg-alt);
+    border-radius: 10px;
+    padding: 1.5rem;
+    border: 2px solid var(--border);
+}
+
+.firma-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.firma-header i {
+    color: var(--uabjb-blue);
+    font-size: 1.5rem;
+}
+
+.firma-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text) !important;
+}
+
+/* Contenedor del canvas */
+.canvas-container {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    box-shadow: var(--shadow);
+    border: 2px solid var(--border);
+}
+
+#canvas-firma {
+    border: 2px dashed var(--uabjb-light-blue);
+    border-radius: 8px;
+    cursor: crosshair;
+    display: block;
+    touch-action: none;
+    width: 100%;
+    max-width: 500px;
+    height: 200px;
+    background: #fafafa;
+}
+
+/* Controles de firma */
+.firma-controles {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.btn-firma {
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-limpiar {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-limpiar:hover {
+    background: #b91c1c;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.firma-info {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    font-style: italic;
+    color: var(--text-alt) !important;
+}
+
+/* Alerta de términos */
+.alerta-terminos {
+    background: #fef2f2;
+    border: 2px solid var(--uabjb-red);
+    border-left: 4px solid var(--uabjb-red);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    display: none;
+    color: #991b1b;
+}
+
+.alerta-terminos.visible {
+    display: block;
+    animation: shake 0.5s ease;
+}
+
+.alerta-terminos i {
+    color: var(--uabjb-red);
+    margin-right: 0.5rem;
+}
+
+.alerta-terminos strong {
+    color: var(--uabjb-red);
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+/* ============================
+   RESPONSIVE PARA TÉRMINOS
+   ============================ */
+@media (max-width: 768px) {
+    .terminos-section {
+        padding: 1.5rem;
+    }
+    
+    .terminos-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .terminos-title {
+        font-size: 1.2rem;
+    }
+    
+    .documentos-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #canvas-firma {
+        max-width: 100%;
+    }
+}
+
+/**/
+/* ============================
+   TÉRMINOS Y CONDICIONES - PALETA UABJB
+   ============================ */
+
+/* Sección principal de términos */
+.terminos-section {
+    display: none;
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 0; /* ✅ Eliminar margen para evitar espacios */
+    color: var(--text);
+    animation: slideDown 0.3s ease;
+    border: 2px solid var(--uabjb-light-blue);
+    border-top: 4px solid #fbbf24;
+    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.1);
+}
+
+@keyframes slideDown {
+    from { 
+        opacity: 0; 
+        transform: translateY(-20px);
+        max-height: 0;
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0);
+        max-height: 2000px;
+    }
+}
+
+.terminos-section.visible {
+    display: block;
+    margin-top: 1.5rem; /* ✅ Solo margen superior cuando está visible */
+}
+
+/* Header de términos */
+.terminos-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(251, 191, 36, 0.5);
+}
+
+.terminos-header i {
+    font-size: 2rem;
+    color: #fbbf24;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.terminos-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    color: white;
+}
+
+.terminos-subtitle {
+    font-size: 0.9rem;
+    opacity: 0.95;
+    margin-top: 0.3rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Grid de documentos */
+.documentos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Tarjeta de documento */
+.documento-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    border: 2px solid rgba(251, 191, 36, 0.3);
+}
+
+.documento-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border-color: #fbbf24;
+}
+
+.documento-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #fbbf24;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.documento-nombre {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.documento-descripcion {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Botón de descarga */
+.btn-descargar {
+    background: white;
+    color: #1e3a8a;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn-descargar:hover {
+    background: #fbbf24;
+    color: #1e3a8a;
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Contenedor de aceptación */
+.aceptacion-container {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    border: 2px solid rgba(251, 191, 36, 0.3);
+}
+
+/* Checkbox personalizado */
+.checkbox-custom {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.checkbox-custom:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(251, 191, 36, 0.5);
+}
+
+.checkbox-custom input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    margin-top: 2px;
+    accent-color: #fbbf24;
+}
+
+.checkbox-label {
+    flex: 1;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: white;
+}
+
+.checkbox-label strong {
+    color: #fbbf24;
+    font-weight: 700;
+}
+
+/* Sección de firma digital */
+.firma-section {
+    margin-top: 2rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 1.5rem;
+    border: 2px solid rgba(251, 191, 36, 0.3);
+}
+
+.firma-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.firma-header i {
+    color: #fbbf24;
+    font-size: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.firma-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+}
+
+/* Contenedor del canvas */
+.canvas-container {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+#canvas-firma {
+    border: 2px dashed #1e3a8a;
+    border-radius: 8px;
+    cursor: crosshair;
+    display: block;
+    touch-action: none;
+    width: 100%;
+    max-width: 500px;
+    height: 200px;
+    background: #fafafa;
+}
+
+/* Controles de firma */
+.firma-controles {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.btn-firma {
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-limpiar {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-limpiar:hover {
+    background: #b91c1c;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.firma-info {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Alerta de términos */
+.alerta-terminos {
+    background: rgba(220, 38, 38, 0.2);
+    border: 2px solid #dc2626;
+    border-left: 4px solid #dc2626;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    display: none;
+    color: white;
+}
+
+.alerta-terminos.visible {
+    display: block;
+    animation: shake 0.5s ease;
+}
+
+.alerta-terminos i {
+    color: #fbbf24;
+    margin-right: 0.5rem;
+}
+
+.alerta-terminos strong {
+    color: #fbbf24;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+/* ============================
+   RESPONSIVE PARA TÉRMINOS
+   ============================ */
+@media (max-width: 768px) {
+    .terminos-section {
+        padding: 1.5rem;
+    }
+    
+    .terminos-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .terminos-title {
+        font-size: 1.2rem;
+    }
+    
+    .documentos-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #canvas-firma {
+        max-width: 100%;
+    }
 }

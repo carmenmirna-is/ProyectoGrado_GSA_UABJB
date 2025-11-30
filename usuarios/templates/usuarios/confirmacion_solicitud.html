@@ -3,31 +3,152 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Confirmación de solicitud - UABJB</title>
-  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .card {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+    }
+    .header h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+    }
+    .body {
+      padding: 30px 25px;
+      color: #2d3748;
+    }
+    .body p {
+      margin: 15px 0;
+      font-size: 15px;
+    }
+    .body h3 {
+      color: #667eea;
+      font-size: 18px;
+      margin: 25px 0 15px 0;
+      border-left: 4px solid #667eea;
+      padding-left: 12px;
+    }
+    .body ul {
+      list-style: none;
+      padding: 0;
+      background: #f7fafc;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .body ul li {
+      padding: 10px 0;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+    }
+    .body ul li:last-child {
+      border-bottom: none;
+    }
+    .body ul li strong {
+      color: #4a5568;
+      display: inline-block;
+      min-width: 180px;
+    }
+    .info-box {
+      background: #edf2f7;
+      border-left: 4px solid #4299e1;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .info-box p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #2d3748;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #667eea;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .btn:hover {
+      background: #5a67d8;
+    }
+    .footer {
+      background: #2d3748;
+      color: #a0aec0;
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+    }
+    .timezone-note {
+      font-size: 12px;
+      color: #718096;
+      font-style: italic;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
   <div class="card">
     <div class="header">
-      <h2>✅ Solicitud recibida</h2>
+      <h2>✅ Solicitud recibida correctamente</h2>
     </div>
     <div class="body">
       <p>Hola <strong>{{ user.first_name|default:user.username }}</strong>,</p>
-      <p>Tu solicitud ha sido enviada exitosamente y está en revisión.</p>
+      <p>Tu solicitud ha sido enviada exitosamente y está en revisión por el encargado del espacio.</p>
 
       <h3>📋 Resumen de tu solicitud</h3>
       <ul>
         <li><strong>Evento:</strong> {{ solicitud.nombre_evento }}</li>
-        <li><strong>Fecha y hora:</strong> {{ fecha_evento }}</li>
+        <li><strong>Descripción:</strong> {{ solicitud.descripcion_evento|default:"Sin descripción" }}</li>
+        <li><strong>Fecha del evento:</strong> {{ fecha_evento }}</li>
         <li><strong>Espacio solicitado:</strong> {{ espacio_nombre }}</li>
-        <li><strong>Archivo adjunto:</strong> {{ tiene_archivo|yesno:"Sí,No" }}</li>
+        <li><strong>Tipo de espacio:</strong> {{ solicitud.get_tipo_espacio_display }}</li>
+        <li><strong>Archivo adjunto:</strong> {{ tiene_archivo|yesno:"✓ Sí,✗ No" }}</li>
+        <li><strong>Fecha de solicitud:</strong> {{ fecha_solicitud }}</li>
       </ul>
 
-      <h3>📬 ¿Qué sigue?</h3>
-      <p>Recibirás una notificación cuando el encargado la revise.</p>
+      <p class="timezone-note">⏰ Todas las fechas están en hora de Bolivia (GMT-4)</p>
+
+      <div class="info-box">
+        <h3 style="margin-top: 0; border: none; padding: 0;">📬 ¿Qué sigue?</h3>
+        <p>✓ Tu solicitud está siendo revisada por el encargado</p>
+        <p>✓ Recibirás un correo cuando sea aceptada o rechazada</p>
+        <p>✓ Puedes revisar el estado en cualquier momento desde tu historial</p>
+      </div>
+
+      <center>
+        <a href="{{ enlace_estado }}" class="btn">Ver mis solicitudes</a>
+      </center>
+
+      <p style="margin-top: 30px; font-size: 13px; color: #718096;">
+        Si tienes alguna pregunta o necesitas hacer cambios a tu solicitud, 
+        puedes editarla desde tu historial mientras esté en estado <strong>Pendiente</strong>.
+      </p>
     </div>
     <div class="footer">
-      © 2025 UABJB - Todos los derechos reservados
+      © 2025 Universidad Autónoma del Beni José Ballivián<br>
+      Sistema de Gestión de Espacios Académicos
     </div>
   </div>
 </body>

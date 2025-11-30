@@ -31,6 +31,36 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from io import BytesIO
 from django.core.files.base import ContentFile
+from django.views.decorators.http import require_http_methods
+from datetime import datetime, timedelta
+import json
+from django.views.decorators.cache import never_cache
+
+# ✅ FIX 1: Vista de Usuario con validación y anti-cache
+@login_required
+@never_cache  # 🔥 CRÍTICO: No cachear
+def usuario(request):
+    """
+    Dashboard del usuario regular
+    """
+    user = request.user
+    
+    # 🔒 Verificar que sea usuario regular
+    if user.tipo_usuario != 'usuario':
+        messages.error(request, '⛔ No tienes permiso para acceder a esta página.')
+        return redirect('login')
+    
+    # 🔍 Debug: Verificar sesión
+    print(f"👤 Dashboard Usuario: {user.username} (ID: {user.id}, Rol: {user.tipo_usuario})")
+    print(f"   Session Key: {request.session.session_key}")
+    
+    context = {
+        'mes_actual': timezone.now().strftime('%B %Y'),
+        'usuario': user,  # ✅ Pasar usuario explícitamente
+        'session_key': request.session.session_key[:10],  # Para debugging
+    }
+    
+    return render(request, 'usuarios/usuario.html', context)
 
 # Zona horaria fija de Bolivia (una sola vez)
 TZ_BOLIVIA = ZoneInfo("America/La_Paz")
@@ -113,6 +143,7 @@ def notificar_aceptacion_solicitud(solicitud, encargado=None):
     Incluye: Token único + Código QR + Detalles del evento
     """
     try:
+        import pytz
         user = solicitud.usuario_solicitante
         
         if not user.email:
@@ -134,17 +165,34 @@ def notificar_aceptacion_solicitud(solicitud, encargado=None):
         # 2️⃣ GENERAR CÓDIGO QR
         qr_base64 = generar_qr_confirmacion(solicitud, token)
         
-        # 3️⃣ PREPARAR INFORMACIÓN DEL EVENTO
-        fecha_evento_local = to_bolivia(solicitud.fecha_evento)
-        fecha_evento_str = fecha_evento_local.strftime("%d/%m/%Y a las %H:%M")
+        # 3️⃣ PREPARAR INFORMACIÓN DEL EVENTO CON ZONA HORARIA CORRECTA
+        # ✅ CORRECCIÓN: Convertir a zona horaria de Bolivia
+        bolivia_tz = pytz.timezone('America/La_Paz')
+        
+        fecha_evento_bolivia = solicitud.fecha_evento.astimezone(bolivia_tz)
+        fecha_evento_str = fecha_evento_bolivia.strftime("%d/%m/%Y a las %H:%M")
 
         if solicitud.fecha_fin_evento:
-            fecha_fin_local = to_bolivia(solicitud.fecha_fin_evento)
-            fecha_fin_str = fecha_fin_local.strftime("%d/%m/%Y a las %H:%M")
+            fecha_fin_bolivia = solicitud.fecha_fin_evento.astimezone(bolivia_tz)
+            fecha_fin_str = fecha_fin_bolivia.strftime("%d/%m/%Y a las %H:%M")
         else:
             fecha_fin_str = None
         
-        espacio_nombre = solicitud.get_nombre_espacio()
+        # ✅ CORRECCIÓN: Obtener el nombre CORRECTO del espacio
+        if solicitud.tipo_espacio == 'carrera' and solicitud.espacio:
+            espacio_nombre = solicitud.espacio.nombre  # ✅ Nombre del ESPACIO, no de la carrera
+            # Mostrar también la carrera en el tipo
+            if solicitud.espacio.carrera:
+                tipo_espacio_display = f"Espacio de Carrera - {solicitud.espacio.carrera.nombre}"
+            else:
+                tipo_espacio_display = "Espacio de Carrera"
+        elif solicitud.tipo_espacio == 'campus' and solicitud.espacio_campus:
+            espacio_nombre = solicitud.espacio_campus.nombre  # ✅ Nombre del espacio de campus
+            tipo_espacio_display = "Espacio de Campus"
+        else:
+            espacio_nombre = "No especificado"
+            tipo_espacio_display = "No especificado"
+        
         solicitante_nombre = user.get_full_name() or user.username
         
         # 4️⃣ CONTEXTO PARA EL TEMPLATE
@@ -157,9 +205,9 @@ def notificar_aceptacion_solicitud(solicitud, encargado=None):
             'fecha_evento': fecha_evento_str,
             'fecha_fin_evento': fecha_fin_str,
             'espacio_nombre': espacio_nombre,
-            'tipo_espacio': solicitud.get_tipo_espacio_display(),
+            'tipo_espacio': tipo_espacio_display,
             'token': token,
-            'qr_base64': None,  # 🔧 Ya no usamos base64 en el template
+            'qr_base64': None,  # Ya no usamos base64 en el template
             'encargado_nombre': encargado.get_full_name() if encargado else 'Encargado del espacio',
         }
         
@@ -172,7 +220,7 @@ def notificar_aceptacion_solicitud(solicitud, encargado=None):
         email = EmailMultiAlternatives(
             subject=subject,
             body=f"Tu solicitud '{solicitud.nombre_evento}' ha sido ACEPTADA. Token: {token}",
-            from_email='cibanezsanguino@gmail.com',
+            from_email=settings.DEFAULT_FROM_EMAIL,
             to=[user.email],
         )
         
@@ -193,6 +241,8 @@ def notificar_aceptacion_solicitud(solicitud, encargado=None):
         
         print(f"✅ Confirmación de aceptación enviada a {user.email}")
         print(f"   Token: {token}")
+        print(f"   Espacio: {espacio_nombre}")
+        print(f"   Fecha (Bolivia): {fecha_evento_str}")
         
         return True
         
@@ -201,6 +251,123 @@ def notificar_aceptacion_solicitud(solicitud, encargado=None):
         import traceback
         traceback.print_exc()
         return False
+    
+@login_required
+@require_http_methods(["POST"])
+def verificar_conflictos_antes_enviar(request):
+    """
+    Verifica si hay conflictos de horario ANTES de que el usuario envíe la solicitud.
+    """
+    try:
+        # ✅ PERMITIR TANTO JSON COMO FORM DATA
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            data = request.POST
+        
+        # ✅ DEBUG: Imprimir lo que recibimos
+        print("=" * 50)
+        print("📥 VERIFICACIÓN DE CONFLICTOS RECIBIDA")
+        print(f"   Content-Type: {request.content_type}")
+        print(f"   Usuario: {request.user.username}")
+        print(f"   Datos: {data}")
+        print("=" * 50)
+        
+        fecha_evento_str = data.get('fecha_evento')
+        fecha_fin_evento_str = data.get('fecha_fin_evento')
+        tipo_espacio = data.get('tipo_espacio')
+        espacio_id = data.get('espacio_carrera') if tipo_espacio == 'carrera' else data.get('espacio_campus')
+        
+        # Validaciones básicas
+        if not all([fecha_evento_str, tipo_espacio, espacio_id]):
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Faltan datos requeridos'
+            }, status=400)
+        
+        # Parsear fechas
+        try:
+            fecha_inicio = datetime.strptime(fecha_evento_str, '%Y-%m-%dT%H:%M')
+            fecha_inicio = timezone.make_aware(fecha_inicio)
+            
+            if fecha_fin_evento_str:
+                fecha_fin = datetime.strptime(fecha_fin_evento_str, '%Y-%m-%dT%H:%M')
+                fecha_fin = timezone.make_aware(fecha_fin)
+            else:
+                # Si no hay fecha fin, asumir 2 horas
+                fecha_fin = fecha_inicio + timedelta(hours=2)
+        except ValueError as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Formato de fecha inválido: {str(e)}'
+            }, status=400)
+        
+        # Buscar solicitudes aceptadas en el mismo espacio
+        query_base = Solicitud.objects.filter(
+            estado='aceptada',
+            eliminada=False
+        )
+        
+        if tipo_espacio == 'carrera':
+            query_base = query_base.filter(
+                tipo_espacio='carrera',
+                espacio_id=espacio_id
+            )
+        else:
+            query_base = query_base.filter(
+                tipo_espacio='campus',
+                espacio_campus_id=espacio_id
+            )
+        
+        # Verificar conflictos
+        conflictos = []
+        
+        for solicitud in query_base:
+            otra_inicio = solicitud.fecha_evento
+            
+            if solicitud.fecha_fin_evento:
+                otra_fin = solicitud.fecha_fin_evento
+            else:
+                otra_fin = solicitud.fecha_evento + timedelta(hours=2)
+            
+            # Verificar si hay solapamiento
+            if fecha_inicio < otra_fin and fecha_fin > otra_inicio:
+                import pytz
+                bolivia_tz = pytz.timezone('America/La_Paz')
+                
+                inicio_bolivia = otra_inicio.astimezone(bolivia_tz)
+                fin_bolivia = otra_fin.astimezone(bolivia_tz)
+                
+                conflictos.append({
+                    'nombre_evento': solicitud.nombre_evento,
+                    'solicitante': solicitud.usuario_solicitante.get_full_name() or solicitud.usuario_solicitante.username,
+                    'fecha_inicio': inicio_bolivia.strftime('%d/%m/%Y %H:%M'),
+                    'fecha_fin': fin_bolivia.strftime('%d/%m/%Y %H:%M'),
+                    'es_propio': solicitud.usuario_solicitante == request.user
+                })
+        
+        if conflictos:
+            return JsonResponse({
+                'status': 'warning',
+                'tiene_conflictos': True,
+                'mensaje': f'⚠️ Hay {len(conflictos)} reserva(s) aceptada(s) en este horario',
+                'conflictos': conflictos
+            })
+        else:
+            return JsonResponse({
+                'status': 'success',
+                'tiene_conflictos': False,
+                'mensaje': '✅ No hay conflictos de horario'
+            })
+        
+    except Exception as e:
+        print(f"❌ Error verificando conflictos: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Error al verificar conflictos: {str(e)}'
+        }, status=500)
 
 def notificar_rechazo_solicitud(solicitud, motivo=""):
     """
@@ -242,117 +409,87 @@ def notificar_rechazo_solicitud(solicitud, motivo=""):
         print(f"❌ Error enviando notificación de rechazo: {str(e)}")
         return False
 
-def notificar_nueva_solicitud(solicitud):
-    """
-    Envía notificación por correo al encargado cuando llega una nueva solicitud
-    """
+def notificar_confirmacion_solicitud(solicitud, request):
     try:
-        # Determinar el encargado según el tipo de espacio
-        encargado = None
+        import pytz
         
-        if solicitud.tipo_espacio == 'carrera' and solicitud.espacio:
-            encargado = solicitud.espacio.encargado
-        elif solicitud.tipo_espacio == 'campus' and solicitud.espacio_campus:
-            encargado = solicitud.espacio_campus.encargado
+        user = solicitud.usuario_solicitante
+        if not user.email:
+            print("⚠️ El usuario no tiene email configurado")
+            return False
+
+        protocol = 'https' if request.is_secure() else 'http'
+        domain = request.get_host()
+        enlace_estado = f"{protocol}://{domain}/usuarios/historial-solicitudes/"
+
+        # ✅ Configurar zona horaria de Bolivia
+        bolivia_tz = pytz.timezone('America/La_Paz')
         
-        # Si no hay encargado asignado o no tiene email, no enviar correo
-        if not encargado:
-            print(f'⚠️  No hay encargado asignado para el espacio de la solicitud: {solicitud.nombre_evento}')
-            return
+        # 🔧 FIX: Convertir fecha_evento a hora de Bolivia
+        if isinstance(solicitud.fecha_evento, str):
+            try:
+                fecha_obj = parse_datetime(solicitud.fecha_evento)
+                if fecha_obj:
+                    # Asegurar que sea aware y convertir a Bolivia
+                    if timezone.is_naive(fecha_obj):
+                        fecha_obj = timezone.make_aware(fecha_obj)
+                    fecha_bolivia = fecha_obj.astimezone(bolivia_tz)
+                    fecha_evento = fecha_bolivia.strftime("%d/%m/%Y a las %H:%M")
+                else:
+                    fecha_evento = solicitud.fecha_evento
+            except:
+                fecha_evento = solicitud.fecha_evento
+        else:
+            # Si ya es datetime, convertir a Bolivia
+            if timezone.is_naive(solicitud.fecha_evento):
+                fecha_obj = timezone.make_aware(solicitud.fecha_evento)
+            else:
+                fecha_obj = solicitud.fecha_evento
             
-        if not encargado.email:
-            print(f'⚠️  El encargado {encargado.username} no tiene email configurado')
-            return
+            fecha_bolivia = fecha_obj.astimezone(bolivia_tz)
+            fecha_evento = fecha_bolivia.strftime("%d/%m/%Y a las %H:%M")
         
-        # Preparar información del solicitante
-        solicitante_nombre = f"{solicitud.usuario_solicitante.first_name} {solicitud.usuario_solicitante.last_name}".strip()
-        if not solicitante_nombre:
-            solicitante_nombre = solicitud.usuario_solicitante.username
+        # ✅ Convertir fecha de creación de la solicitud a Bolivia
+        if timezone.is_naive(solicitud.fecha_creacion):
+            fecha_creacion_obj = timezone.make_aware(solicitud.fecha_creacion)
+        else:
+            fecha_creacion_obj = solicitud.fecha_creacion
         
-        # Información académica del solicitante
-        info_academica = ""
-        if solicitud.usuario_solicitante.carrera:
-            info_academica += f"- Carrera: {solicitud.usuario_solicitante.carrera}\n"
-        if solicitud.usuario_solicitante.facultad:
-            info_academica += f"- Facultad: {solicitud.usuario_solicitante.facultad}\n"
+        fecha_creacion_bolivia = fecha_creacion_obj.astimezone(bolivia_tz)
+        fecha_solicitud = fecha_creacion_bolivia.strftime("%d/%m/%Y a las %H:%M")
         
-        # Preparar fechas de forma segura
-        try:
-            fecha_evento_str = solicitud.fecha_evento.strftime("%d/%m/%Y a las %H:%M")
-        except:
-            fecha_evento_str = str(solicitud.fecha_evento)
-        
-        try:
-            fecha_creacion_str = solicitud.fecha_creacion.strftime("%d/%m/%Y a las %H:%M")
-        except:
-            fecha_creacion_str = str(solicitud.fecha_creacion)
-        
-        # Preparar el contenido del correo
-        subject = '🔔 Nueva Solicitud Recibida - Sistema UABJB'
-        
-        message = f'''Estimado/a {encargado.first_name or encargado.username},
+        espacio_nombre = solicitud.get_nombre_espacio()
+        tiene_archivo = bool(solicitud.archivo_adjunto)
 
-Tienes una nueva solicitud que requiere tu atención en el Sistema de Gestión UABJB.
+        html_message = render_to_string('usuarios/confirmacion_solicitud.html', {
+            'solicitud': solicitud,
+            'user': user,
+            'enlace_estado': enlace_estado,
+            'fecha_evento': fecha_evento,
+            'fecha_solicitud': fecha_solicitud,  # ✅ Nueva variable con hora de Bolivia
+            'espacio_nombre': espacio_nombre,
+            'tiene_archivo': tiene_archivo,
+        })
 
-📋 DETALLES DE LA SOLICITUD:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        subject = "✅ Solicitud recibida - Sistema UABJB"
 
-👤 SOLICITANTE:
-- Nombre: {solicitante_nombre}
-- Email: {solicitud.usuario_solicitante.email}
-- Teléfono: {solicitud.usuario_solicitante.telefono or 'No especificado'}
-{info_academica}
-
-🎯 INFORMACIÓN DEL EVENTO:
-- Evento: {solicitud.nombre_evento}
-- Descripción: {solicitud.descripcion_evento or 'No especificada'}
-- Fecha y hora: {fecha_evento_str}
-- Espacio solicitado: {solicitud.get_nombre_espacio()}
-- Tipo de espacio: {solicitud.get_tipo_espacio_display()}
-
-📅 INFORMACIÓN DE LA SOLICITUD:
-- Estado: {solicitud.get_estado_display()}
-- Fecha de solicitud: {fecha_creacion_str}
-- Archivo adjunto: {'Sí' if solicitud.archivo_adjunto else 'No'}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-⚡ ACCIÓN REQUERIDA:
-Por favor, revisa tu dashboard para aprobar o rechazar esta solicitud.
-
-📱 Dashboard → Ver Solicitudes → Solicitudes Pendientes
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Este es un correo automático del Sistema de Gestión UABJB.
-
-Saludos cordiales,
-Sistema de Gestión UABJB'''
-        
-        # Enviar el correo
         send_mail(
             subject,
-            message,
-            'cibanezsanguino@gmail.com',  # From email (el mismo que usas actualmente)
-            [encargado.email],  # To email
-            fail_silently=True,  # No rompe el sistema si falla el correo
+            None,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            html_message=html_message,
+            fail_silently=False,
         )
-        
-        print(f'✅ Notificación enviada al encargado {encargado.email} para la solicitud: {solicitud.nombre_evento}')
-        
+        print(f"✅ Confirmación HTML enviada a {user.email}")
+        print(f"   Fecha evento (Bolivia): {fecha_evento}")
+        print(f"   Fecha solicitud (Bolivia): {fecha_solicitud}")
+        return True
     except Exception as e:
-        print(f'❌ Error enviando notificación al encargado: {str(e)}')
-
-
-@login_required
-def usuario(request):
-    if request.method == 'POST':
-        # Lógica para manejar interacciones del calendario (si se implementa en el futuro)
-        pass
-    context = {
-        'mes_actual': timezone.now().strftime('%B %Y'),
-    }
-    return render(request, 'usuarios/usuario.html', context)
+        print(f"❌ Error enviando confirmación HTML: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return False
 
 @login_required
 def listar_espacios(request):
@@ -665,10 +802,8 @@ def enviar_solicitud(request):
         espacio_campus     = request.POST.get('espacio_campus')
         archivo_adjunto    = request.FILES.get('archivo_adjunto')
         
-        # 🆕 NUEVOS CAMPOS PARA TÉRMINOS Y CONDICIONES
+        # ✅ SOLO CHECKBOX DE TÉRMINOS (sin firma)
         acepta_condiciones = request.POST.get('acepta_condiciones_uso') == 'on'
-        acepta_ley = request.POST.get('acepta_ley_259') == 'on'
-        firma_digital_base64 = request.POST.get('firma_digital', '')
         
         # 🔒 VERIFICAR TOKEN DE FORMULARIO
         token_form = request.POST.get('form_token')
@@ -687,12 +822,10 @@ def enviar_solicitud(request):
         if tipo_espacio == 'campus' and not espacio_campus:   
             errores.append('Selecciona campus.')
         
-        # 🆕 VALIDACIÓN ESPECIAL PARA ESPACIOS DE CAMPUS
+        # ✅ VALIDACIÓN SIMPLIFICADA PARA ESPACIOS DE CAMPUS (solo checkbox)
         if tipo_espacio == 'campus' and espacio_campus:
             if not acepta_condiciones:
                 errores.append('❌ Debes aceptar las Condiciones de Uso.')
-            if not firma_digital_base64:
-                errores.append('❌ Debes firmar digitalmente el documento.')
 
         if errores:
             for e in errores: 
@@ -721,27 +854,7 @@ def enviar_solicitud(request):
                     '⚠️ Ya enviaste una solicitud idéntica hace menos de 5 minutos.')
                 return redirect('usuarios:historial_solicitudes')
             
-            # 🆕 PROCESAR FIRMA DIGITAL (si existe)
-            firma_archivo = None
-            if firma_digital_base64 and tipo_espacio == 'campus':
-                try:
-                    # Remover el prefijo "data:image/png;base64,"
-                    import base64
-                    from django.core.files.base import ContentFile
-                    
-                    formato, imgstr = firma_digital_base64.split(';base64,')
-                    ext = formato.split('/')[-1]
-                    
-                    # Decodificar y crear archivo
-                    data = base64.b64decode(imgstr)
-                    firma_archivo = ContentFile(
-                        data, 
-                        name=f'firma_{request.user.username}_{timezone.now().strftime("%Y%m%d_%H%M%S")}.{ext}'
-                    )
-                except Exception as e:
-                    print(f'❌ Error procesando firma: {e}')
-            
-            # Crear la solicitud
+            # Crear la solicitud (sin procesar firma digital)
             nueva_solicitud = Solicitud.objects.create(
                 usuario_solicitante=request.user,
                 nombre_evento=nombre_evento,
@@ -753,11 +866,10 @@ def enviar_solicitud(request):
                 espacio_campus_id=espacio_campus if tipo_espacio == 'campus' else None,
                 archivo_adjunto=archivo_adjunto,
                 estado='pendiente',
-                # 🆕 NUEVOS CAMPOS
+                # ✅ SOLO GUARDAR ACEPTACIÓN DE TÉRMINOS (sin firma)
                 acepta_condiciones_uso=acepta_condiciones if tipo_espacio == 'campus' else False,
-                firma_digital=firma_archivo if tipo_espacio == 'campus' else None,
-                fecha_aceptacion_terminos=timezone.now() if tipo_espacio == 'campus' else None,
-                ip_aceptacion=obtener_ip_cliente(request) if tipo_espacio == 'campus' else None,
+                fecha_aceptacion_terminos=timezone.now() if tipo_espacio == 'campus' and acepta_condiciones else None,
+                ip_aceptacion=obtener_ip_cliente(request) if tipo_espacio == 'campus' and acepta_condiciones else None,
             )
             
             # 🔐 GENERAR TOKEN ÚNICO
@@ -771,19 +883,17 @@ def enviar_solicitud(request):
             request.session['last_form_token'] = token_unico
             request.session['last_solicitud_id'] = nueva_solicitud.id
 
-            # Si es campus y aceptó términos, enviar PDF
-            if tipo_espacio == 'campus' and acepta_condiciones and acepta_ley:
-                # Obtener encargado
-                encargado = None
-                if espacio_campus:
-                    try:
-                        espacio_obj = EspacioCampus.objects.get(id=espacio_campus)
-                        encargado = espacio_obj.encargado
-                    except:
-                        pass
-                
-                # Enviar email con PDF de términos aceptados
-                enviar_email_terminos_aceptados(nueva_solicitud, encargado)
+            # ❌ COMENTADO: Ya no enviamos PDF de términos porque no hay firma
+            # if tipo_espacio == 'campus' and acepta_condiciones:
+            #     encargado = None
+            #     if espacio_campus:
+            #         try:
+            #             espacio_obj = EspacioCampus.objects.get(id=espacio_campus)
+            #             encargado = espacio_obj.encargado
+            #         except:
+            #             pass
+            #     
+            #     enviar_email_terminos_aceptados(nueva_solicitud, encargado)
                         
             # 🔔 NOTIFICACIONES
             print(f'📧 Enviando notificación para: {nueva_solicitud.nombre_evento}')
@@ -791,7 +901,7 @@ def enviar_solicitud(request):
             notificar_confirmacion_solicitud(nueva_solicitud, request)
             
             mensaje_exito = '✅ ¡Solicitud enviada con éxito!'
-            if tipo_espacio == 'campus':
+            if tipo_espacio == 'campus' and acepta_condiciones:
                 mensaje_exito += ' Términos y condiciones aceptados.'
             
             messages.success(request, mensaje_exito)
@@ -807,6 +917,106 @@ def enviar_solicitud(request):
         'form_token': form_token,
     })
 
+def notificar_nueva_solicitud(solicitud):
+    """
+    Envía notificación por correo al encargado cuando llega una nueva solicitud
+    """
+    try:
+        # Determinar el encargado según el tipo de espacio
+        encargado = None
+        
+        if solicitud.tipo_espacio == 'carrera' and solicitud.espacio:
+            encargado = solicitud.espacio.encargado
+        elif solicitud.tipo_espacio == 'campus' and solicitud.espacio_campus:
+            encargado = solicitud.espacio_campus.encargado
+        
+        # Si no hay encargado asignado o no tiene email, no enviar correo
+        if not encargado:
+            print(f'⚠️  No hay encargado asignado para el espacio de la solicitud: {solicitud.nombre_evento}')
+            return
+            
+        if not encargado.email:
+            print(f'⚠️  El encargado {encargado.username} no tiene email configurado')
+            return
+        
+        # Preparar información del solicitante
+        solicitante_nombre = f"{solicitud.usuario_solicitante.first_name} {solicitud.usuario_solicitante.last_name}".strip()
+        if not solicitante_nombre:
+            solicitante_nombre = solicitud.usuario_solicitante.username
+        
+        # Información académica del solicitante
+        info_academica = ""
+        if solicitud.usuario_solicitante.carrera:
+            info_academica += f"- Carrera: {solicitud.usuario_solicitante.carrera}\n"
+        if solicitud.usuario_solicitante.facultad:
+            info_academica += f"- Facultad: {solicitud.usuario_solicitante.facultad}\n"
+        
+        # Preparar fechas de forma segura
+        try:
+            fecha_evento_str = solicitud.fecha_evento.strftime("%d/%m/%Y a las %H:%M")
+        except:
+            fecha_evento_str = str(solicitud.fecha_evento)
+        
+        try:
+            fecha_creacion_str = solicitud.fecha_creacion.strftime("%d/%m/%Y a las %H:%M")
+        except:
+            fecha_creacion_str = str(solicitud.fecha_creacion)
+        
+        # Preparar el contenido del correo
+        subject = '🔔 Nueva Solicitud Recibida - Sistema UABJB'
+        
+        message = f'''Estimado/a {encargado.first_name or encargado.username},
+
+Tienes una nueva solicitud que requiere tu atención en el Sistema de Gestión UABJB.
+
+📋 DETALLES DE LA SOLICITUD:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 SOLICITANTE:
+- Nombre: {solicitante_nombre}
+- Email: {solicitud.usuario_solicitante.email}
+- Teléfono: {solicitud.usuario_solicitante.telefono or 'No especificado'}
+{info_academica}
+
+🎯 INFORMACIÓN DEL EVENTO:
+- Evento: {solicitud.nombre_evento}
+- Descripción: {solicitud.descripcion_evento or 'No especificada'}
+- Fecha y hora: {fecha_evento_str}
+- Espacio solicitado: {solicitud.get_nombre_espacio()}
+- Tipo de espacio: {solicitud.get_tipo_espacio_display()}
+
+📅 INFORMACIÓN DE LA SOLICITUD:
+- Estado: {solicitud.get_estado_display()}
+- Fecha de solicitud: {fecha_creacion_str}
+- Archivo adjunto: {'Sí' if solicitud.archivo_adjunto else 'No'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ ACCIÓN REQUERIDA:
+Por favor, revisa tu dashboard para aprobar o rechazar esta solicitud.
+
+📱 Dashboard → Ver Solicitudes → Solicitudes Pendientes
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Este es un correo automático del Sistema de Gestión UABJB.
+
+Saludos cordiales,
+Sistema de Gestión UABJB'''
+        
+        # Enviar el correo
+        send_mail(
+            subject,
+            message,
+            'cibanezsanguino@gmail.com',  # From email (el mismo que usas actualmente)
+            [encargado.email],  # To email
+            fail_silently=True,  # No rompe el sistema si falla el correo
+        )
+        
+        print(f'✅ Notificación enviada al encargado {encargado.email} para la solicitud: {solicitud.nombre_evento}')
+        
+    except Exception as e:
+        print(f'❌ Error enviando notificación al encargado: {str(e)}')
 
 # 🆕 FUNCIÓN AUXILIAR PARA OBTENER IP
 def obtener_ip_cliente(request):
@@ -822,7 +1032,9 @@ def obtener_ip_cliente(request):
 def eventos_usuario_json(request):
     """
     Retorna TODAS las solicitudes aceptadas de los espacios relevantes para el usuario
+    INCLUYE LA HORA DEL EVENTO
     """
+    import pytz
     user = request.user
 
     # Obtener IDs de los espacios relevantes
@@ -830,7 +1042,6 @@ def eventos_usuario_json(request):
     ids_facultad = Espacio.objects.filter(carrera__facultad=user.facultad).values_list('id', flat=True)
     ids_campus = EspacioCampus.objects.all().values_list('id', flat=True)
 
-    # 🔥 Traer TODAS las solicitudes aceptadas (no solo las del usuario)
     eventos = Solicitud.objects.filter(
         estado='aceptada'
     ).filter(
@@ -840,17 +1051,42 @@ def eventos_usuario_json(request):
     ).select_related('espacio', 'espacio_campus', 'usuario_solicitante')
 
     data = []
+    bolivia_tz = pytz.timezone('America/La_Paz')
+    
     for s in eventos:
         es_del_usuario = (s.usuario_solicitante == user)
         nombre_solicitante = s.usuario_solicitante.get_full_name() or s.usuario_solicitante.username
         
+        # ✅ Obtener el nombre REAL del espacio
+        if s.tipo_espacio == 'carrera' and s.espacio:
+            nombre_espacio = s.espacio.nombre
+        elif s.tipo_espacio == 'campus' and s.espacio_campus:
+            nombre_espacio = s.espacio_campus.nombre
+        else:
+            nombre_espacio = "No especificado"
+        
+        # ✅ CONVERTIR A HORA DE BOLIVIA
+        fecha_evento_bolivia = s.fecha_evento.astimezone(bolivia_tz)
+        
+        # ✅ AGREGAR HORA FORMATEADA
+        hora_inicio = fecha_evento_bolivia.strftime('%H:%M')  # Formato 24 horas: "14:30"
+        
+        # ✅ Si hay fecha fin, también incluirla
+        if s.fecha_fin_evento:
+            fecha_fin_bolivia = s.fecha_fin_evento.astimezone(bolivia_tz)
+            hora_fin = fecha_fin_bolivia.strftime('%H:%M')
+            hora_completa = f"{hora_inicio} - {hora_fin}"
+        else:
+            hora_completa = hora_inicio
+        
         data.append({
             'id': s.id,
-            'fecha': s.fecha_evento.strftime('%Y-%m-%d'),
-            'fecha_completa': s.fecha_evento.strftime('%Y-%m-%d %H:%M'),
-            'fecha_fin': s.fecha_fin_evento.strftime('%Y-%m-%d %H:%M') if s.fecha_fin_evento else None,
+            'fecha': fecha_evento_bolivia.strftime('%Y-%m-%d'),
+            'fecha_completa': fecha_evento_bolivia.strftime('%Y-%m-%d %H:%M'),
+            'fecha_fin': s.fecha_fin_evento.astimezone(bolivia_tz).strftime('%Y-%m-%d %H:%M') if s.fecha_fin_evento else None,
+            'hora': hora_completa,  # ✅ NUEVA PROPIEDAD CON LA HORA
             'nombre_evento': s.nombre_evento,
-            'espacio__nombre': s.get_nombre_espacio(),
+            'espacio__nombre': nombre_espacio,
             'tipo_espacio': s.get_tipo_espacio_display(),
             'solicitante': nombre_solicitante,
             'es_mio': es_del_usuario,

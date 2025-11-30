@@ -1,5 +1,5 @@
 /* ===== AISLAR TEMA POR ROL ===== */
-const ROL = location.pathname.split('/')[1].replace(/\/$/, '') || 'usuario'; // admin | encargado | usuario
+const ROL = location.pathname.split('/')[1].replace(/\/$/, '') || 'usuario';
 const THEME_KEY = `theme-${ROL}`;
 
 // Aplicar tema propio al cargar
@@ -15,25 +15,6 @@ function toggleTheme() {
     const nuevo = esOscuro ? 'light' : 'dark';
     body.setAttribute('data-theme', nuevo);
     localStorage.setItem(THEME_KEY, nuevo);
-}
-
-// ============================
-// FUNCIONES COMUNES
-// ============================
-function toggleTheme() {
-    const html = document.documentElement;
-    const themeIcon = document.getElementById('theme-icon');
-    const themeText = document.getElementById('theme-text');
-    
-    if (html.getAttribute('data-theme') === 'dark') {
-        html.removeAttribute('data-theme');
-        themeIcon.className = 'fas fa-moon';
-        themeText.textContent = 'Modo Oscuro';
-    } else {
-        html.setAttribute('data-theme', 'dark');
-        themeIcon.className = 'fas fa-sun';
-        themeText.textContent = 'Modo Claro';
-    }
 }
 
 // ============================
@@ -84,7 +65,6 @@ function showAlert(message, type = 'info') {
 
     document.body.appendChild(alert);
 
-    // Agregar estilos de animación si no existen
     if (!document.getElementById('alert-styles')) {
         const alertStyles = document.createElement('style');
         alertStyles.id = 'alert-styles';
@@ -110,7 +90,7 @@ function showAlert(message, type = 'info') {
 }
 
 // ============================
-// VALIDACIÓN DEL FORMULARIO - NUEVA VERSIÓN ROBUSTA
+// VALIDACIÓN DEL FORMULARIO
 // ============================
 function validarFormulario() {
     console.log('=== INICIANDO VALIDACIÓN DEL FORMULARIO ===');
@@ -122,7 +102,6 @@ function validarFormulario() {
             return false;
         }
         
-        // Validaciones básicas
         const nombreEvento = form.querySelector('[name="nombre_evento"]');
         const fechaEvento = form.querySelector('[name="fecha_evento"]');
         const tipoEspacio = form.querySelector('[name="tipo_espacio"]');
@@ -153,17 +132,8 @@ function validarFormulario() {
 
         console.log('Tipo de espacio seleccionado:', tipoEspacio.value);
 
-        // Validación específica de espacios
         if (tipoEspacio.value === 'carrera') {
-            const espacioCarreraDiv = document.getElementById('espacioCarreraDiv');
             const espacioCarrera = form.querySelector('select[name="espacio_carrera"]');
-            
-            console.log('Validando espacio carrera:', {
-                divVisible: espacioCarreraDiv ? espacioCarreraDiv.style.display : 'div no encontrado',
-                elemento: !!espacioCarrera,
-                valor: espacioCarrera ? espacioCarrera.value : 'no encontrado',
-                opciones: espacioCarrera ? espacioCarrera.options.length : 0
-            });
             
             if (!espacioCarrera) {
                 console.error('ERROR: Select de espacio_carrera no encontrado en DOM');
@@ -180,15 +150,7 @@ function validarFormulario() {
         }
 
         if (tipoEspacio.value === 'campus') {
-            const espacioCampusDiv = document.getElementById('espacioCampusDiv');
             const espacioCampus = form.querySelector('select[name="espacio_campus"]');
-            
-            console.log('Validando espacio campus:', {
-                divVisible: espacioCampusDiv ? espacioCampusDiv.style.display : 'div no encontrado',
-                elemento: !!espacioCampus,
-                valor: espacioCampus ? espacioCampus.value : 'no encontrado',
-                opciones: espacioCampus ? espacioCampus.options.length : 0
-            });
             
             if (!espacioCampus) {
                 console.error('ERROR: Select de espacio_campus no encontrado en DOM');
@@ -240,7 +202,6 @@ function configurarEspacios() {
             campus: !!campusDiv
         });
         
-        // Ocultar ambos
         if (carreraDiv) {
             carreraDiv.style.display = 'none';
             carreraDiv.style.opacity = '0';
@@ -250,7 +211,6 @@ function configurarEspacios() {
             campusDiv.style.opacity = '0';
         }
         
-        // Mostrar el correspondiente
         if (this.value === 'carrera' && carreraDiv) {
             console.log('MOSTRANDO CARRERA');
             carreraDiv.style.display = 'block';
@@ -286,7 +246,6 @@ function configurarFileUpload() {
 
     console.log('Elementos encontrados:', { fileArea: !!fileArea, fileInput: !!fileInput });
 
-    // Ocultar input
     fileInput.style.cssText = `
         position: absolute !important;
         left: -9999px !important;
@@ -362,11 +321,70 @@ function configurarFileUpload() {
 }
 
 // ============================
+// MANEJO DE ESPACIOS Y TÉRMINOS
+// ============================
+function toggleEspaciosYTerminos(tipo) {
+    const carreraDiv = document.getElementById('espacioCarreraDiv');
+    const campusDiv = document.getElementById('espacioCampusDiv');
+    const terminosSection = document.getElementById('terminosSection');
+    const selectCarrera = document.getElementById('espacio_carrera');
+    const selectCampus = document.getElementById('espacio_campus');
+
+    if (terminosSection) {
+        terminosSection.classList.remove('visible');
+    }
+    
+    if (tipo === 'carrera') {
+        carreraDiv.style.display = 'block';
+        campusDiv.style.display = 'none';
+        
+        if (selectCampus) selectCampus.value = '';
+        
+        const aceptaCondiciones = document.getElementById('acepta_condiciones');
+        if (aceptaCondiciones) {
+            aceptaCondiciones.required = false;
+        }
+        
+    } else if (tipo === 'campus') {
+        carreraDiv.style.display = 'none';
+        campusDiv.style.display = 'block';
+        
+        if (selectCarrera) selectCarrera.value = '';
+        
+    } else {
+        carreraDiv.style.display = 'none';
+        campusDiv.style.display = 'none';
+        
+        if (selectCarrera) selectCarrera.value = '';
+        if (selectCampus) selectCampus.value = '';
+    }
+}
+
+function verificarEspacioCampus(espacioId) {
+    const terminosSection = document.getElementById('terminosSection');
+    
+    if (espacioId) {
+        setTimeout(() => {
+            terminosSection.classList.add('visible');
+        }, 100);
+        
+        const aceptaCondiciones = document.getElementById('acepta_condiciones');
+        if (aceptaCondiciones) {
+            aceptaCondiciones.required = true;
+        }
+    } else {
+        terminosSection.classList.remove('visible');
+        
+        const aceptaCondiciones = document.getElementById('acepta_condiciones');
+        if (aceptaCondiciones) {
+            aceptaCondiciones.required = false;
+        }
+    }
+}
+
+// ============================
 // INICIALIZACIÓN COMPLETA
 // ============================
-console.log('=== SCRIPT DE DEBUG INICIADO ===');
-
-// Función de inicialización que se ejecuta cuando está todo listo
 function inicializarTodo() {
     console.log('=== TESTING DOM ===');
     
@@ -380,26 +398,32 @@ function inicializarTodo() {
         fileInput: !!fileInput
     });
     
-    // Configurar espacios
     if (tipoSelect) {
         configurarEspacios();
     }
     
-    // Configurar file upload
     if (fileArea && fileInput) {
         configurarFileUpload();
     }
     
+    // Asegurar que todo esté oculto al inicio
+    const terminosSection = document.getElementById('terminosSection');
+    const carreraDiv = document.getElementById('espacioCarreraDiv');
+    const campusDiv = document.getElementById('espacioCampusDiv');
+    
+    if (terminosSection) terminosSection.classList.remove('visible');
+    if (carreraDiv) carreraDiv.style.display = 'none';
+    if (campusDiv) campusDiv.style.display = 'none';
+    
     console.log('=== DEBUG COMPLETADO ===');
 }
 
-// Ejecutar inicialización cuando el DOM esté listo
+// Ejecutar inicialización
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM Content Loaded');
     setTimeout(inicializarTodo, 1000);
 });
 
-// También ejecutar si el DOM ya está cargado
 if (document.readyState === 'loading') {
     console.log('DOM todavía cargando...');
 } else {
@@ -412,6 +436,8 @@ if (document.readyState === 'loading') {
 // ============================
 window.toggleTheme = toggleTheme;
 window.validarFormulario = validarFormulario;
+window.toggleEspaciosYTerminos = toggleEspaciosYTerminos;
+window.verificarEspacioCampus = verificarEspacioCampus;
 
 window.removerArchivo = function() {
     const fileInput = document.querySelector('input[name="archivo_adjunto"]');

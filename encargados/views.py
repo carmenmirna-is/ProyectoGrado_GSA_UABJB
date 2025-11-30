@@ -13,14 +13,24 @@ from django.core.mail import send_mail
 import json
 from django.db.models import Q
 from usuarios.views import notificar_aceptacion_solicitud
+from django.views.decorators.cache import never_cache
 
 @login_required
+@never_cache  # 🔥 CRÍTICO: No cachear
 def dashboard_encargados(request):
+    """
+    Dashboard del encargado de espacios
+    """
     user = request.user
 
+    # 🔒 Verificar que sea encargado
     if user.tipo_usuario != 'encargado':
-        messages.error(request, 'No tienes permiso para acceder a esta página.')
+        messages.error(request, '⛔ No tienes permiso para acceder a esta página.')
         return redirect('login')
+    
+    # 🔍 Debug: Verificar sesión
+    print(f"👔 Dashboard Encargado: {user.username} (ID: {user.id}, Rol: {user.tipo_usuario})")
+    print(f"   Session Key: {request.session.session_key}")
 
     # ✅ Obtener solo los espacios que gestiona este encargado
     espacios_carrera = user.espacios_encargados.all()
@@ -36,7 +46,11 @@ def dashboard_encargados(request):
         'mes_actual': timezone.now().strftime('%B %Y'),
         'espacios': espacios,
         'espacio_preseleccionado': espacio_preseleccionado,
+        'usuario': user,  # ✅ Pasar usuario explícitamente
+        'encargado': user,  # ✅ Alias para templates
+        'session_key': request.session.session_key[:10],  # Para debugging
     }
+    
     return render(request, 'encargados/dashboard_encargados.html', context)
 
 @login_required
@@ -107,7 +121,6 @@ def solicitudes_aceptadas(request):
 @require_POST
 def cancelar_evento(request):
     user = request.user
-    
     try:
         # 🔧 FIX: Obtener el ID correctamente (puede venir como JSON o POST)
         if request.content_type == 'application/json':
@@ -183,7 +196,8 @@ def enviar_correo_cancelacion(solicitud, motivo, encargado):
     try:
         from django.core.mail import EmailMultiAlternatives
         from django.template.loader import render_to_string
-        # ❌ ELIMINADO: from usuarios.views import to_bolivia
+        from django.utils import timezone as django_timezone
+        import pytz
         
         user = solicitud.usuario_solicitante
         
@@ -195,10 +209,22 @@ def enviar_correo_cancelacion(solicitud, motivo, encargado):
         nombre_solicitante = user.get_full_name() or user.username
         encargado_nombre = encargado.get_full_name() or encargado.username
         
-        # ✅ Django ya maneja la zona horaria de Bolivia automáticamente
-        fecha_evento_str = solicitud.fecha_evento.strftime("%d/%m/%Y a las %H:%M")
+        # ✅ CORRECCIÓN: Convertir a zona horaria de Bolivia antes de formatear
+        bolivia_tz = pytz.timezone('America/La_Paz')
+        fecha_evento_bolivia = solicitud.fecha_evento.astimezone(bolivia_tz)
+        fecha_evento_str = fecha_evento_bolivia.strftime("%d/%m/%Y a las %H:%M")
         
-        espacio_nombre = solicitud.get_nombre_espacio()
+        # ✅ CORRECCIÓN: Obtener el nombre CORRECTO del espacio
+        if solicitud.tipo_espacio == 'carrera' and solicitud.espacio:
+            espacio_nombre = solicitud.espacio.nombre  # Nombre del espacio, no de la carrera
+            tipo_espacio_display = f"Espacio de Carrera - {solicitud.espacio.carrera.nombre}"
+        elif solicitud.tipo_espacio == 'campus' and solicitud.espacio_campus:
+            espacio_nombre = solicitud.espacio_campus.nombre
+            tipo_espacio_display = "Espacio de Campus"
+        else:
+            espacio_nombre = "No especificado"
+            tipo_espacio_display = "No especificado"
+        
         motivo_texto = motivo if motivo else "No se especificó un motivo"
         
         # Preparar contexto para el template
@@ -209,12 +235,12 @@ def enviar_correo_cancelacion(solicitud, motivo, encargado):
             'nombre_evento': solicitud.nombre_evento,
             'fecha_evento': fecha_evento_str,
             'espacio_nombre': espacio_nombre,
-            'tipo_espacio': solicitud.get_tipo_espacio_display(),
+            'tipo_espacio': tipo_espacio_display,
             'encargado_nombre': encargado_nombre,
             'motivo': motivo_texto,
         }
         
-        # ✅ Renderizar HTML del correo (con extensión .html)
+        # ✅ Renderizar HTML del correo
         html_message = render_to_string('encargados/confirmacion_cancelacion.html', context)
         
         # Crear correo
@@ -231,6 +257,7 @@ DETALLES DEL EVENTO:
 📌 Evento: {solicitud.nombre_evento}
 📅 Fecha: {fecha_evento_str}
 📍 Espacio: {espacio_nombre}
+🏢 Tipo: {tipo_espacio_display}
 👤 Cancelado por: {encargado_nombre}
 
 MOTIVO DE LA CANCELACIÓN:
@@ -260,6 +287,8 @@ Universidad Autónoma del Beni José Ballivián
         
         print(f"✅ Correo de cancelación enviado a {user.email}")
         print(f"   Evento: {solicitud.nombre_evento}")
+        print(f"   Espacio: {espacio_nombre}")
+        print(f"   Fecha (Bolivia): {fecha_evento_str}")
         print(f"   Motivo: {motivo_texto}")
         
         return True
@@ -374,13 +403,6 @@ def verificar_conflictos_horario(solicitud):
         # - Y el nuevo evento termina después de que empiece el otro
         if inicio < otro_fin and fin > otro_inicio:
             conflictos.append(otra_solicitud)
-    
-    # ✅ DEBUG: Imprimir para verificar
-    print(f"🔍 Verificando conflictos para solicitud #{solicitud.id}")
-    print(f"   📅 Inicio: {inicio}")
-    print(f"   📅 Fin: {fin}")
-    print(f"   📍 Espacio: {solicitud.get_nombre_espacio()}")
-    print(f"   ⚠️ Conflictos encontrados: {len(conflictos)}")
     
     for c in conflictos:
         c_fin = c.fecha_fin_evento or c.fecha_evento + timedelta(hours=2)

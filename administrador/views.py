@@ -5,10 +5,33 @@ from gestion_espacios_academicos.forms import (
     FacultadForm, CarreraForm, EspacioForm,
     EncargadoRegistrationForm, EspacioCampusForm
 )
+from django.views.decorators.cache import never_cache
+from django.contrib.auth.decorators import login_required
 
-# ================= Dashboard =================
+@login_required
+@never_cache  # 🔥 CRÍTICO: No cachear
 def dashboard_administrador(request):
-    return render(request, 'administrador/dashboard_administrador.html')
+    """
+    Dashboard del administrador del sistema
+    """
+    user = request.user
+    
+    # 🔒 Verificar que sea administrador
+    if user.tipo_usuario != 'administrador':
+        messages.error(request, '⛔ No tienes permiso para acceder a esta página.')
+        return redirect('login')
+    
+    # 🔍 Debug: Verificar sesión
+    print(f"👨‍💼 Dashboard Admin: {user.username} (ID: {user.id}, Rol: {user.tipo_usuario})")
+    print(f"   Session Key: {request.session.session_key}")
+    
+    context = {
+        'usuario': user,  # ✅ Pasar usuario explícitamente
+        'administrador': user,  # ✅ Alias para templates
+        'session_key': request.session.session_key[:10],  # Para debugging
+    }
+    
+    return render(request, 'administrador/dashboard_administrador.html', context)
 
 # ================= Facultades =================
 def registrar_facultad(request):

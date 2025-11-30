@@ -88,6 +88,160 @@
             document.getElementById('espacio_campus_group').style.display = tipo === 'campus' ? 'block' : 'none';
         }
     </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const formulario = document.querySelector('form');
+        const fechaEventoInput = document.querySelector('input[name="fecha_evento"]');
+        const fechaFinInput = document.querySelector('input[name="fecha_fin_evento"]');
+        const tipoEspacioSelect = document.querySelector('select[name="tipo_espacio"]');
+        const espacioCarreraSelect = document.querySelector('select[name="espacio_carrera"]');
+        const espacioCampusSelect = document.querySelector('select[name="espacio_campus"]');
+        const submitButton = formulario.querySelector('button[type="submit"]');
+        
+        // Contenedor para mostrar advertencias
+        let warningContainer = document.getElementById('conflictos-warning');
+        if (!warningContainer) {
+            warningContainer = document.createElement('div');
+            warningContainer.id = 'conflictos-warning';
+            warningContainer.style.display = 'none';
+            warningContainer.style.marginTop = '15px';
+            warningContainer.className = 'alert alert-warning';
+            formulario.insertBefore(warningContainer, submitButton);
+        }
+        
+        // Función para verificar conflictos
+        async function verificarConflictos() {
+            const fechaEvento = fechaEventoInput.value;
+            const fechaFin = fechaFinInput ? fechaFinInput.value : '';
+            const tipoEspacio = tipoEspacioSelect.value;
+            const espacioId = tipoEspacio === 'carrera' ? 
+                espacioCarreraSelect.value : 
+                espacioCampusSelect.value;
+            
+            // Validar que tengamos los datos necesarios
+            if (!fechaEvento || !tipoEspacio || !espacioId) {
+                warningContainer.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('fecha_evento', fechaEvento);
+                if (fechaFin) formData.append('fecha_fin_evento', fechaFin);
+                formData.append('tipo_espacio', tipoEspacio);
+                if (tipoEspacio === 'carrera') {
+                    formData.append('espacio_carrera', espacioId);
+                } else {
+                    formData.append('espacio_campus', espacioId);
+                }
+                
+                const response = await fetch('/usuarios/verificar-conflictos/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.tiene_conflictos) {
+                    mostrarAdvertenciaConflictos(data.conflictos);
+                } else {
+                    warningContainer.style.display = 'none';
+                }
+                
+            } catch (error) {
+                console.error('Error verificando conflictos:', error);
+            }
+        }
+        
+        // Función para mostrar advertencias
+        function mostrarAdvertenciaConflictos(conflictos) {
+            let html = `
+                <div style="background-color: #fef3c7; border-left: 4px solid #fbbf24; padding: 15px; border-radius: 8px;">
+                    <h4 style="color: #92400e; margin: 0 0 10px 0;">
+                        ⚠️ Advertencia: Conflictos de Horario
+                    </h4>
+                    <p style="margin: 0 0 10px 0; color: #78350f;">
+                        Ya hay ${conflictos.length} reserva(s) aceptada(s) en este horario:
+                    </p>
+                    <ul style="margin: 0; padding-left: 20px; color: #78350f;">
+            `;
+            
+            conflictos.forEach(conflicto => {
+                html += `
+                    <li style="margin-bottom: 8px;">
+                        <strong>${conflicto.nombre_evento}</strong><br>
+                        <small>
+                            📅 ${conflicto.fecha_inicio} - ${conflicto.fecha_fin}<br>
+                            👤 ${conflicto.solicitante}
+                            ${conflicto.es_propio ? ' <span style="color: #1e3a8a;">(Tu reserva)</span>' : ''}
+                        </small>
+                    </li>
+                `;
+            });
+            
+            html += `
+                    </ul>
+                    <p style="margin: 10px 0 0 0; color: #78350f; font-size: 14px;">
+                        <strong>Nota:</strong> Puedes enviar la solicitud de todas formas. 
+                        El encargado decidirá si acepta o rechaza considerando estos conflictos.
+                    </p>
+                </div>
+            `;
+            
+            warningContainer.innerHTML = html;
+            warningContainer.style.display = 'block';
+            
+            // Scroll suave a la advertencia
+            warningContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // Función para obtener CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Event listeners con debounce para evitar muchas llamadas
+        let timeoutId;
+        const debouncedCheck = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(verificarConflictos, 500);
+        };
+        
+        if (fechaEventoInput) {
+            fechaEventoInput.addEventListener('change', debouncedCheck);
+        }
+        
+        if (fechaFinInput) {
+            fechaFinInput.addEventListener('change', debouncedCheck);
+        }
+        
+        if (tipoEspacioSelect) {
+            tipoEspacioSelect.addEventListener('change', debouncedCheck);
+        }
+        
+        if (espacioCarreraSelect) {
+            espacioCarreraSelect.addEventListener('change', debouncedCheck);
+        }
+        
+        if (espacioCampusSelect) {
+            espacioCampusSelect.addEventListener('change', debouncedCheck);
+        }
+    });
+    </script>
     <script src="{% static 'js/scripts.js' %}"></script>
 </body>
 </html>

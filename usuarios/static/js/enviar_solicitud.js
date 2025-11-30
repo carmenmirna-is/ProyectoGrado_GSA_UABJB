@@ -41,6 +41,90 @@ function toggleEspacios(tipo) {
 }
 
 // ============================
+// SISTEMA DE ALERTAS
+// ============================
+function mostrarAlertaExito(mensaje) {
+  const alerta = document.createElement('div');
+  alerta.className = 'alert alert-success';
+  alerta.style.opacity = '0';
+  alerta.innerHTML = `
+    <i class="fas fa-check-circle"></i>
+    <span>${mensaje}</span>
+  `;
+  
+  const form = document.getElementById('solicitudForm');
+  form.insertBefore(alerta, form.firstChild);
+  
+  // Animar entrada
+  setTimeout(() => {
+    alerta.style.opacity = '1';
+  }, 10);
+  
+  // Scroll suave hacia la alerta
+  alerta.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  
+  // Auto-ocultar después de 5 segundos
+  setTimeout(() => {
+    alerta.style.opacity = '0';
+    setTimeout(() => alerta.remove(), 300);
+  }, 5000);
+}
+
+function mostrarAlertaError(mensaje) {
+  const alerta = document.createElement('div');
+  alerta.className = 'alert alert-error';
+  alerta.style.opacity = '0';
+  alerta.innerHTML = `
+    <i class="fas fa-exclamation-circle"></i>
+    <span>${mensaje}</span>
+  `;
+  
+  const form = document.getElementById('solicitudForm');
+  form.insertBefore(alerta, form.firstChild);
+  
+  // Animar entrada
+  setTimeout(() => {
+    alerta.style.opacity = '1';
+  }, 10);
+  
+  // Scroll suave hacia la alerta
+  alerta.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  
+  // Auto-ocultar después de 5 segundos
+  setTimeout(() => {
+    alerta.style.opacity = '0';
+    setTimeout(() => alerta.remove(), 300);
+  }, 5000);
+}
+
+function mostrarAlertaAdvertencia(mensaje) {
+  const alerta = document.createElement('div');
+  alerta.className = 'alert alert-warning';
+  alerta.style.opacity = '0';
+  alerta.innerHTML = `
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>${mensaje}</span>
+  `;
+  
+  const form = document.getElementById('solicitudForm');
+  form.insertBefore(alerta, form.firstChild);
+  
+  // Animar entrada
+  setTimeout(() => {
+    alerta.style.opacity = '1';
+  }, 10);
+  
+  // Scroll suave hacia la alerta
+  alerta.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  
+  // Auto-ocultar después de 4 segundos
+  setTimeout(() => {
+    alerta.style.opacity = '0';
+    setTimeout(() => alerta.remove(), 300);
+  }, 4000);
+}
+
+// ============================
 // SISTEMA DE CARGA DE ARCHIVOS
 // ============================
 function initFileUpload() {
@@ -84,7 +168,7 @@ function initFileUpload() {
         fileInput.files = files;
         showFileInfo(file);
       } else {
-        alert('Tipo de archivo no válido. Formatos permitidos: PDF, JPG, PNG, DOC, DOCX');
+        mostrarAlertaAdvertencia('Tipo de archivo no válido. Formatos permitidos: PDF, JPG, PNG, DOC, DOCX');
       }
     }
   });
@@ -149,7 +233,7 @@ function removeFile() {
 }
 
 // ============================
-// VALIDACIÓN SIMPLE
+// VALIDACIÓN MEJORADA
 // ============================
 function validarFormulario() {
   const form = document.getElementById('solicitudForm');
@@ -160,13 +244,101 @@ function validarFormulario() {
   const campus  = form.querySelector('[name="espacio_campus"]').value;
   const archivo = form.querySelector('[name="archivo_adjunto"]').files.length;
 
-  if (!nombre) { alert('Nombre obligatorio'); return false; }
-  if (!fecha)  { alert('Fecha obligatoria'); return false; }
-  if (!tipo)   { alert('Tipo obligatorio'); return false; }
-  if (tipo === 'carrera' && !carrera) { alert('Selecciona carrera'); return false; }
-  if (tipo === 'campus' && !campus)   { alert('Selecciona campus'); return false; }
-  if (!archivo) { alert('Debes adjuntar un archivo'); return false; }
+  if (!nombre) { 
+    mostrarAlertaAdvertencia('El nombre del evento es obligatorio'); 
+    return false; 
+  }
+  if (!fecha) { 
+    mostrarAlertaAdvertencia('La fecha del evento es obligatoria'); 
+    return false; 
+  }
+  if (!tipo) { 
+    mostrarAlertaAdvertencia('Debes seleccionar el tipo de espacio'); 
+    return false; 
+  }
+  if (tipo === 'carrera' && !carrera) { 
+    mostrarAlertaAdvertencia('Debes seleccionar un espacio de carrera'); 
+    return false; 
+  }
+  if (tipo === 'campus' && !campus) { 
+    mostrarAlertaAdvertencia('Debes seleccionar un espacio de campus'); 
+    return false; 
+  }
+  if (!archivo) { 
+    mostrarAlertaAdvertencia('Debes adjuntar un archivo'); 
+    return false; 
+  }
   return true;
+}
+
+// ============================
+// ENVÍO DEL FORMULARIO CON AJAX
+// ============================
+function initFormSubmit() {
+  const form = document.getElementById('solicitudForm');
+  if (!form) return;
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault(); // Prevenir recarga de página
+    
+    // Validar formulario
+    if (!validarFormulario()) return;
+    
+    // Obtener botón de envío
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Deshabilitar botón y mostrar loading
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+    
+    try {
+      // Crear FormData con todos los datos del formulario
+      const formData = new FormData(form);
+      
+      // Enviar formulario
+      const response = await fetch(form.action || window.location.href, {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (response.ok) {
+        // Mostrar mensaje de éxito
+        mostrarAlertaExito('¡Solicitud enviada con éxito! Redirigiendo al historial...');
+        
+        // Resetear formulario
+        form.reset();
+        removeFile();
+        
+        // Ocultar secciones de espacios
+        const carreraDiv = document.getElementById('espacioCarreraDiv');
+        const campusDiv = document.getElementById('espacioCampusDiv');
+        if (carreraDiv) carreraDiv.style.display = 'none';
+        if (campusDiv) campusDiv.style.display = 'none';
+        
+        // Redirigir al historial después de 2 segundos
+        setTimeout(() => {
+          window.location.href = '/usuarios/historial/';
+        }, 2000);
+        
+      } else {
+        // Error del servidor
+        const errorText = await response.text();
+        console.error('Error del servidor:', errorText);
+        mostrarAlertaError('Hubo un error al enviar la solicitud. Por favor, intenta de nuevo.');
+      }
+      
+    } catch (error) {
+      // Error de conexión
+      console.error('Error de conexión:', error);
+      mostrarAlertaError('Error de conexión. Verifica tu internet e intenta de nuevo.');
+      
+    } finally {
+      // Restaurar botón
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+    }
+  });
 }
 
 // ============================
@@ -181,4 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Inicializar sistema de carga de archivos
   initFileUpload();
+  
+  // Inicializar envío del formulario con AJAX
+  initFormSubmit();
 });
