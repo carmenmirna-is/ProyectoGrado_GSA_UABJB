@@ -1,6 +1,6 @@
 /* ============================
-   CALENDARIO USUARIO – EVENTOS DE CARRERA, FACULTAD Y CAMPUS
-   Muestra TODAS las reservas aceptadas (propias en azul, otras en gris)
+   CALENDARIO USUARIO – EVENTOS CON HORA
+   Muestra hora del evento en el tooltip
    ============================ */
 
 // Variables globales para la navegación
@@ -24,15 +24,13 @@ async function cargarEventosUsuario() {
 
         data.forEach(e => {
             const key = e.fecha;
-            console.log(`📌 Procesando evento: ${e.nombre_evento} - Fecha: ${key} - Es mío: ${e.es_mio}`);
+            console.log(`📌 Procesando evento: ${e.nombre_evento} - Fecha: ${key} - Hora: ${e.hora}`);
             
             if (!eventosMap[key]) eventosMap[key] = [];
             
             // 🎨 Color diferente según sea del usuario o de otros
-            const color = e.es_mio ? '#3b82f6' : '#94a3b8'; // Azul para propios, gris para otros
+            const color = e.es_mio ? '#3b82f6' : '#94a3b8';
             const icono = e.es_mio ? '✅' : '📅';
-            
-            console.log(`🎨 Asignando color: ${color} para evento ${e.nombre_evento} (es_mio: ${e.es_mio})`);
             
             eventosMap[key].push({
                 nombre: e.nombre_evento,
@@ -42,12 +40,12 @@ async function cargarEventosUsuario() {
                 color: color,
                 icono: icono,
                 descripcion: e.descripcion || '',
-                tipoEspacio: e.tipo_espacio
+                tipoEspacio: e.tipo_espacio,
+                hora: e.hora || 'Hora no especificada'  // ✅ AGREGAR HORA
             });
         });
         
         console.log('🗺️ Mapa de eventos generado:', eventosMap);
-        console.log(`📍 Días con eventos: ${Object.keys(eventosMap).length}`);
         return eventosMap;
         
     } catch (err) {
@@ -79,7 +77,6 @@ async function generarCalendario() {
     tbody.innerHTML = '';
     let fecha = 1;
 
-    // Para verificar el día actual
     const hoy = new Date();
 
     for (let sem = 0; sem < 6; sem++) {
@@ -91,7 +88,6 @@ async function generarCalendario() {
             } else if (fecha > diasMes) {
                 cell.classList.add('dia-vacio');
             } else {
-                // Verificar si es el día actual
                 const hoyCheck = fecha === hoy.getDate() && 
                                 mesActualU === hoy.getMonth() && 
                                 anioActualU === hoy.getFullYear();
@@ -101,7 +97,6 @@ async function generarCalendario() {
                 numero.className = 'numero-dia';
                 numero.textContent = fecha;
 
-                // Formato de fecha YYYY-MM-DD
                 const fechaKey = `${anioActualU}-${String(mesActualU + 1).padStart(2, '0')}-${String(fecha).padStart(2, '0')}`;
                 
                 let eventosDelDia = eventos[fechaKey] || [];
@@ -110,7 +105,6 @@ async function generarCalendario() {
                     console.log(`✅ ${eventosDelDia.length} eventos para ${fechaKey}:`, eventosDelDia);
                     numero.classList.add('evento-presente');
                     
-                    // 🔥 AGREGAR CONTADOR DE EVENTOS
                     if (eventosDelDia.length > 1) {
                         const contador = document.createElement('span');
                         contador.className = 'contador-eventos';
@@ -119,46 +113,43 @@ async function generarCalendario() {
                     }
                 }
 
-                // 📋 CREAR MARKERS Y TOOLTIPS PARA CADA EVENTO
+                // 📋 CREAR MARKERS Y TOOLTIPS CON HORA
                 const markersContainer = document.createElement('div');
                 markersContainer.className = 'markers-container';
                 
                 eventosDelDia.forEach((ev, index) => {
-                    console.log(`🎨 Agregando evento visual: ${ev.nombre} con color ${ev.color}`);
+                    console.log(`🎨 Agregando evento: ${ev.nombre} a las ${ev.hora}`);
                     
-                    // 🔴 CREAR MARKER VISUAL (círculo de color)
                     const marker = document.createElement('div');
                     marker.className = 'evento-marker';
-                    marker.style.backgroundColor = ev.color; // ✅ Aplicar color correcto
-                    marker.title = `${ev.nombre} - ${ev.solicitante}`; // Tooltip nativo simple
+                    marker.style.backgroundColor = ev.color;
+                    marker.title = `${ev.nombre} - ${ev.hora}`;
                     
-                    // 📝 CREAR TOOLTIP COMPLETO
+                    // 📝 TOOLTIP CON HORA
                     const tooltip = document.createElement('div');
                     tooltip.className = 'tooltip';
 
                     const tooltipText = document.createElement('span');
                     tooltipText.className = 'tooltip-text';
                     
-                    // 🎯 TOOLTIP MEJORADO CON MÁS INFO
                     const etiquetaMia = ev.esMio ? '✨ TU RESERVA' : `👤 ${ev.solicitante}`;
+                    
+                    // ✅ TOOLTIP CON HORA INCLUIDA
                     tooltipText.innerHTML = `
                         <strong>${ev.icono} ${ev.nombre}</strong>
-                        <small style="color: ${ev.color};">${etiquetaMia}</small>
+                        <small style="color: ${ev.color};">${etiquetaMia}</small><br>
+                        🕒 <strong>${ev.hora}</strong><br>
                         📍 ${ev.espacio}<br>
                         🏢 ${ev.tipoEspacio}
                         ${ev.descripcion ? `<br>📝 ${ev.descripcion}` : ''}
                     `;
 
                     tooltip.appendChild(tooltipText);
-                    
-                    // ✅ AGREGAR MARKER CON SU TOOLTIP
                     marker.appendChild(tooltip);
                     markersContainer.appendChild(marker);
                 });
                 
-                // Agregar todos los markers al cell
                 cell.appendChild(markersContainer);
-
                 cell.appendChild(numero);
                 fecha++;
             }
@@ -167,19 +158,15 @@ async function generarCalendario() {
         tbody.appendChild(row);
     }
 
-    // Actualizar el título del mes
     const titulo = document.getElementById('titulo-mes');
     if (titulo) {
         titulo.textContent = `${nombresMeses[mesActualU]} ${anioActualU}`;
     }
     
-    // 📊 MOSTRAR ESTADÍSTICAS
     mostrarEstadisticas(eventos);
-    
-    console.log('✅ Calendario generado completamente');
+    console.log('✅ Calendario generado con horas incluidas');
 }
 
-// 📊 Función para mostrar estadísticas de eventos
 function mostrarEstadisticas(eventos) {
     let totalEventos = 0;
     let misPropios = 0;
@@ -193,12 +180,8 @@ function mostrarEstadisticas(eventos) {
         });
     });
     
-    console.log(`📊 Estadísticas del mes:
-    - Total de eventos: ${totalEventos}
-    - Mis reservas: ${misPropios}
-    - Reservas de otros: ${deOtros}`);
+    console.log(`📊 Estadísticas: Total: ${totalEventos}, Propios: ${misPropios}, Otros: ${deOtros}`);
     
-    // Actualizar el DOM si existe un elemento de estadísticas
     const statsEl = document.getElementById('calendario-stats');
     if (statsEl) {
         statsEl.innerHTML = `
@@ -219,9 +202,7 @@ function mostrarEstadisticas(eventos) {
     }
 }
 
-// Función de navegación entre meses
 window.cambiarMes = function (delta) {
-    console.log('🔄 Navegando con delta:', delta);
     mesActualU += delta;
     if (mesActualU < 0) { 
         mesActualU = 11; 
@@ -231,12 +212,10 @@ window.cambiarMes = function (delta) {
         mesActualU = 0; 
         anioActualU++; 
     }
-    console.log(`📅 Nuevo mes: ${mesActualU + 1}/${anioActualU}`);
     generarCalendario();
 };
 
-// Inicializar al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Inicializando calendario del usuario...');
+    console.log('🚀 Inicializando calendario con horas...');
     generarCalendario();
 });

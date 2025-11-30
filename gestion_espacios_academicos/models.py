@@ -127,6 +127,15 @@ class EspacioCampus(models.Model):
         related_name='espacios_campus_encargados',
         limit_choices_to={'tipo_usuario': 'encargado'}
     )
+    
+    # 🆕 NUEVO CAMPO PARA DOCUMENTO
+    documento_condiciones = models.FileField(
+        upload_to='condiciones_espacios/',
+        blank=True,
+        null=True,
+        verbose_name='Documento de Condiciones de Uso',
+        help_text='Sube el PDF con las condiciones de uso del espacio'
+    )
 
     class Meta:
         verbose_name = 'Espacio de Campus'
@@ -163,8 +172,6 @@ class Solicitud(models.Model):
     fecha_eliminacion = models.DateTimeField(null=True, blank=True)
     fecha_aprobacion = models.DateTimeField(null=True, blank=True)
     acepta_condiciones_uso = models.BooleanField(default=False)
-    acepta_ley_259 = models.BooleanField(default=False)
-    firma_digital = models.ImageField(upload_to='firmas/', null=True, blank=True)
     fecha_aceptacion_terminos = models.DateTimeField(null=True, blank=True)
     ip_aceptacion = models.GenericIPAddressField(null=True, blank=True)
 

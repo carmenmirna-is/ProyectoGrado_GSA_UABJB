@@ -189,18 +189,29 @@ class EspacioForm(forms.ModelForm):
 class EspacioCampusForm(forms.ModelForm):
     class Meta:
         model = EspacioCampus
-        fields = ['nombre', 'ubicacion', 'capacidad', 'descripcion', 'encargado']
+        fields = ['nombre', 'ubicacion', 'capacidad', 'descripcion', 'encargado', 'documento_condiciones']
         widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ejemplo: Auditorio Central'}),
-            'ubicacion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ejemplo: Edificio A, Piso 2'}),
-            'capacidad': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ejemplo: 150'}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Descripción del espacio'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Salón Bicentenario'}),
+            'ubicacion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Edificio Principal, Piso 2'}),
+            'capacidad': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 100'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Descripción del espacio...'}),
             'encargado': forms.Select(attrs={'class': 'form-control'}),
+            'documento_condiciones': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': '.pdf',  # Solo acepta PDFs
+            }),
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['encargado'].queryset = CustomUser.objects.filter(tipo_usuario='encargado')
+        labels = {
+            'nombre': 'Nombre del Espacio',
+            'ubicacion': 'Ubicación',
+            'capacidad': 'Capacidad (personas)',
+            'descripcion': 'Descripción',
+            'encargado': 'Encargado',
+            'documento_condiciones': '📄 Documento de Condiciones de Uso (PDF)',
+        }
+        help_texts = {
+            'documento_condiciones': 'Sube el PDF con las condiciones y normas de uso del espacio',
+        }
 
 # Formulario para registrar y editar encargados
 class EncargadoRegistrationForm(forms.ModelForm):

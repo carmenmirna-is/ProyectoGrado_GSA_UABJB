@@ -7,6 +7,34 @@
     <title>Listar Espacios - UABJB</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <style>
+        .doc-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .doc-link:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .doc-link i {
+            color: #ffffff;
+            font-size: 1rem;
+        }
+        .no-doc {
+            color: #718096;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
     <div class="header">
@@ -29,13 +57,13 @@
         <div class="pautas-box">
             <h3><i class="fas fa-exclamation-circle"></i> Requisitos para reserva:</h3>
             <ul>
-                <li><strong>Anticipación:</strong> Mínimo 3 días hábiles</li>
-                <li><strong>Documentación:</strong> Justificación en PDF (máx. 2MB)</li>
+                <li><strong>Anticipación:</strong> Para no tener conflictos en su solicitud, se recomienda envíar 3 días antes.</li>
+                <li><strong>Documentación:</strong> Justificación en PDF </li>
                 <li><strong>Horario:</strong> Lunes a Viernes de 8:00 AM a 6:00 PM</li>
                 <li><strong>Confirmación:</strong> Respuesta en 24-48 horas hábiles</li>
+                <li><strong>Condiciones de uso en espacios del campus:</strong> Leer detenidamente las condiciones y políticas propuestas para la solicitud/reserva</li>
             </ul>
         </div>
-
         <div class="table-wrapper">
             <table>
                 <thead>
@@ -43,6 +71,7 @@
                         <th>Nombre</th>
                         <th>Descripción</th>
                         <th>Encargado</th>
+                        <th>Condiciones de Uso</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,30 +81,37 @@
                         <td>{{ espacio.nombre }}</td>
                         <td>{{ espacio.descripcion }}</td>
                         <td>{{ espacio.encargado.get_full_name|default:espacio.encargado.username }}</td>
+                        <td style="text-align: center;">
+                            <span class="no-doc">—</span>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="3" style="text-align:center;">No hay espacios disponibles para tu facultad.</td>
+                        <td colspan="4" style="text-align:center;">No hay espacios disponibles para tu facultad.</td>
                     </tr>
                     {% endfor %}
-
                     <!-- Espacios generales del campus -->
                     {% for espacio in espacios_campus %}
                     <tr>
                         <td>{{ espacio.nombre }}</td>
                         <td>{{ espacio.descripcion }}</td>
                         <td>{{ espacio.encargado.get_full_name|default:espacio.encargado.username }}</td>
+                        <td style="text-align: center;">
+                            <a href="{% static 'documentos/' %}condiciones_{{ espacio.id }}.pdf" class="doc-link" target="_blank">
+                                <i class="fas fa-file-pdf"></i>
+                                Ver Documento
+                            </a>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="3" style="text-align:center;">No hay espacios del campus disponibles.</td>
+                        <td colspan="4" style="text-align:center;">No hay espacios del campus disponibles.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
-
     <script src="{% static 'js/scripts.js' %}"></script>
 </body>
 </html>

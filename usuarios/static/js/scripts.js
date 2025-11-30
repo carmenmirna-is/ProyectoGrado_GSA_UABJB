@@ -28,7 +28,7 @@ function showAlert(message, type = 'info') {
     alert.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dynamic`;
     alert.style.cssText = `
         position: fixed;
-        top: 20px;
+        top: 80px;
         right: 20px;
         z-index: 9999;
         min-width: 300px;
@@ -93,115 +93,82 @@ function showAlert(message, type = 'info') {
 // VALIDACIÓN DEL FORMULARIO
 // ============================
 function validarFormulario() {
-    console.log('=== INICIANDO VALIDACIÓN DEL FORMULARIO ===');
+    const form = document.getElementById('solicitudForm');
+    if (!form) return false;
     
-    try {
-        const form = document.getElementById('solicitudForm');
-        if (!form) {
-            console.error('ERROR: Formulario no encontrado');
-            return false;
-        }
-        
-        const nombreEvento = form.querySelector('[name="nombre_evento"]');
-        const fechaEvento = form.querySelector('[name="fecha_evento"]');
-        const tipoEspacio = form.querySelector('[name="tipo_espacio"]');
+    const nombreEvento = form.querySelector('[name="nombre_evento"]');
+    const fechaEvento = form.querySelector('[name="fecha_evento"]');
+    const tipoEspacio = form.querySelector('[name="tipo_espacio"]');
+    const archivoAdjunto = form.querySelector('[name="archivo_adjunto"]');
 
-        console.log('Elementos básicos:', {
-            nombreEvento: !!nombreEvento && nombreEvento.value,
-            fechaEvento: !!fechaEvento && fechaEvento.value,
-            tipoEspacio: !!tipoEspacio && tipoEspacio.value
-        });
-
-        if (!nombreEvento || !nombreEvento.value.trim()) {
-            showAlert('El nombre del evento es obligatorio', 'error');
-            if (nombreEvento) nombreEvento.focus();
-            return false;
-        }
-
-        if (!fechaEvento || !fechaEvento.value) {
-            showAlert('La fecha del evento es obligatoria', 'error');
-            if (fechaEvento) fechaEvento.focus();
-            return false;
-        }
-
-        if (!tipoEspacio || !tipoEspacio.value) {
-            showAlert('Debes seleccionar un tipo de espacio', 'error');
-            if (tipoEspacio) tipoEspacio.focus();
-            return false;
-        }
-
-        console.log('Tipo de espacio seleccionado:', tipoEspacio.value);
-
-        if (tipoEspacio.value === 'carrera') {
-            const espacioCarrera = form.querySelector('select[name="espacio_carrera"]');
-            
-            if (!espacioCarrera) {
-                console.error('ERROR: Select de espacio_carrera no encontrado en DOM');
-                showAlert('Error del sistema: campo de espacio no disponible', 'error');
-                return false;
-            }
-            
-            if (!espacioCarrera.value || espacioCarrera.value === '') {
-                console.error('ERROR: Espacio de carrera no seleccionado');
-                showAlert('Debes seleccionar un espacio de carrera', 'error');
-                if (espacioCarrera) espacioCarrera.focus();
-                return false;
-            }
-        }
-
-        if (tipoEspacio.value === 'campus') {
-            const espacioCampus = form.querySelector('select[name="espacio_campus"]');
-            
-            if (!espacioCampus) {
-                console.error('ERROR: Select de espacio_campus no encontrado en DOM');
-                showAlert('Error del sistema: campo de espacio no disponible', 'error');
-                return false;
-            }
-            
-            if (!espacioCampus.value || espacioCampus.value === '') {
-                console.error('ERROR: Espacio de campus no seleccionado');
-                showAlert('Debes seleccionar un espacio de campus', 'error');
-                if (espacioCampus) espacioCampus.focus();
-                return false;
-            }
-        }
-
-        console.log('=== VALIDACIÓN EXITOSA ===');
-        showAlert('Validación exitosa. Enviando solicitud...', 'success');
-        return true;
-        
-    } catch (error) {
-        console.error('ERROR EN VALIDACIÓN:', error);
-        showAlert('Error del sistema durante la validación', 'error');
+    // ✅ Validar nombre del evento
+    if (!nombreEvento || !nombreEvento.value.trim()) {
+        showAlert('El nombre del evento es obligatorio', 'error');
+        if (nombreEvento) nombreEvento.focus();
         return false;
     }
+
+    // ✅ Validar fecha
+    if (!fechaEvento || !fechaEvento.value) {
+        showAlert('La fecha del evento es obligatoria', 'error');
+        if (fechaEvento) fechaEvento.focus();
+        return false;
+    }
+
+    // ✅ Validar tipo de espacio
+    if (!tipoEspacio || !tipoEspacio.value) {
+        showAlert('Debes seleccionar un tipo de espacio', 'error');
+        if (tipoEspacio) tipoEspacio.focus();
+        return false;
+    }
+
+    // ✅ Validar espacio según tipo
+    if (tipoEspacio.value === 'carrera') {
+        const espacioCarrera = form.querySelector('select[name="espacio_carrera"]');
+        if (!espacioCarrera || !espacioCarrera.value) {
+            showAlert('Debes seleccionar un espacio de carrera', 'error');
+            if (espacioCarrera) espacioCarrera.focus();
+            return false;
+        }
+    } else if (tipoEspacio.value === 'campus') {
+        const espacioCampus = form.querySelector('select[name="espacio_campus"]');
+        if (!espacioCampus || !espacioCampus.value) {
+            showAlert('Debes seleccionar un espacio de campus', 'error');
+            if (espacioCampus) espacioCampus.focus();
+            return false;
+        }
+        
+        // ✅ Validar aceptación de condiciones para campus
+        const aceptaCondiciones = form.querySelector('[name="acepta_condiciones_uso"]');
+        if (aceptaCondiciones && !aceptaCondiciones.checked) {
+            showAlert('Debes aceptar las condiciones de uso para espacios de campus', 'error');
+            aceptaCondiciones.focus();
+            return false;
+        }
+    }
+
+    // ✅ Validar archivo adjunto
+    if (!archivoAdjunto || !archivoAdjunto.files || archivoAdjunto.files.length === 0) {
+        showAlert('Debes adjuntar un archivo con la justificación', 'error');
+        return false;
+    }
+
+    return true;
 }
 
 // ============================
 // CONFIGURACIÓN DE ESPACIOS
 // ============================
 function configurarEspacios() {
-    console.log('CONFIGURANDO TIPO ESPACIO...');
-    
     const tipoSelect = document.querySelector('select[name="tipo_espacio"]');
-    if (!tipoSelect) {
-        console.error('ERROR: Select tipo_espacio no encontrado');
-        return;
-    }
-
-    console.log('Select encontrado:', tipoSelect);
+    if (!tipoSelect) return;
 
     tipoSelect.addEventListener('change', function() {
-        console.log('CAMBIO DETECTADO:', this.value);
-        
         const carreraDiv = document.getElementById('espacioCarreraDiv');
         const campusDiv = document.getElementById('espacioCampusDiv');
+        const terminosSection = document.getElementById('terminosSection');
         
-        console.log('Divs encontrados:', {
-            carrera: !!carreraDiv,
-            campus: !!campusDiv
-        });
-        
+        // Ocultar todo
         if (carreraDiv) {
             carreraDiv.style.display = 'none';
             carreraDiv.style.opacity = '0';
@@ -210,57 +177,42 @@ function configurarEspacios() {
             campusDiv.style.display = 'none';
             campusDiv.style.opacity = '0';
         }
+        if (terminosSection) {
+            terminosSection.classList.remove('visible');
+        }
         
+        // Mostrar según selección
         if (this.value === 'carrera' && carreraDiv) {
-            console.log('MOSTRANDO CARRERA');
             carreraDiv.style.display = 'block';
-            setTimeout(() => {
-                carreraDiv.style.opacity = '1';
-            }, 50);
+            setTimeout(() => carreraDiv.style.opacity = '1', 50);
         } else if (this.value === 'campus' && campusDiv) {
-            console.log('MOSTRANDO CAMPUS');
             campusDiv.style.display = 'block';
-            setTimeout(() => {
-                campusDiv.style.opacity = '1';
-            }, 50);
+            setTimeout(() => campusDiv.style.opacity = '1', 50);
         }
     });
-    
-    console.log('EVENT LISTENER AGREGADO AL SELECT');
 }
 
 // ============================
 // CONFIGURACIÓN DE FILE UPLOAD
 // ============================
 function configurarFileUpload() {
-    console.log('CONFIGURANDO FILE UPLOAD...');
-    
     const fileArea = document.getElementById('fileUploadArea');
     const fileInput = document.querySelector('input[name="archivo_adjunto"]');
     const fileInfo = document.getElementById('fileInfo');
     
-    if (!fileArea || !fileInput) {
-        console.error('ERROR: Elementos de file upload no encontrados');
-        return;
-    }
+    if (!fileArea || !fileInput) return;
 
-    console.log('Elementos encontrados:', { fileArea: !!fileArea, fileInput: !!fileInput });
-
-    fileInput.style.cssText = `
-        position: absolute !important;
-        left: -9999px !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-    `;
+    // Ocultar input original
+    fileInput.style.cssText = 'position: absolute; left: -9999px; opacity: 0; visibility: hidden;';
     
+    // Click en área para abrir selector
     fileArea.addEventListener('click', function(e) {
         e.preventDefault();
-        console.log('CLICK EN FILE AREA DETECTADO');
         fileInput.click();
     });
     
+    // Mostrar archivo seleccionado
     fileInput.addEventListener('change', function() {
-        console.log('ARCHIVO SELECCIONADO:', this.files[0]);
         if (this.files[0]) {
             const file = this.files[0];
             const fileName = file.name;
@@ -278,33 +230,13 @@ function configurarFileUpload() {
             
             if (fileInfo) {
                 fileInfo.innerHTML = `
-                    <div style="
-                        display: flex;
-                        align-items: center;
-                        gap: 12px;
-                        padding: 12px;
-                        background: #f0fdf4;
-                        border: 2px solid #22c55e;
-                        border-radius: 8px;
-                        margin-top: 8px;
-                    ">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f0fdf4; border: 2px solid #22c55e; border-radius: 8px; margin-top: 8px;">
                         <i class="${iconClass}" style="font-size: 24px; color: #22c55e;"></i>
                         <div style="flex: 1;">
                             <div style="font-weight: 500; color: #1f2937;">${fileName}</div>
                             <div style="font-size: 14px; color: #6b7280;">${fileSize}</div>
                         </div>
-                        <button type="button" onclick="removerArchivo()" style="
-                            background: #ef4444;
-                            color: white;
-                            border: none;
-                            border-radius: 50%;
-                            width: 28px;
-                            height: 28px;
-                            cursor: pointer;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        ">
+                        <button type="button" onclick="removerArchivo()" style="background: #ef4444; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
                             <i class="fas fa-times" style="font-size: 12px;"></i>
                         </button>
                     </div>
@@ -313,100 +245,54 @@ function configurarFileUpload() {
             }
             
             fileArea.style.display = 'none';
-            showAlert('Archivo seleccionado correctamente', 'success');
         }
     });
-    
-    console.log('FILE UPLOAD CONFIGURADO');
 }
 
 // ============================
-// MANEJO DE ESPACIOS Y TÉRMINOS
+// MANEJO DE TÉRMINOS PARA CAMPUS
 // ============================
-function toggleEspaciosYTerminos(tipo) {
-    const carreraDiv = document.getElementById('espacioCarreraDiv');
-    const campusDiv = document.getElementById('espacioCampusDiv');
-    const terminosSection = document.getElementById('terminosSection');
-    const selectCarrera = document.getElementById('espacio_carrera');
-    const selectCampus = document.getElementById('espacio_campus');
-
-    if (terminosSection) {
-        terminosSection.classList.remove('visible');
-    }
-    
-    if (tipo === 'carrera') {
-        carreraDiv.style.display = 'block';
-        campusDiv.style.display = 'none';
-        
-        if (selectCampus) selectCampus.value = '';
-        
-        const aceptaCondiciones = document.getElementById('acepta_condiciones');
-        if (aceptaCondiciones) {
-            aceptaCondiciones.required = false;
-        }
-        
-    } else if (tipo === 'campus') {
-        carreraDiv.style.display = 'none';
-        campusDiv.style.display = 'block';
-        
-        if (selectCarrera) selectCarrera.value = '';
-        
-    } else {
-        carreraDiv.style.display = 'none';
-        campusDiv.style.display = 'none';
-        
-        if (selectCarrera) selectCarrera.value = '';
-        if (selectCampus) selectCampus.value = '';
-    }
-}
-
 function verificarEspacioCampus(espacioId) {
     const terminosSection = document.getElementById('terminosSection');
+    const aceptaCondiciones = document.getElementById('acepta_condiciones');
     
     if (espacioId) {
-        setTimeout(() => {
-            terminosSection.classList.add('visible');
-        }, 100);
-        
-        const aceptaCondiciones = document.getElementById('acepta_condiciones');
+        if (terminosSection) {
+            setTimeout(() => terminosSection.classList.add('visible'), 100);
+        }
         if (aceptaCondiciones) {
             aceptaCondiciones.required = true;
         }
     } else {
-        terminosSection.classList.remove('visible');
-        
-        const aceptaCondiciones = document.getElementById('acepta_condiciones');
+        if (terminosSection) {
+            terminosSection.classList.remove('visible');
+        }
         if (aceptaCondiciones) {
             aceptaCondiciones.required = false;
+            aceptaCondiciones.checked = false;
         }
     }
 }
 
 // ============================
-// INICIALIZACIÓN COMPLETA
+// DESHABILITAR AUTOCOMPLETADO
+// ============================
+function deshabilitarAutocompletado() {
+    const inputs = document.querySelectorAll('input[type="text"], textarea');
+    inputs.forEach(input => {
+        input.setAttribute('autocomplete', 'off');
+    });
+}
+
+// ============================
+// INICIALIZACIÓN
 // ============================
 function inicializarTodo() {
-    console.log('=== TESTING DOM ===');
+    configurarEspacios();
+    configurarFileUpload();
+    deshabilitarAutocompletado();
     
-    const tipoSelect = document.querySelector('select[name="tipo_espacio"]');
-    const fileArea = document.getElementById('fileUploadArea');
-    const fileInput = document.querySelector('input[name="archivo_adjunto"]');
-    
-    console.log('Elementos principales:', {
-        tipoSelect: !!tipoSelect,
-        fileArea: !!fileArea,
-        fileInput: !!fileInput
-    });
-    
-    if (tipoSelect) {
-        configurarEspacios();
-    }
-    
-    if (fileArea && fileInput) {
-        configurarFileUpload();
-    }
-    
-    // Asegurar que todo esté oculto al inicio
+    // Ocultar todo al inicio
     const terminosSection = document.getElementById('terminosSection');
     const carreraDiv = document.getElementById('espacioCarreraDiv');
     const campusDiv = document.getElementById('espacioCampusDiv');
@@ -414,21 +300,13 @@ function inicializarTodo() {
     if (terminosSection) terminosSection.classList.remove('visible');
     if (carreraDiv) carreraDiv.style.display = 'none';
     if (campusDiv) campusDiv.style.display = 'none';
-    
-    console.log('=== DEBUG COMPLETADO ===');
 }
 
-// Ejecutar inicialización
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded');
-    setTimeout(inicializarTodo, 1000);
-});
-
+// ⚡ EJECUCIÓN INMEDIATA (sin delays)
 if (document.readyState === 'loading') {
-    console.log('DOM todavía cargando...');
+    document.addEventListener('DOMContentLoaded', inicializarTodo);
 } else {
-    console.log('DOM ya está cargado, ejecutando inmediatamente');
-    setTimeout(inicializarTodo, 500);
+    inicializarTodo();
 }
 
 // ============================
@@ -436,7 +314,6 @@ if (document.readyState === 'loading') {
 // ============================
 window.toggleTheme = toggleTheme;
 window.validarFormulario = validarFormulario;
-window.toggleEspaciosYTerminos = toggleEspaciosYTerminos;
 window.verificarEspacioCampus = verificarEspacioCampus;
 
 window.removerArchivo = function() {
@@ -450,6 +327,4 @@ window.removerArchivo = function() {
         fileInfo.innerHTML = '';
     }
     if (fileArea) fileArea.style.display = 'block';
-    
-    showAlert('Archivo removido correctamente', 'success');
 };

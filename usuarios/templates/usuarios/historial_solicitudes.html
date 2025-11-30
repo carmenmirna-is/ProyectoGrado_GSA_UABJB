@@ -52,15 +52,24 @@
                             <td>{{ solicitud.fecha_evento|date:"d/m/Y H:i"|default:"No especificada" }}</td>
                             <td>
                                 {% if solicitud.archivo_adjunto %}
-                                <p>
-                                    <i class="fas fa-file"></i>
-                                    <a href="{{ solicitud.archivo_adjunto.url }}" target="_blank" download>
-                                    Descargar {{ solicitud.archivo_adjunto.name|basename }}
-                                    </a>
-                                    ({{ solicitud.tamano_archivo_legible }})
-                                </p>
+                                    {% if solicitud.archivo_adjunto.name %}
+                                        <p>
+                                            <i class="fas fa-file"></i>
+                                            <a href="{{ solicitud.archivo_adjunto.url }}" target="_blank" download>
+                                                Descargar {{ solicitud.archivo_adjunto.name|basename }}
+                                            </a>
+                                            {% if solicitud.tamano_archivo_legible %}
+                                                ({{ solicitud.tamano_archivo_legible }})
+                                            {% endif %}
+                                        </p>
+                                    {% else %}
+                                        <p style="color: #dc2626;">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            Archivo no disponible
+                                        </p>
+                                    {% endif %}
                                 {% else %}
-                                <p>Sin archivo adjunto</p>
+                                    <p>Sin archivo adjunto</p>
                                 {% endif %}
                             </td>
                             <td>
@@ -97,7 +106,7 @@
             </div>
         </div>
     </div>
-    <script src="{% static 'js/scripts' %}"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
 </body>
 </body>
 </html>

@@ -129,10 +129,12 @@ def registrar_espacios(request):
 
 def registrar_espacio_campus(request):
     if request.method == 'POST':
-        form = EspacioCampusForm(request.POST)
+        # ⚠️ IMPORTANTE: Agregar request.FILES para que acepte archivos
+        form = EspacioCampusForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('administrador:lista_espacios')  # o la ruta que uses
+            messages.success(request, '✅ Espacio registrado exitosamente')
+            return redirect('administrador:lista_espacios')
     else:
         form = EspacioCampusForm()
     return render(request, 'administrador/registrar_espacio_campus.html', {'form': form})

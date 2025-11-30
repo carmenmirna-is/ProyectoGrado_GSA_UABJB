@@ -422,40 +422,46 @@ def notificar_confirmacion_solicitud(solicitud, request):
         domain = request.get_host()
         enlace_estado = f"{protocol}://{domain}/usuarios/historial-solicitudes/"
 
-        # ✅ Configurar zona horaria de Bolivia
+        # ✅ CONFIGURAR ZONA HORARIA DE BOLIVIA
         bolivia_tz = pytz.timezone('America/La_Paz')
         
-        # 🔧 FIX: Convertir fecha_evento a hora de Bolivia
+        # 🔧 FIX: Convertir fecha_evento a hora de Bolivia CORRECTAMENTE
         if isinstance(solicitud.fecha_evento, str):
             try:
+                # Parsear el string a datetime
                 fecha_obj = parse_datetime(solicitud.fecha_evento)
                 if fecha_obj:
-                    # Asegurar que sea aware y convertir a Bolivia
+                    # ✅ CRITICAL: Si es naive, asumimos que YA ESTÁ en hora de Bolivia
                     if timezone.is_naive(fecha_obj):
-                        fecha_obj = timezone.make_aware(fecha_obj)
-                    fecha_bolivia = fecha_obj.astimezone(bolivia_tz)
+                        # Lo hacemos aware directamente con la zona horaria de Bolivia
+                        fecha_bolivia = bolivia_tz.localize(fecha_obj)
+                    else:
+                        # Si ya es aware, solo convertimos a Bolivia
+                        fecha_bolivia = fecha_obj.astimezone(bolivia_tz)
+                    
                     fecha_evento = fecha_bolivia.strftime("%d/%m/%Y a las %H:%M")
                 else:
                     fecha_evento = solicitud.fecha_evento
-            except:
+            except Exception as e:
+                print(f"⚠️ Error al parsear fecha: {e}")
                 fecha_evento = solicitud.fecha_evento
         else:
-            # Si ya es datetime, convertir a Bolivia
+            # Si ya es datetime
             if timezone.is_naive(solicitud.fecha_evento):
-                fecha_obj = timezone.make_aware(solicitud.fecha_evento)
+                # ✅ CRITICAL: Asumimos que es hora de Bolivia
+                fecha_bolivia = bolivia_tz.localize(solicitud.fecha_evento)
             else:
-                fecha_obj = solicitud.fecha_evento
+                # Si ya es aware, convertimos a Bolivia
+                fecha_bolivia = solicitud.fecha_evento.astimezone(bolivia_tz)
             
-            fecha_bolivia = fecha_obj.astimezone(bolivia_tz)
             fecha_evento = fecha_bolivia.strftime("%d/%m/%Y a las %H:%M")
         
         # ✅ Convertir fecha de creación de la solicitud a Bolivia
         if timezone.is_naive(solicitud.fecha_creacion):
-            fecha_creacion_obj = timezone.make_aware(solicitud.fecha_creacion)
+            fecha_creacion_bolivia = bolivia_tz.localize(solicitud.fecha_creacion)
         else:
-            fecha_creacion_obj = solicitud.fecha_creacion
+            fecha_creacion_bolivia = solicitud.fecha_creacion.astimezone(bolivia_tz)
         
-        fecha_creacion_bolivia = fecha_creacion_obj.astimezone(bolivia_tz)
         fecha_solicitud = fecha_creacion_bolivia.strftime("%d/%m/%Y a las %H:%M")
         
         espacio_nombre = solicitud.get_nombre_espacio()
@@ -466,7 +472,7 @@ def notificar_confirmacion_solicitud(solicitud, request):
             'user': user,
             'enlace_estado': enlace_estado,
             'fecha_evento': fecha_evento,
-            'fecha_solicitud': fecha_solicitud,  # ✅ Nueva variable con hora de Bolivia
+            'fecha_solicitud': fecha_solicitud,
             'espacio_nombre': espacio_nombre,
             'tiene_archivo': tiene_archivo,
         })
@@ -962,6 +968,39 @@ def notificar_nueva_solicitud(solicitud):
         except:
             fecha_creacion_str = str(solicitud.fecha_creacion)
         
+        # 🆕 INFORMACIÓN SOBRE ACEPTACIÓN DE CONDICIONES (solo para campus)
+        info_condiciones = ""
+        if solicitud.tipo_espacio == 'campus':
+            if solicitud.acepta_condiciones_uso:
+                import pytz
+                bolivia_tz = pytz.timezone('America/La_Paz')
+                
+                fecha_aceptacion = solicitud.fecha_aceptacion_terminos
+                if fecha_aceptacion:
+                    if timezone.is_naive(fecha_aceptacion):
+                        fecha_aceptacion = timezone.make_aware(fecha_aceptacion)
+                    fecha_aceptacion_bolivia = fecha_aceptacion.astimezone(bolivia_tz)
+                    fecha_aceptacion_str = fecha_aceptacion_bolivia.strftime("%d/%m/%Y a las %H:%M:%S")
+                else:
+                    fecha_aceptacion_str = "No registrada"
+                
+                info_condiciones = f'''
+✅ CONDICIONES DE USO ACEPTADAS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- El solicitante ha aceptado las Condiciones de Uso del Campus
+- Fecha de aceptación: {fecha_aceptacion_str}
+- IP de aceptación: {solicitud.ip_aceptacion or 'No registrada'}
+- Documentos aceptados:
+  • Condiciones de Uso de Espacios del Campus
+  • Ley 259 - Control al Expendio y Consumo de Bebidas Alcohólicas
+
+'''
+            else:
+                info_condiciones = '''
+⚠️  NOTA: Este espacio de campus no requirió aceptación de condiciones.
+
+'''
+        
         # Preparar el contenido del correo
         subject = '🔔 Nueva Solicitud Recibida - Sistema UABJB'
         
@@ -990,7 +1029,7 @@ Tienes una nueva solicitud que requiere tu atención en el Sistema de Gestión U
 - Fecha de solicitud: {fecha_creacion_str}
 - Archivo adjunto: {'Sí' if solicitud.archivo_adjunto else 'No'}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{info_condiciones}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ⚡ ACCIÓN REQUERIDA:
 Por favor, revisa tu dashboard para aprobar o rechazar esta solicitud.
@@ -1008,15 +1047,20 @@ Sistema de Gestión UABJB'''
         send_mail(
             subject,
             message,
-            'cibanezsanguino@gmail.com',  # From email (el mismo que usas actualmente)
-            [encargado.email],  # To email
-            fail_silently=True,  # No rompe el sistema si falla el correo
+            'cibanezsanguino@gmail.com',
+            [encargado.email],
+            fail_silently=True,
         )
         
         print(f'✅ Notificación enviada al encargado {encargado.email} para la solicitud: {solicitud.nombre_evento}')
+        if solicitud.tipo_espacio == 'campus' and solicitud.acepta_condiciones_uso:
+            print(f'   ✓ Incluye información de aceptación de condiciones')
         
     except Exception as e:
         print(f'❌ Error enviando notificación al encargado: {str(e)}')
+        import traceback
+        traceback.print_exc()
+
 
 # 🆕 FUNCIÓN AUXILIAR PARA OBTENER IP
 def obtener_ip_cliente(request):
