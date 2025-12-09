@@ -273,3 +273,92 @@ body {
         max-width: 100%;
     }
 }
+/* ---------- Hero UABJB ---------- */
+.hero{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:70vh;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;
+  inset:0;
+  z-index:0;
+}
+
+.hero-card{
+  position:relative;
+  z-index:1;
+  background-color: var(--bg-secondary);
+  border-radius:20px;
+  padding:3rem 4rem 3.5rem;
+  text-align:center;
+  color:var(--text-primary);
+  max-width:560px;
+  box-shadow:var(--shadow-lg);
+  animation:fadeIn .8s ease-out;
+}
+
+.hero-icons{
+  display:flex;
+  justify-content:center;
+  gap:1.2rem;
+  margin-bottom:1.5rem;
+}
+.hero-icons .ico{
+  font-size:2.2rem;
+  color:var(--uabjb-yellow);
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.15));
+}
+
+.auth-buttons{
+  display:flex;
+  gap:1rem;
+  justify-content:center;
+  margin-top:2rem;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.6rem;
+  padding:.85rem 2rem;
+  border-radius:50px;
+  font-weight:600;
+  text-decoration:none;
+  transition:all .3s ease;
+  box-shadow:var(--shadow);
+}
+.btn-login{
+  background:var(--uabjb-blue);
+  color:#ffffff;
+}
+.btn-login:hover{
+  background:var(--uabjb-light-blue);
+  transform:translateY(-2px);
+  box-shadow:var(--card-hover);
+}
+.btn-register{
+  background:transparent;
+  color:var(--uabjb-blue);
+  border:2px solid var(--uabjb-blue);
+}
+.btn-register:hover{
+  background:var(--uabjb-blue);
+  color:#ffffff;
+  transform:translateY(-2px);
+  box-shadow:var(--card-hover);
+}
+.dashboard-body {
+  background-color: var(--bg-secondary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.dashboard {
+  flex: 1;               /* empuja el footer (si lo hubiera) abajo */
+  display: flex;
+  align-items: center;   /* centra verticalmente la card */
+  justify-content: center;
+}

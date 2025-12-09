@@ -54,16 +54,53 @@
             </div>
         </div>
     </div>
-        <div class="pautas-box">
-            <h3><i class="fas fa-exclamation-circle"></i> Requisitos para reserva:</h3>
-            <ul>
-                <li><strong>Anticipación:</strong> Para no tener conflictos en su solicitud, se recomienda envíar 3 días antes.</li>
-                <li><strong>Documentación:</strong> Justificación en PDF </li>
-                <li><strong>Horario:</strong> Lunes a Viernes de 8:00 AM a 6:00 PM</li>
-                <li><strong>Confirmación:</strong> Respuesta en 24-48 horas hábiles</li>
-                <li><strong>Condiciones de uso en espacios del campus:</strong> Leer detenidamente las condiciones y políticas propuestas para la solicitud/reserva</li>
+        <section class="requisitos-box">
+            <div class="requisitos-header">
+                <i class="fas fa-clipboard-check"></i>
+                <div>
+                <h3>Requisitos para reserva</h3>
+                <p>Todo lo que necesitas saber antes de solicitar</p>
+                </div>
+            </div>
+
+            <ul class="requisitos-lista">
+                <li>
+                <span class="req-ico">⏱️</span>
+                <div>
+                    <strong>Anticipación</strong>
+                    <span>Envía tu solicitud al menos 3 días antes para evitar conflictos.</span>
+                </div>
+                </li>
+                <li>
+                <span class="req-ico">📄</span>
+                <div>
+                    <strong>Documentación</strong>
+                    <span>Adjunta justificación en formato PDF.</span>
+                </div>
+                </li>
+                <li>
+                <span class="req-ico">🕘</span>
+                <div>
+                    <strong>Horario</strong>
+                    <span>Lunes a viernes de 8:00 AM a 6:00 PM.</span>
+                </div>
+                </li>
+                <li>
+                <span class="req-ico">✅</span>
+                <div>
+                    <strong>Confirmación</strong>
+                    <span>Recibirás respuesta en 24-48 h hábiles.</span>
+                </div>
+                </li>
+                <li>
+                <span class="req-ico">📋</span>
+                <div>
+                    <strong>Condiciones de uso</strong>
+                    <span>Lee detenidamente las políticas de solicitud/reserva.</span>
+                </div>
+                </li>
             </ul>
-        </div>
+            </section>
         <div class="table-wrapper">
             <table>
                 <thead>
@@ -97,9 +134,13 @@
                         <td>{{ espacio.descripcion }}</td>
                         <td>{{ espacio.encargado.get_full_name|default:espacio.encargado.username }}</td>
                         <td style="text-align: center;">
-                            <a href="{% static 'documentos/' %}condiciones_{{ espacio.id }}.pdf" class="doc-link" target="_blank">
-                                <i class="fas fa-file-pdf"></i>
-                                Ver Documento
+                            {% if espacio.documento_condiciones %}
+                                <a href="{{ espacio.documento_condiciones.url }}" class="doc-link" target="_blank">
+                                    <i class="fas fa-file-pdf"></i> Ver Documento
+                                </a>
+                            {% else %}
+                                <span class="no-doc">—</span>
+                            {% endif %}
                             </a>
                         </td>
                     </tr>

@@ -15,4 +15,5 @@ urlpatterns = [
     path('cancelar/<int:id>/', views.cancelar_solicitud, name='cancelar_solicitud'),
     path('editar-perfil/', views.editar_perfil, name='editar_perfil'),
     path('verificar-conflictos/', views.verificar_conflictos_antes_enviar, name='verificar_conflictos'),
+    path('api/documento-espacio/<int:espacio_id>/', views.obtener_documento_espacio, name='obtener_documento_espacio'),
 ]

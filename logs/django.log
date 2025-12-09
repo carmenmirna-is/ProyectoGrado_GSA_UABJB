@@ -1193,3 +1193,241 @@ INFO 2025-11-30 11:46:18,769 autoreload Watching for file changes with StatReloa
 INFO 2025-11-30 11:46:28,104 basehttp "POST /encargados/aprobar_solicitud/18/ HTTP/1.1" 200 105
 INFO 2025-11-30 11:46:30,617 basehttp "GET /encargados/lista_solicitudes/ HTTP/1.1" 200 14941
 INFO 2025-11-30 11:49:30,160 autoreload Watching for file changes with StatReloader
+INFO 2025-12-06 10:43:02,810 autoreload Watching for file changes with StatReloader
+INFO 2025-12-06 10:45:01,228 basehttp code 400, message Bad request version ('ïy\x8b\x12ùÌO7{_\x04\x8edLmôú\x19Û\x8a\x8a¯D\x9e\x9f±$/UV\x1a4læÉ1õS´\x94æSY\x03\x82*ÕygÔ\x10·´7ºìrøw')
+ERROR 2025-12-06 10:45:01,231 basehttp You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-12-06 10:45:01,241 basehttp code 400, message Bad request version ('ºº\x13\x01\x13\x02\x13\x03À+À/À,À0Ì©Ì¨À\x13À\x14\x00\x9c\x00\x9d\x00/\x005\x01\x00\x06S')
+ERROR 2025-12-06 10:45:01,242 basehttp You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-12-06 10:45:27,336 basehttp "GET / HTTP/1.1" 200 1983
+INFO 2025-12-06 10:45:27,445 basehttp "GET /static/css/custom-styles.css HTTP/1.1" 304 0
+INFO 2025-12-06 10:45:27,446 basehttp "GET /static/js/scripts.js HTTP/1.1" 304 0
+WARNING 2025-12-06 10:45:27,742 log Not Found: /favicon.ico
+WARNING 2025-12-06 10:45:27,744 basehttp "GET /favicon.ico HTTP/1.1" 404 3913
+INFO 2025-12-06 10:45:29,951 basehttp "GET /login/ HTTP/1.1" 200 2352
+INFO 2025-12-06 10:45:30,053 basehttp "GET /static/css/materialize_styles.css HTTP/1.1" 200 1885
+INFO 2025-12-06 10:45:41,849 basehttp "POST /login/ HTTP/1.1" 200 2568
+INFO 2025-12-06 10:45:52,197 basehttp "POST /login/ HTTP/1.1" 200 2568
+INFO 2025-12-06 10:45:56,671 basehttp "GET /recuperar/ HTTP/1.1" 200 1523
+INFO 2025-12-06 10:46:08,276 basehttp "GET /admin/gestion_espacios_academicos/customuser/2/change/ HTTP/1.1" 302 0
+INFO 2025-12-06 10:46:08,401 basehttp "GET /admin/login/?next=/admin/gestion_espacios_academicos/customuser/2/change/ HTTP/1.1" 200 4318
+INFO 2025-12-06 10:46:08,473 basehttp "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2929
+INFO 2025-12-06 10:46:08,483 basehttp "GET /static/admin/css/base.css HTTP/1.1" 200 21310
+INFO 2025-12-06 10:46:08,484 basehttp "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2694
+INFO 2025-12-06 10:46:08,504 basehttp "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2025-12-06 10:46:08,506 basehttp "GET /static/admin/css/login.css HTTP/1.1" 304 0
+INFO 2025-12-06 10:46:08,508 basehttp "GET /static/admin/css/responsive.css HTTP/1.1" 200 18559
+INFO 2025-12-06 10:46:08,510 basehttp "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2025-12-06 10:46:16,095 basehttp "POST /admin/login/?next=/admin/gestion_espacios_academicos/customuser/2/change/ HTTP/1.1" 200 4527
+INFO 2025-12-08 11:14:43,508 basehttp "POST /admin/login/?next=/admin/gestion_espacios_academicos/customuser/2/change/ HTTP/1.1" 200 4527
+INFO 2025-12-08 11:14:43,662 basehttp "GET /static/admin/css/base.css HTTP/1.1" 200 21310
+INFO 2025-12-08 11:14:43,682 basehttp "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2929
+INFO 2025-12-08 11:14:43,697 basehttp "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2694
+INFO 2025-12-08 11:14:43,700 basehttp "GET /static/admin/css/login.css HTTP/1.1" 200 958
+INFO 2025-12-08 11:14:43,705 basehttp "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2025-12-08 11:14:43,708 basehttp "GET /static/admin/css/responsive.css HTTP/1.1" 200 18559
+INFO 2025-12-08 11:14:43,711 basehttp "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+WARNING 2025-12-08 11:14:43,909 log Not Found: /favicon.ico
+WARNING 2025-12-08 11:14:43,910 basehttp "GET /favicon.ico HTTP/1.1" 404 3913
+INFO 2025-12-08 11:16:58,514 basehttp "POST /admin/login/?next=/admin/gestion_espacios_academicos/customuser/2/change/ HTTP/1.1" 302 0
+INFO 2025-12-08 11:16:58,560 basehttp "GET /admin/gestion_espacios_academicos/customuser/2/change/ HTTP/1.1" 302 0
+INFO 2025-12-08 11:16:58,671 basehttp "GET /admin/ HTTP/1.1" 200 8724
+INFO 2025-12-08 11:16:58,705 basehttp "GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+INFO 2025-12-08 11:16:58,763 basehttp "GET /static/admin/img/icon-alert.svg HTTP/1.1" 200 504
+INFO 2025-12-08 11:16:58,765 basehttp "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+INFO 2025-12-08 11:16:58,766 basehttp "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 380
+INFO 2025-12-08 11:17:03,553 basehttp "GET /admin/gestion_espacios_academicos/customuser/ HTTP/1.1" 200 14868
+INFO 2025-12-08 11:17:03,645 basehttp "GET /static/admin/css/changelists.css HTTP/1.1" 200 6566
+INFO 2025-12-08 11:17:03,647 basehttp "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 8943
+INFO 2025-12-08 11:17:03,649 basehttp "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2025-12-08 11:17:03,667 basehttp "GET /static/admin/js/core.js HTTP/1.1" 200 5682
+INFO 2025-12-08 11:17:03,677 basehttp "GET /static/admin/js/actions.js HTTP/1.1" 200 7872
+INFO 2025-12-08 11:17:03,683 basehttp "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2025-12-08 11:17:03,686 basehttp "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2025-12-08 11:17:03,698 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 8006
+INFO 2025-12-08 11:17:03,700 basehttp "GET /static/admin/img/icon-yes.svg HTTP/1.1" 200 436
+INFO 2025-12-08 11:17:03,701 basehttp "GET /static/admin/img/search.svg HTTP/1.1" 200 458
+INFO 2025-12-08 11:17:03,716 basehttp "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 292458
+INFO 2025-12-08 11:17:03,724 basehttp "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 232381
+INFO 2025-12-08 11:17:03,756 basehttp "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2025-12-08 11:17:03,829 basehttp "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+INFO 2025-12-08 11:17:03,838 basehttp "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1097
+INFO 2025-12-08 11:17:19,774 basehttp "GET /admin/gestion_espacios_academicos/customuser/1/change/ HTTP/1.1" 200 32878
+INFO 2025-12-08 11:17:19,836 basehttp "GET /static/admin/css/forms.css HTTP/1.1" 200 9090
+INFO 2025-12-08 11:17:19,838 basehttp "GET /static/admin/js/SelectBox.js HTTP/1.1" 200 4530
+INFO 2025-12-08 11:17:19,839 basehttp "GET /static/admin/js/admin/DateTimeShortcuts.js HTTP/1.1" 200 19319
+INFO 2025-12-08 11:17:19,846 basehttp "GET /static/admin/js/calendar.js HTTP/1.1" 200 8466
+INFO 2025-12-08 11:17:19,849 basehttp "GET /static/admin/js/SelectFilter2.js HTTP/1.1" 200 15292
+INFO 2025-12-08 11:17:19,860 basehttp "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 581
+INFO 2025-12-08 11:17:19,861 basehttp "GET /static/admin/img/icon-deletelink.svg HTTP/1.1" 200 392
+INFO 2025-12-08 11:17:19,865 basehttp "GET /static/admin/css/widgets.css HTTP/1.1" 200 11921
+INFO 2025-12-08 11:17:19,865 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 8006
+INFO 2025-12-08 11:17:19,945 basehttp "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 200 586
+INFO 2025-12-08 11:17:19,946 basehttp "GET /static/admin/js/change_form.js HTTP/1.1" 200 606
+INFO 2025-12-08 11:17:20,016 basehttp "GET /static/admin/img/icon-unknown.svg HTTP/1.1" 200 655
+INFO 2025-12-08 11:17:20,032 basehttp "GET /static/admin/img/selector-icons.svg HTTP/1.1" 200 3291
+INFO 2025-12-08 11:17:20,033 basehttp "GET /static/admin/img/icon-clock.svg HTTP/1.1" 200 677
+INFO 2025-12-08 11:17:20,033 basehttp "GET /static/admin/img/icon-unknown-alt.svg HTTP/1.1" 200 655
+INFO 2025-12-08 11:17:20,037 basehttp "GET /static/admin/img/icon-calendar.svg HTTP/1.1" 200 1086
+INFO 2025-12-08 11:17:35,414 basehttp "POST /admin/gestion_espacios_academicos/customuser/1/change/ HTTP/1.1" 302 0
+INFO 2025-12-08 11:17:35,448 basehttp "GET /admin/gestion_espacios_academicos/customuser/ HTTP/1.1" 200 15125
+INFO 2025-12-08 11:17:35,492 basehttp "GET /admin/jsi18n/ HTTP/1.1" 200 8006
+INFO 2025-12-08 11:17:44,508 basehttp "GET / HTTP/1.1" 200 1983
+INFO 2025-12-08 11:17:45,973 basehttp "GET /login/ HTTP/1.1" 200 2352
+INFO 2025-12-08 11:17:46,053 basehttp "GET /static/css/materialize_styles.css HTTP/1.1" 200 1885
+INFO 2025-12-08 11:17:54,671 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-12-08 11:17:54,725 basehttp "GET /administrador/ HTTP/1.1" 200 5357
+INFO 2025-12-08 11:17:54,796 basehttp "GET /static/css/styles-v2.css HTTP/1.1" 200 5828
+INFO 2025-12-08 11:18:01,171 basehttp "GET /administrador/registrar_carrera/ HTTP/1.1" 200 2315
+INFO 2025-12-08 11:18:03,041 basehttp "GET /administrador/ HTTP/1.1" 200 5357
+INFO 2025-12-08 11:18:04,548 basehttp "GET /administrador/registrar_facultad/ HTTP/1.1" 200 2320
+INFO 2025-12-08 11:18:53,423 basehttp "POST /administrador/registrar_facultad/ HTTP/1.1" 302 0
+INFO 2025-12-08 11:18:53,483 basehttp "GET /administrador/lista_facultades/ HTTP/1.1" 200 2601
+INFO 2025-12-08 11:18:55,898 basehttp "GET /administrador/ HTTP/1.1" 200 5357
+INFO 2025-12-08 11:18:58,642 basehttp "GET /administrador/registrar_carrera/ HTTP/1.1" 200 2383
+INFO 2025-12-08 11:19:08,742 basehttp "POST /administrador/registrar_carrera/ HTTP/1.1" 302 0
+INFO 2025-12-08 11:19:08,798 basehttp "GET /administrador/lista_carreras/ HTTP/1.1" 200 2804
+INFO 2025-12-08 11:19:10,805 basehttp "GET /administrador/ HTTP/1.1" 200 5357
+INFO 2025-12-08 11:19:13,209 basehttp "GET /administrador/registrar_espacios/ HTTP/1.1" 200 3451
+INFO 2025-12-08 11:19:15,836 basehttp "GET /administrador/lista_espacios/ HTTP/1.1" 200 2203
+INFO 2025-12-08 11:19:17,101 basehttp "GET /administrador/ HTTP/1.1" 200 5357
+INFO 2025-12-08 11:19:19,129 basehttp "GET /administrador/registrar_encargados/ HTTP/1.1" 200 3809
+INFO 2025-12-08 11:20:02,312 basehttp "POST /administrador/registrar_encargados/ HTTP/1.1" 302 0
+INFO 2025-12-08 11:20:02,367 basehttp "GET /administrador/lista_encargados/ HTTP/1.1" 200 2799
+INFO 2025-12-08 11:20:09,449 basehttp "GET /administrador/registrar_encargados/ HTTP/1.1" 200 3809
+INFO 2025-12-08 11:21:26,059 basehttp "POST /administrador/registrar_encargados/ HTTP/1.1" 302 0
+INFO 2025-12-08 11:21:26,073 basehttp "GET /administrador/lista_encargados/ HTTP/1.1" 200 3391
+INFO 2025-12-08 11:21:28,294 basehttp "GET /administrador/registrar_encargados/ HTTP/1.1" 200 3809
+INFO 2025-12-08 11:21:29,915 basehttp "GET /administrador/lista_encargados/ HTTP/1.1" 200 3206
+INFO 2025-12-08 11:21:31,301 basehttp "GET /administrador/ HTTP/1.1" 200 5357
+INFO 2025-12-08 11:21:32,714 basehttp "GET /administrador/registrar_espacios/ HTTP/1.1" 200 3611
+INFO 2025-12-08 11:22:44,383 basehttp "POST /administrador/registrar_espacios/ HTTP/1.1" 302 0
+INFO 2025-12-08 11:22:44,402 basehttp "GET /administrador/lista_espacios/ HTTP/1.1" 200 3163
+INFO 2025-12-08 11:22:50,435 basehttp "GET /administrador/ HTTP/1.1" 200 5357
+INFO 2025-12-08 11:22:52,649 basehttp "GET /administrador/registrar_espacio_campus/ HTTP/1.1" 200 6097
+INFO 2025-12-08 11:23:33,619 basehttp "POST /administrador/registrar_espacio_campus/ HTTP/1.1" 302 0
+INFO 2025-12-08 11:23:33,637 basehttp "GET /administrador/lista_espacios/ HTTP/1.1" 200 3168
+INFO 2025-12-08 11:23:36,907 basehttp "GET /administrador/ HTTP/1.1" 200 5357
+INFO 2025-12-08 11:23:40,304 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-12-08 11:23:40,312 basehttp "GET /login/ HTTP/1.1" 200 2571
+INFO 2025-12-08 11:23:49,786 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-12-08 11:23:49,866 basehttp "GET /encargados/dashboard/ HTTP/1.1" 200 7423
+INFO 2025-12-08 11:23:49,966 basehttp "GET /static/encargados/css/styles.css HTTP/1.1" 200 18022
+INFO 2025-12-08 11:23:50,008 basehttp "GET /static/encargados/js/dashboard_encargado.js HTTP/1.1" 200 8522
+INFO 2025-12-08 11:23:50,210 basehttp "GET /encargados/api/solicitudes-aceptadas/ HTTP/1.1" 200 2
+INFO 2025-12-08 11:23:53,557 basehttp "GET /encargados/lista_solicitudes/ HTTP/1.1" 200 4123
+INFO 2025-12-08 11:23:53,678 basehttp "GET /static/encargados/js/scripts.js HTTP/1.1" 200 17908
+INFO 2025-12-08 11:23:57,094 basehttp "GET /encargados/dashboard/ HTTP/1.1" 200 7423
+INFO 2025-12-08 11:24:02,227 basehttp "GET /logout/ HTTP/1.1" 302 0
+INFO 2025-12-08 11:24:02,235 basehttp "GET /login/ HTTP/1.1" 200 2571
+INFO 2025-12-08 11:31:11,910 autoreload /app/usuarios/views.py changed, reloading.
+INFO 2025-12-08 11:31:15,270 autoreload Watching for file changes with StatReloader
+INFO 2025-12-08 12:01:40,766 autoreload /app/usuarios/views.py changed, reloading.
+INFO 2025-12-08 12:01:45,404 autoreload Watching for file changes with StatReloader
+INFO 2025-12-08 12:02:08,663 autoreload /app/usuarios/views.py changed, reloading.
+INFO 2025-12-08 12:02:10,312 autoreload Watching for file changes with StatReloader
+INFO 2025-12-08 12:02:20,345 autoreload /app/usuarios/views.py changed, reloading.
+INFO 2025-12-08 12:02:21,996 autoreload Watching for file changes with StatReloader
+INFO 2025-12-08 12:04:29,739 autoreload /app/usuarios/urls.py changed, reloading.
+INFO 2025-12-08 12:04:31,294 autoreload Watching for file changes with StatReloader
+INFO 2025-12-08 12:07:34,171 basehttp "GET /login/ HTTP/1.1" 200 2352
+INFO 2025-12-08 12:07:39,102 basehttp "GET /registro/ HTTP/1.1" 200 4212
+INFO 2025-12-08 12:08:24,238 basehttp "POST /registro/ HTTP/1.1" 302 0
+INFO 2025-12-08 12:08:24,251 basehttp "GET /login/ HTTP/1.1" 200 2604
+INFO 2025-12-08 12:09:21,490 basehttp "POST /login/ HTTP/1.1" 200 2568
+INFO 2025-12-08 12:09:26,809 basehttp "GET /verificar/4c9c5a48-d2f3-4a62-9770-548de4dd1704/ HTTP/1.1" 302 0
+INFO 2025-12-08 12:09:26,844 basehttp "GET /login/ HTTP/1.1" 200 2592
+INFO 2025-12-08 12:09:35,748 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-12-08 12:09:35,808 basehttp "GET /usuarios/ HTTP/1.1" 200 5685
+INFO 2025-12-08 12:09:35,933 basehttp "GET /static/css/base.css HTTP/1.1" 200 34516
+INFO 2025-12-08 12:09:35,966 basehttp "GET /static/js/calendario.js HTTP/1.1" 200 8755
+INFO 2025-12-08 12:09:36,126 basehttp "GET /usuarios/api/eventos-usuario/ HTTP/1.1" 200 2
+INFO 2025-12-08 12:09:39,079 basehttp "GET /usuarios/enviar_solicitud/ HTTP/1.1" 200 14420
+INFO 2025-12-08 12:09:39,270 basehttp "GET /static/js/verificacion-conflictos.js HTTP/1.1" 200 18346
+INFO 2025-12-08 12:09:45,697 basehttp "GET /usuarios/api/documento-espacio/1/ HTTP/1.1" 200 113
+INFO 2025-12-08 12:09:45,771 basehttp "GET /media/condiciones_espacios/condiciones_uso_sb.pdf HTTP/1.1" 200 76845
+INFO 2025-12-08 12:09:55,525 basehttp "GET /usuarios/enviar_solicitud/ HTTP/1.1" 200 14420
+INFO 2025-12-08 12:09:55,663 basehttp "GET /static/css/base.css HTTP/1.1" 200 34516
+INFO 2025-12-08 12:09:55,666 basehttp "GET /static/js/verificacion-conflictos.js HTTP/1.1" 200 18346
+INFO 2025-12-08 12:09:55,741 basehttp "GET /static/js/scripts.js HTTP/1.1" 200 13739
+WARNING 2025-12-08 12:09:56,562 log Not Found: /favicon.ico
+WARNING 2025-12-08 12:09:56,563 basehttp "GET /favicon.ico HTTP/1.1" 404 3913
+INFO 2025-12-08 12:10:01,054 basehttp "GET /usuarios/api/documento-espacio/1/ HTTP/1.1" 200 113
+INFO 2025-12-08 12:10:38,709 autoreload /app/usuarios/urls.py changed, reloading.
+INFO 2025-12-08 12:10:41,276 autoreload Watching for file changes with StatReloader
+INFO 2025-12-08 12:10:45,959 basehttp "GET /usuarios/enviar_solicitud/ HTTP/1.1" 200 14420
+INFO 2025-12-08 12:10:46,028 basehttp "GET /static/js/scripts.js HTTP/1.1" 200 13739
+INFO 2025-12-08 12:10:46,043 basehttp "GET /static/js/verificacion-conflictos.js HTTP/1.1" 200 18346
+INFO 2025-12-08 12:10:46,044 basehttp "GET /static/css/base.css HTTP/1.1" 200 34516
+WARNING 2025-12-08 12:10:46,690 log Not Found: /favicon.ico
+WARNING 2025-12-08 12:10:46,693 basehttp "GET /favicon.ico HTTP/1.1" 404 3913
+INFO 2025-12-08 12:10:51,171 basehttp "GET /usuarios/api/documento-espacio/1/ HTTP/1.1" 200 113
+INFO 2025-12-08 12:14:14,118 basehttp "GET /usuarios/enviar_solicitud/ HTTP/1.1" 200 19498
+INFO 2025-12-08 12:14:14,190 basehttp "GET /static/js/scripts.js HTTP/1.1" 200 13739
+INFO 2025-12-08 12:14:14,208 basehttp "GET /static/js/verificacion-conflictos.js HTTP/1.1" 200 18346
+INFO 2025-12-08 12:14:14,215 basehttp "GET /static/css/base.css HTTP/1.1" 200 34516
+WARNING 2025-12-08 12:14:15,015 log Not Found: /favicon.ico
+WARNING 2025-12-08 12:14:15,016 basehttp "GET /favicon.ico HTTP/1.1" 404 3913
+INFO 2025-12-08 12:14:19,646 basehttp "GET /usuarios/api/documento-espacio/1/ HTTP/1.1" 200 113
+INFO 2025-12-08 12:14:25,545 basehttp "GET /media/condiciones_espacios/condiciones_uso_sb.pdf HTTP/1.1" 200 76845
+INFO 2025-12-08 13:02:22,976 basehttp "GET /usuarios/ HTTP/1.1" 200 5685
+INFO 2025-12-08 13:02:34,289 basehttp "GET / HTTP/1.1" 200 2172
+INFO 2025-12-08 13:03:15,704 basehttp "GET / HTTP/1.1" 200 2172
+INFO 2025-12-08 13:03:15,761 basehttp "GET /static/js/scripts.js HTTP/1.1" 200 13739
+INFO 2025-12-08 13:03:15,772 basehttp "GET /static/css/custom-styles.css HTTP/1.1" 200 7022
+WARNING 2025-12-08 13:03:15,894 log Not Found: /favicon.ico
+WARNING 2025-12-08 13:03:15,896 basehttp "GET /favicon.ico HTTP/1.1" 404 3913
+INFO 2025-12-08 13:09:21,411 basehttp "GET / HTTP/1.1" 200 2172
+INFO 2025-12-08 13:09:21,463 basehttp "GET /static/js/scripts.js HTTP/1.1" 200 13739
+INFO 2025-12-08 13:09:21,476 basehttp "GET /static/css/custom-styles.css HTTP/1.1" 200 7262
+WARNING 2025-12-08 13:09:21,533 log Not Found: /favicon.ico
+WARNING 2025-12-08 13:09:21,535 basehttp "GET /favicon.ico HTTP/1.1" 404 3913
+INFO 2025-12-08 13:11:51,967 basehttp "GET / HTTP/1.1" 200 2172
+INFO 2025-12-08 13:11:52,015 basehttp "GET /static/js/scripts.js HTTP/1.1" 200 13739
+INFO 2025-12-08 13:11:52,029 basehttp "GET /static/css/custom-styles.css HTTP/1.1" 200 7638
+WARNING 2025-12-08 13:11:52,075 log Not Found: /favicon.ico
+WARNING 2025-12-08 13:11:52,076 basehttp "GET /favicon.ico HTTP/1.1" 404 3913
+INFO 2025-12-08 13:12:43,403 basehttp "GET / HTTP/1.1" 200 2172
+INFO 2025-12-08 13:12:43,461 basehttp "GET /static/js/scripts.js HTTP/1.1" 200 13739
+INFO 2025-12-08 13:12:43,477 basehttp "GET /static/css/custom-styles.css HTTP/1.1" 200 7588
+WARNING 2025-12-08 13:12:43,537 log Not Found: /favicon.ico
+WARNING 2025-12-08 13:12:43,538 basehttp "GET /favicon.ico HTTP/1.1" 404 3913
+INFO 2025-12-08 13:13:19,470 basehttp "GET / HTTP/1.1" 200 2172
+INFO 2025-12-08 13:13:19,541 basehttp "GET /static/js/scripts.js HTTP/1.1" 200 13739
+INFO 2025-12-08 13:13:19,558 basehttp "GET /static/css/custom-styles.css HTTP/1.1" 200 7497
+WARNING 2025-12-08 13:13:19,696 log Not Found: /favicon.ico
+WARNING 2025-12-08 13:13:19,698 basehttp "GET /favicon.ico HTTP/1.1" 404 3913
+INFO 2025-12-08 13:13:31,445 basehttp "GET / HTTP/1.1" 200 2172
+INFO 2025-12-08 13:13:31,491 basehttp "GET /static/js/scripts.js HTTP/1.1" 200 13739
+INFO 2025-12-08 13:13:31,505 basehttp "GET /static/css/custom-styles.css HTTP/1.1" 200 7456
+WARNING 2025-12-08 13:13:31,553 log Not Found: /favicon.ico
+WARNING 2025-12-08 13:13:31,554 basehttp "GET /favicon.ico HTTP/1.1" 404 3913
+INFO 2025-12-08 13:13:46,582 basehttp "GET / HTTP/1.1" 200 2172
+INFO 2025-12-08 13:13:46,630 basehttp "GET /static/js/scripts.js HTTP/1.1" 200 13739
+INFO 2025-12-08 13:13:46,643 basehttp "GET /static/css/custom-styles.css HTTP/1.1" 200 7183
+WARNING 2025-12-08 13:13:46,690 log Not Found: /favicon.ico
+WARNING 2025-12-08 13:13:46,691 basehttp "GET /favicon.ico HTTP/1.1" 404 3913
+INFO 2025-12-08 13:14:05,216 basehttp "GET / HTTP/1.1" 200 2172
+INFO 2025-12-08 13:14:05,260 basehttp "GET /static/js/scripts.js HTTP/1.1" 200 13739
+INFO 2025-12-08 13:14:05,277 basehttp "GET /static/css/custom-styles.css HTTP/1.1" 200 7465
+WARNING 2025-12-08 13:14:05,325 log Not Found: /favicon.ico
+WARNING 2025-12-08 13:14:05,327 basehttp "GET /favicon.ico HTTP/1.1" 404 3913
+INFO 2025-12-08 13:18:12,616 basehttp "GET /login/ HTTP/1.1" 200 2352
+INFO 2025-12-08 13:22:23,975 basehttp "GET /login/ HTTP/1.1" 200 2352
+INFO 2025-12-08 13:22:32,843 basehttp "POST /login/ HTTP/1.1" 302 0
+INFO 2025-12-08 13:22:32,877 basehttp "GET /usuarios/ HTTP/1.1" 200 5685
+INFO 2025-12-08 13:22:33,133 basehttp "GET /usuarios/api/eventos-usuario/ HTTP/1.1" 200 2
+INFO 2025-12-08 13:22:37,206 basehttp "GET /usuarios/api/eventos-usuario/ HTTP/1.1" 200 2
+INFO 2025-12-08 13:22:40,287 basehttp "GET /usuarios/enviar_solicitud/ HTTP/1.1" 200 19498
+INFO 2025-12-08 13:23:41,940 basehttp "GET /usuarios/api/documento-espacio/1/ HTTP/1.1" 200 113
+INFO 2025-12-08 13:23:42,027 basehttp "GET /media/condiciones_espacios/condiciones_uso_sb.pdf HTTP/1.1" 200 76845
+INFO 2025-12-08 13:24:04,389 basehttp "POST /usuarios/verificar-conflictos/ HTTP/1.1" 200 98
+INFO 2025-12-08 13:24:12,096 basehttp "POST /usuarios/enviar_solicitud/ HTTP/1.1" 302 0
+INFO 2025-12-08 13:24:12,209 basehttp "GET /usuarios/historial/ HTTP/1.1" 200 3994
+INFO 2025-12-08 13:24:15,949 basehttp "GET /usuarios/enviar_solicitud/ HTTP/1.1" 200 19769
+INFO 2025-12-08 13:24:16,999 basehttp "GET /usuarios/ HTTP/1.1" 200 5685
+INFO 2025-12-08 13:24:20,540 basehttp "GET /usuarios/historial/ HTTP/1.1" 200 3994
+INFO 2025-12-08 13:24:23,225 basehttp "GET /usuarios/ HTTP/1.1" 200 5685
+INFO 2025-12-08 13:24:26,588 basehttp "GET /usuarios/listar_espacios/ HTTP/1.1" 200 4323
+INFO 2025-12-08 13:24:29,209 basehttp "GET /static/documentos/condiciones_1.pdf HTTP/1.1" 200 76845
+INFO 2025-12-08 13:27:00,371 autoreload /app/usuarios/views.py changed, reloading.
+INFO 2025-12-08 13:27:02,846 autoreload Watching for file changes with StatReloader

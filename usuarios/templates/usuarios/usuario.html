@@ -13,19 +13,13 @@
     <div class="header">
         <div class="header-content">
             <div style="display: flex; align-items: center; gap: 1rem;">
-                <div class="logo">
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
+                <div class="logo"><i class="fas fa-graduation-cap"></i></div>
                 <div>
-                    <div class="header-title">
-                        <i class="fas fa-user"></i>
-                        Dashboard Usuario
-                    </div>
+                    <div class="header-title"><i class="fas fa-user"></i> Dashboard Usuario</div>
                     <div class="header-subtitle">Sistema de Gestión UABJB</div>
                 </div>
             </div>
             <div class="header-controls">
-                <!-- 👤 Enlace al perfil del usuario -->
                 <a href="{% url 'usuarios:perfil_usuario' %}" class="profile-link" title="Mi Perfil">
                     <i class="fas fa-user-circle"></i>
                     <span>{{ request.user.first_name|default:request.user.username }}</span>
@@ -41,21 +35,14 @@
     <!-- Contenedor Principal -->
     <div class="container">
         <div class="dashboard-container fade-in">
-            <h1 class="dashboard-title">
-                <i class="fas fa-calendar-alt"></i>
-                Bienvenido, {{ request.user.first_name|default:request.user.username }}
-            </h1>
+            <h1 class="dashboard-title"><i class="fas fa-calendar-alt"></i> Bienvenido, {{ request.user.first_name|default:request.user.username }}</h1>
             <p class="welcome-text">Aquí puedes gestionar tus eventos y solicitudes del mes actual.</p>
            
             <!-- Navegación del Mes -->
             <div class="navegacion-mes">
-                <button class="btn-nav" onclick="cambiarMes(-1)">
-                    <i class="fas fa-chevron-left"></i> Anterior
-                </button>
+                <button class="btn-nav" onclick="cambiarMes(-1)"><i class="fas fa-chevron-left"></i> Anterior</button>
                 <span class="titulo-mes" id="titulo-mes">Noviembre 2025</span>
-                <button class="btn-nav" onclick="cambiarMes(1)">
-                    Siguiente <i class="fas fa-chevron-right"></i>
-                </button>
+                <button class="btn-nav" onclick="cambiarMes(1)">Siguiente <i class="fas fa-chevron-right"></i></button>
             </div>
             
             <!-- Calendario -->
@@ -63,48 +50,27 @@
                 <table>
                     <thead>
                         <tr class="dias-semana">
-                            <th>Dom</th>
-                            <th>Lun</th>
-                            <th>Mar</th>
-                            <th>Mié</th>
-                            <th>Jue</th>
-                            <th>Vie</th>
-                            <th>Sáb</th>
+                            <th>Dom</th><th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th>
                         </tr>
                     </thead>
-                    <tbody id="calendario-body">
-                        <!-- El calendario se genera dinámicamente -->
-                    </tbody>
+                    <tbody id="calendario-body"><!-- se llena con JS --></tbody>
                 </table>
             </div>
 
-            <!-- 📊 NUEVO: Estadísticas del mes -->
-            <div id="calendario-stats" class="calendario-stats-container">
-                <!-- Se llenará automáticamente con JavaScript -->
-            </div>
+            <!-- Estadísticas del mes -->
+            <div id="calendario-stats" class="calendario-stats-container"></div>
 
-            <!-- 📖 NUEVO: Leyenda de colores -->
+            <!-- Leyenda de colores -->
             <div class="leyenda-calendario">
-                <h3 class="leyenda-titulo">
-                    <i class="fas fa-info-circle"></i> Leyenda del Calendario
-                </h3>
+                <h3 class="leyenda-titulo"><i class="fas fa-info-circle"></i> Leyenda del Calendario</h3>
                 <div class="leyenda-items">
-                    <div class="leyenda-item">
-                        <div class="leyenda-color" style="background-color: #3b82f6;"></div>
-                        <span>Tus reservas</span>
-                    </div>
-                    <div class="leyenda-item">
-                        <div class="leyenda-color" style="background-color: #94a3b8;"></div>
-                        <span>Reservas de otros usuarios</span>
-                    </div>
-                    <div class="leyenda-item">
-                        <div class="leyenda-color-border"></div>
-                        <span>Día actual</span>
-                    </div>
+                    <div class="leyenda-item"><div class="leyenda-color" style="background-color: #3b82f6;"></div><span>Tus reservas</span></div>
+                    <div class="leyenda-item"><div class="leyenda-color" style="background-color: #94a3b8;"></div><span>Reservas de otros usuarios</span></div>
+                    <div class="leyenda-item"><div class="leyenda-color-border"></div><span>Día actual</span></div>
                 </div>
             </div>
 
-            <!-- 💡 NUEVO: Información adicional -->
+            <!-- Información adicional -->
             <div class="info-calendario">
                 <i class="fas fa-lightbulb"></i>
                 <div>
@@ -115,24 +81,108 @@
             
             <!-- Acciones del Dashboard -->
             <div class="dashboard-actions">
-                <a href="{% url 'usuarios:enviar_solicitud' %}" class="btn-action">
-                    <i class="fas fa-plus"></i> Nueva Solicitud
-                </a>
-                <a href="{% url 'usuarios:historial_solicitudes' %}" class="dashboard-btn">
-                    <i class="fas fa-history"></i> Historial de Solicitudes
-                </a>
-                <a href="{% url 'usuarios:listar_espacios' %}" class="dashboard-btn">
-                    <i class="fas fa-building"></i> Espacios Disponibles
-                </a>
-                <a href="{% url 'logout' %}" class="btn-action">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                </a>
+                <a href="{% url 'usuarios:enviar_solicitud' %}" class="btn-action"><i class="fas fa-plus"></i> Nueva Solicitud</a>
+                <a href="{% url 'usuarios:historial_solicitudes' %}" class="dashboard-btn"><i class="fas fa-history"></i> Historial de Solicitudes</a>
+                <a href="{% url 'usuarios:listar_espacios' %}" class="dashboard-btn"><i class="fas fa-building"></i> Espacios Disponibles</a>
+                <a href="{% url 'logout' %}" class="btn-action"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
             </div>
         </div>
     </div>
 
+    <!-- Scripts base -->
     <script src="{% static 'js/scripts.js' %}"></script>
     <script src="{% static 'js/calendario.js' %}"></script>
 
+    <!-- Botón FAB que abre el tour -->
+    <button id="btn-ayuda-tour" class="btn-fab" title="¿Cómo usar el sistema?">
+        <i class="fas fa-question"></i>
+    </button>
+
+    <!-- Estilos del tour -->
+    <style>
+    .btn-fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border:none;border-radius:50%;background:#667eea;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25);display:grid;place-items:center;z-index:999;transition:transform .2s, background .2s}
+    .btn-fab:hover{transform:scale(1.1);background:#5568d3}
+
+    #tour-overlay{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.55);animation:fade .3s}
+    #tour-highlight{position:absolute;z-index:9999;border:3px solid #667eea;border-radius:8px;box-shadow:0 0 0 9999px rgba(0,0,0,.55);transition:all .5s;pointer-events:none}
+    #tour-popup{position:absolute;z-index:10000;background:#fff;color:#222;padding:1rem 1.2rem;max-width:280px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.35);font-size:.95rem}
+    #tour-popup h4{margin:.2rem 0 .6rem;font-size:1.1rem}
+    #tour-popup p{margin:0 0 .8rem;line-height:1.4}
+    #tour-popup nav{display:flex;gap:.5rem;justify-content:space-between}
+    #tour-popup button{border:none;padding:.4rem .7rem;border-radius:4px;cursor:pointer;font-size:.85rem}
+    #tour-popup .next{background:#667eea;color:#fff}
+    #tour-popup .prev{background:#e2e8f0}
+    #tour-popup .close{background:none;border:none;font-size:18px;color:#555;cursor:pointer}
+    @keyframes fade{from{opacity:0}to{opacity:1}}
+    </style>
+
+    <!-- Lógica del tour con scroll suave y autoplay -->
+    <script>
+    const tourSteps = [
+        {element:'.dashboard-title',title:'Tu dashboard',text:'Aquí ves un resumen rápido del mes y tus próximas reservas.'},
+        {element:'.navegacion-mes',title:'Navegación',text:'Cambia de mes con estos botones para planificar con anticipación.'},
+        {element:'.calendario-minimalista',title:'Calendario visual',text:'Los círculos azules son tus reservas; los grises, las de otros.'},
+        {element:'.dashboard-actions',title:'Acciones rápidas',text:'Desde aquí creas nuevas solicitudes o consultas el historial.'},
+        {element:'#btn-ayuda-tour',title:'¿Dudas?',text:'Pulsa este botón cuando quieras volver a ver esta guía.'}
+    ];
+
+    let current = 0, autoTimer = null;
+    const overlay   = document.createElement('div'); overlay.id   = 'tour-overlay';
+    const highlight = document.createElement('div'); highlight.id = 'tour-highlight';
+    const popup     = document.createElement('div'); popup.id     = 'tour-popup';
+
+    function showStep(idx){
+        const step = tourSteps[idx];
+        const target = document.querySelector(step.element);
+        if(!target){console.warn('Paso sin elemento:',step); return}
+
+        /* 1. scroll suave hasta el elemento */
+        target.scrollIntoView({behavior:'smooth', block:'center'});
+
+        /* 2. después del scroll, posicionar cajas */
+        setTimeout(()=>{
+            const rect = target.getBoundingClientRect();
+            const pad  = 8;
+
+            highlight.style.left   = (rect.left - pad + window.scrollX) + 'px';
+            highlight.style.top    = (rect.top  - pad + window.scrollY) + 'px';
+            highlight.style.width  = (rect.width  + pad*2) + 'px';
+            highlight.style.height = (rect.height + pad*2) + 'px';
+
+            popup.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <h4>${step.title}</h4>
+                    <button class="close" onclick="stopTour()" title="Cerrar tour">&times;</button>
+                </div>
+                <p>${step.text}</p>
+                <nav>
+                    ${idx>0?'<button class="prev" onclick="prevStep()">Anterior</button>':''}
+                    <button class="next" onclick="nextStep()">${idx<tourSteps.length-1?'Siguiente':'Terminar'}</button>
+                </nav>
+            `;
+
+            const dx = rect.left + rect.width/2 - 140;
+            const dy = rect.bottom + 8 + window.scrollY;
+            popup.style.left = Math.max(10, Math.min(window.innerWidth - 290, dx)) + 'px';
+            popup.style.top  = dy + 'px';
+        }, 600); // tiempo del scroll suave
+
+        current = idx;
+        resetAutoplay();
+    }
+
+    function nextStep(){ if(current < tourSteps.length-1) showStep(current+1); else stopTour(); }
+    function prevStep(){ if(current > 0) showStep(current-1); }
+    function resetAutoplay(){ clearTimeout(autoTimer); autoTimer = setTimeout(nextStep, 3000); }
+    function stopTour(){ clearTimeout(autoTimer); overlay.remove(); highlight.remove(); popup.remove(); localStorage.setItem('tour-visto','1'); }
+    function startTour(){ document.body.append(overlay,highlight,popup); showStep(0); }
+
+    /* primera vez auto, después manual */
+    if(!localStorage.getItem('tour-visto')) window.addEventListener('load',()=>setTimeout(startTour,800));
+    document.addEventListener('DOMContentLoaded',()=>{
+        const btn = document.getElementById('btn-ayuda-tour');
+        if(btn) btn.addEventListener('click',startTour);
+    });
+    </script>
 </body>
 </html>

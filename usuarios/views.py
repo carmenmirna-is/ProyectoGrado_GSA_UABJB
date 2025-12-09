@@ -808,10 +808,8 @@ def enviar_solicitud(request):
         espacio_campus     = request.POST.get('espacio_campus')
         archivo_adjunto    = request.FILES.get('archivo_adjunto')
         
-        # ✅ SOLO CHECKBOX DE TÉRMINOS (sin firma)
         acepta_condiciones = request.POST.get('acepta_condiciones_uso') == 'on'
         
-        # 🔒 VERIFICAR TOKEN DE FORMULARIO
         token_form = request.POST.get('form_token')
         token_session = request.session.get('last_form_token')
         
@@ -828,8 +826,15 @@ def enviar_solicitud(request):
         if tipo_espacio == 'campus' and not espacio_campus:   
             errores.append('Selecciona campus.')
         
-        # ✅ VALIDACIÓN SIMPLIFICADA PARA ESPACIOS DE CAMPUS (solo checkbox)
+        # ✅ VALIDAR QUE EXISTA DOCUMENTO DE CONDICIONES PARA ESPACIOS DE CAMPUS
         if tipo_espacio == 'campus' and espacio_campus:
+            try:
+                espacio_obj = EspacioCampus.objects.get(id=espacio_campus)
+                if not espacio_obj.documento_condiciones:
+                    errores.append('⚠️ Este espacio no tiene documento de condiciones disponible.')
+            except EspacioCampus.DoesNotExist:
+                errores.append('❌ Espacio no válido.')
+            
             if not acepta_condiciones:
                 errores.append('❌ Debes aceptar las Condiciones de Uso.')
 
@@ -837,10 +842,8 @@ def enviar_solicitud(request):
             for e in errores: 
                 messages.error(request, e)
         else:
-            # Determinar el espacio ID para el token
             espacio_id = espacio_carrera if tipo_espacio == 'carrera' else espacio_campus
             
-            # 🔍 VERIFICAR SI YA EXISTE UNA SOLICITUD IDÉNTICA
             cinco_minutos_atras = timezone.now() - timezone.timedelta(minutes=5)
             solicitud_existente = Solicitud.objects.filter(
                 usuario_solicitante=request.user,
@@ -860,7 +863,6 @@ def enviar_solicitud(request):
                     '⚠️ Ya enviaste una solicitud idéntica hace menos de 5 minutos.')
                 return redirect('usuarios:historial_solicitudes')
             
-            # Crear la solicitud (sin procesar firma digital)
             nueva_solicitud = Solicitud.objects.create(
                 usuario_solicitante=request.user,
                 nombre_evento=nombre_evento,
@@ -872,13 +874,11 @@ def enviar_solicitud(request):
                 espacio_campus_id=espacio_campus if tipo_espacio == 'campus' else None,
                 archivo_adjunto=archivo_adjunto,
                 estado='pendiente',
-                # ✅ SOLO GUARDAR ACEPTACIÓN DE TÉRMINOS (sin firma)
                 acepta_condiciones_uso=acepta_condiciones if tipo_espacio == 'campus' else False,
                 fecha_aceptacion_terminos=timezone.now() if tipo_espacio == 'campus' and acepta_condiciones else None,
                 ip_aceptacion=obtener_ip_cliente(request) if tipo_espacio == 'campus' and acepta_condiciones else None,
             )
             
-            # 🔐 GENERAR TOKEN ÚNICO
             token_unico = generar_token_solicitud(
                 request.user.id,
                 nombre_evento,
@@ -888,20 +888,7 @@ def enviar_solicitud(request):
             
             request.session['last_form_token'] = token_unico
             request.session['last_solicitud_id'] = nueva_solicitud.id
-
-            # ❌ COMENTADO: Ya no enviamos PDF de términos porque no hay firma
-            # if tipo_espacio == 'campus' and acepta_condiciones:
-            #     encargado = None
-            #     if espacio_campus:
-            #         try:
-            #             espacio_obj = EspacioCampus.objects.get(id=espacio_campus)
-            #             encargado = espacio_obj.encargado
-            #         except:
-            #             pass
-            #     
-            #     enviar_email_terminos_aceptados(nueva_solicitud, encargado)
                         
-            # 🔔 NOTIFICACIONES
             print(f'📧 Enviando notificación para: {nueva_solicitud.nombre_evento}')
             notificar_nueva_solicitud(nueva_solicitud)
             notificar_confirmacion_solicitud(nueva_solicitud, request)
@@ -913,7 +900,6 @@ def enviar_solicitud(request):
             messages.success(request, mensaje_exito)
             return redirect('usuarios:historial_solicitudes')
     
-    # 🎫 GENERAR TOKEN ÚNICO PARA EL FORMULARIO
     import uuid
     form_token = str(uuid.uuid4())
 
@@ -922,6 +908,31 @@ def enviar_solicitud(request):
         'espacios_campus': espacios_campus,
         'form_token': form_token,
     })
+
+from django.http import JsonResponse
+
+@login_required
+def obtener_documento_espacio(request, espacio_id):
+    """Devuelve la URL del documento de condiciones del espacio"""
+    try:
+        espacio = EspacioCampus.objects.get(id=espacio_id)
+        if espacio.documento_condiciones:
+            return JsonResponse({
+                'success': True,
+                'documento_url': espacio.documento_condiciones.url,
+                'tiene_documento': True
+            })
+        else:
+            return JsonResponse({
+                'success': True,
+                'tiene_documento': False,
+                'mensaje': 'Este espacio no tiene documento de condiciones'
+            })
+    except EspacioCampus.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Espacio no encontrado'
+        }, status=404)
 
 def notificar_nueva_solicitud(solicitud):
     """
@@ -1026,7 +1037,6 @@ Tienes una nueva solicitud que requiere tu atención en el Sistema de Gestión U
 
 📅 INFORMACIÓN DE LA SOLICITUD:
 - Estado: {solicitud.get_estado_display()}
-- Fecha de solicitud: {fecha_creacion_str}
 - Archivo adjunto: {'Sí' if solicitud.archivo_adjunto else 'No'}
 
 {info_condiciones}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
