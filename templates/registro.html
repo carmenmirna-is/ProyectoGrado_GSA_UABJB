@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro – Sistema de Gestión UABJB</title>
+
+  <!-- Materialize 1.0.0 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Estilos comunes -->
+  <link rel="stylesheet" href="{% static 'css/materialize_styles.css' %}">
+</head>
+<body>
+  <div class="login-card z-depth-1" style="max-width:480px;">
+    <div class="logo-section center-align">
+      <i class="material-icons">school</i>
+      <div class="logo-title">Crear Cuenta</div>
+      <div class="logo-subtitle">Únete a la comunidad UABJB</div>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="card-panel {% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %} lighten-4 black-text">
+          <i class="material-icons tiny left">
+            {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}check_circle{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
+          </i>
+          {{ message }}
+        </div>
+      {% endfor %}
+          {% if form.errors %}
+      <div class="card-panel red lighten-4 black-text">
+        <i class="material-icons tiny left">error</i>
+        <strong>Por favor corrige los siguientes errores:</strong>
+        <ul>
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+    {% endif %}
+
+    <form method="POST" action="{% url 'registro' %}">
+      {% csrf_token %}
+
+      <!-- Usuario -->
+      <div class="input-field">
+        <i class="material-icons prefix">person</i>
+        <input type="text" name="username" id="id_username" required>
+        <label for="id_username">Nombre de usuario</label>
+      </div>
+
+      <!-- Nombre -->
+      <div class="input-field">
+        <i class="material-icons prefix">badge</i>
+        <input type="text" name="first_name" id="id_first_name">
+        <label for="id_first_name">Nombre</label>
+      </div>
+
+      <!-- Apellido -->
+      <div class="input-field">
+        <i class="material-icons prefix">badge</i>
+        <input type="text" name="last_name" id="id_last_name">
+        <label for="id_last_name">Apellido</label>
+      </div>
+
+      <!-- Email -->
+      <div class="input-field">
+        <i class="material-icons prefix">email</i>
+        <input type="email" name="email" id="id_email">
+        <label for="id_email">Correo electrónico</label>
+      </div>
+
+      <!-- Teléfono -->
+      <div class="input-field">
+        <i class="material-icons prefix">phone</i>
+        <input type="tel" name="telefono" id="id_telefono">
+        <label for="id_telefono">Teléfono</label>
+      </div>
+
+      <!-- Documento -->
+      <div class="input-field">
+        <i class="material-icons prefix">badge</i>
+        <input type="text" name="documento" id="id_documento">
+        <label for="id_documento">Cédula / CI</label>
+      </div>
+
+      <!-- Carrera (select Materialize) -->
+      <div class="input-field">
+        <i class="material-icons prefix">menu_book</i>
+        <select name="carrera" id="id_carrera" required>
+          <option value="" disabled selected>Seleccionar Carrera</option>
+          {% for carrera in form.carrera.field.queryset %}
+            <option value="{{ carrera.id }}">{{ carrera.nombre }}</option>
+          {% endfor %}
+        </select>
+        <label>Carrera</label>
+      </div>
+
+      <!-- Contraseña 1 -->
+      <div class="input-field">
+        <i class="material-icons prefix">lock</i>
+        {{ form.password1 }}
+        <label for="{{ form.password1.id_for_label }}">Contraseña</label>
+      </div>
+
+      <!-- Contraseña 2 -->
+      <div class="input-field">
+        <i class="material-icons prefix">lock</i>
+        {{ form.password2 }}
+        <label for="{{ form.password1.id_for_label }}">Confirmar contraseña</label>
+      </div>
+
+      <button type="submit" class="btn waves-effect waves-light btn-login">Crear mi cuenta</button>
+    </form>
+
+    <div class="divider"><span>o</span></div>
+
+    <div class="register-link center-align">
+      ¿Ya tienes una cuenta? <a href="{% url 'login' %}">Iniciar sesión</a>
+    </div>
+  </div>
+
+  <!-- Materialize JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      M.FormSelect.init(document.querySelectorAll('select'));
+    });
+  </script>
+</body>
+</html>

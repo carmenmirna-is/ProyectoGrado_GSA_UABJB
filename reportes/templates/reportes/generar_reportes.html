@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generación de Reportes - UABJB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/reportes-styles.css' %}">
+</head>
+<body class="generar-reportes">
+    <div class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="logo"><i class="fas fa-graduation-cap"></i></div>
+                <div>
+                    <div class="header-title"><i class="fas fa-file-alt"></i> Generación de Reportes</div>
+                    <div class="header-subtitle">Sistema de Gestión UABJB</div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                    <span id="theme-text">Modo Oscuro</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="dashboard-container">
+            <a href="{% url 'encargados:dashboard_encargados' %}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </a>
+            <form action="{% url 'reportes:generar_reportes' %}" method="get">
+                <div class="form-group">
+                    <label for="formato">Formato del Reporte:</label>
+                    <select name="formato" id="formato" class="form-control">
+                        <option value="pdf">PDF</option>
+                        <option value="excel">Excel</option>
+                        <option value="word">Word</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="estado">Estado de las Solicitudes:</label>
+                    <select name="estado" id="estado" class="form-control">
+                        <option value="todos">Todos los estados</option>
+                        <option value="aceptada">Aceptadas</option>
+                        <option value="rechazada">Rechazadas</option>
+                        <option value="pendiente">Pendientes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="fecha_inicio">Fecha Inicial:</label>
+                    <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="fecha_fin">Fecha Final:</label>
+                    <input type="date" name="fecha_fin" id="fecha_fin" class="form-control">
+                </div>
+                <div class="buttons">
+                    <button type="submit" class="btn btn-action"><i class="fas fa-file-export"></i> Generar Reporte</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>

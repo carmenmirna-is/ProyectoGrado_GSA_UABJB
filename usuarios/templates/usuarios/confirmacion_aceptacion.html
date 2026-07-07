@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud Aceptada - UABJB</title>
+    <style>
+        :root {
+            --uabjb-blue: #1e3a8a;
+            --uabjb-light-blue: #3b82f6;
+            --uabjb-yellow: #fbbf24;
+            --uabjb-red: #dc2626;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .email-container {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 4px solid #fbbf24;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        
+        .content {
+            padding: 30px 20px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #374151;
+        }
+        
+        .success-message {
+            background-color: #f0f9ff;
+            border-left: 5px solid #3b82f6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            color: #1e3a8a;
+        }
+        
+        .success-message strong {
+            color: #1e3a8a;
+        }
+        
+        .token-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%);
+            border: 2px solid #3b82f6;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+        
+        .token-box h3 {
+            margin: 0 0 10px 0;
+            color: #1e3a8a;
+            font-size: 18px;
+        }
+        
+        .token {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e3a8a;
+            letter-spacing: 3px;
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 2px dashed #3b82f6;
+            margin-top: 10px;
+            box-shadow: 0 2px 4px rgba(30, 58, 138, 0.1);
+        }
+        
+        .qr-section {
+            text-align: center;
+            margin: 30px 0;
+            padding: 25px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            border: 2px solid #3b82f6;
+        }
+        
+        .qr-section h3 {
+            color: #1e3a8a;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .qr-section img {
+            max-width: 250px;
+            border: 3px solid #3b82f6;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(30, 58, 138, 0.2);
+        }
+        
+        .qr-instruction {
+            font-size: 13px;
+            color: #1e3a8a;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+        
+        .details-box {
+            background: #f0f9ff;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+            border: 2px solid #3b82f6;
+        }
+        
+        .details-box h3 {
+            margin: 0 0 15px 0;
+            color: #1e3a8a;
+            font-size: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #fbbf24;
+        }
+        
+        .detail-item {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #dbeafe;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            color: #1e3a8a;
+            min-width: 140px;
+        }
+        
+        .detail-value {
+            color: #374151;
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .warning-box {
+            background-color: #fef3c7;
+            border: 2px solid #fbbf24;
+            border-left: 5px solid #fbbf24;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .warning-box p {
+            margin: 0;
+            color: #92400e;
+            font-weight: 500;
+        }
+        
+        .approved-by {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #dbeafe 0%, #f0f9ff 100%);
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #3b82f6;
+        }
+        
+        .approved-by strong {
+            color: #1e3a8a;
+        }
+        
+        .footer {
+            background-color: #1e3a8a;
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+        
+        .footer .university {
+            font-weight: 600;
+            font-size: 16px;
+            color: #fbbf24;
+            margin-bottom: 5px;
+        }
+        
+        .footer .disclaimer {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+        
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, #1e3a8a 0%, #fbbf24 50%, #1e3a8a 100%);
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>✅ ¡Solicitud Aceptada!</h1>
+            <p>Tu reserva ha sido confirmada exitosamente</p>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">
+                Estimado/a <strong style="color: #1e3a8a;">{{ solicitante_nombre }}</strong>,
+            </div>
+            
+            <div class="success-message">
+                <p>Nos complace informarte que tu solicitud para el evento <strong>"{{ nombre_evento }}"</strong> ha sido <strong>ACEPTADA</strong>.</p>
+            </div>
+            
+            <div class="token-box">
+                <h3>🔑 Token de Confirmación</h3>
+                <p style="margin: 5px 0; font-size: 14px; color: #1e3a8a;">Guarda este token. Lo necesitarás para confirmar tu asistencia:</p>
+                <div class="token">{{ token }}</div>
+            </div>
+            
+            <div class="qr-section">
+                <h3>📱 Código QR de Confirmación</h3>
+                <img src="cid:qr_code" alt="Código QR" style="max-width: 250px;">
+                <p class="qr-instruction">
+                    💡 Presenta este código QR o el token al llegar al evento
+                </p>
+            </div>
+            
+            <div class="details-box">
+                <h3>📋 Detalles de tu Reserva</h3>
+                
+                <div class="detail-item">
+                    <span class="detail-label">📌 Evento:</span>
+                    <span class="detail-value">{{ nombre_evento }}</span>
+                </div>
+                
+                {% if descripcion_evento %}
+                <div class="detail-item">
+                    <span class="detail-label">📝 Descripción:</span>
+                    <span class="detail-value">{{ descripcion_evento }}</span>
+                </div>
+                {% endif %}
+                
+                <div class="detail-item">
+                    <span class="detail-label">📅 Fecha inicio:</span>
+                    <span class="detail-value">{{ fecha_evento }}</span>
+                </div>
+                
+                {% if fecha_fin_evento %}
+                <div class="detail-item">
+                    <span class="detail-label">🕐 Fecha fin:</span>
+                    <span class="detail-value">{{ fecha_fin_evento }}</span>
+                </div>
+                {% endif %}
+                
+                <div class="detail-item">
+                    <span class="detail-label">🏛️ Espacio:</span>
+                    <span class="detail-value">{{ espacio_nombre }}</span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">🏢 Tipo de espacio:</span>
+                    <span class="detail-value">{{ tipo_espacio }}</span>
+                </div>
+            </div>
+            
+            <div class="approved-by">
+                <p><strong>Aprobado por:</strong> <span style="color: #1e3a8a;">{{ encargado_nombre }}</span></p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="warning-box">
+                <p>⚠️ <strong>Importante:</strong> Por favor, llega 10 minutos antes del evento con tu código QR o token de confirmación.</p>
+            </div>
+            
+            <p style="margin-top: 20px; color: #6b7280; font-size: 14px; line-height: 1.6;">
+                Si tienes alguna pregunta o necesitas realizar cambios, por favor contacta al encargado del espacio.
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p class="university">Universidad Autónoma del Beni José Ballivián</p>
+            <p style="font-size: 14px;">Sistema de Gestión de Espacios Académicos</p>
+            <p class="disclaimer">
+                Este es un correo automático, por favor no respondas a este mensaje.<br>
+                Para consultas, contacta al encargado del espacio correspondiente.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

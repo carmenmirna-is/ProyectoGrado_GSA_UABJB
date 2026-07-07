@@ -1,0 +1,316 @@
+/* ============================
+   ESTILOS DE LISTAR ESPACIOS
+   ============================ */
+
+/* Container específico */
+.container-listar {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* ============================
+   SECCIÓN DE ENCABEZADO
+   ============================ */
+.header-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.back-link {
+    background: linear-gradient(135deg, var(--uabjb-blue), var(--uabjb-light-blue));
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.back-link:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-hover);
+    text-decoration: none;
+    color: white;
+}
+
+.page-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 0;
+}
+
+.page-title i {
+    color: var(--uabjb-yellow);
+    background: linear-gradient(135deg, var(--uabjb-yellow), #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ============================
+   PAUTAS Y REQUISITOS
+   ============================ */
+.pautas-box {
+    background: var(--bg-primary);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    border-left: 5px solid var(--uabjb-yellow);
+}
+
+.pautas-box h3 {
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pautas-box h3 i {
+    color: var(--uabjb-yellow);
+    font-size: 1.2rem;
+}
+
+.pautas-box ul {
+    list-style: none;
+    padding: 0;
+}
+
+.pautas-box li {
+    padding: 8px 0;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    position: relative;
+    padding-left: 25px;
+}
+
+.pautas-box li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 18px;
+    height: 18px;
+    background: var(--success-green);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.pautas-box strong {
+    color: var(--uabjb-blue);
+    font-weight: 600;
+}
+
+/* ============================
+   TABLA DE ESPACIOS
+   ============================ */
+.table-wrapper {
+    background: var(--bg-primary);
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.table-wrapper:hover {
+    box-shadow: var(--card-hover);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
+}
+
+table thead {
+    background: linear-gradient(135deg, var(--uabjb-blue), var(--uabjb-light-blue));
+}
+
+table thead th {
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 20px;
+    text-align: left;
+    position: relative;
+    border: none;
+}
+
+table thead th:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 25%;
+    height: 50%;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+table tbody tr:hover {
+    background: var(--bg-secondary);
+    transform: translateX(5px);
+}
+
+table tbody tr:last-child {
+    border-bottom: none;
+}
+
+table tbody td {
+    padding: 18px 20px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    border: none;
+}
+
+table tbody td:first-child {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ============================
+   ESTADO VACÍO
+   ============================ */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: var(--uabjb-yellow);
+    margin-bottom: 20px;
+    opacity: 0.7;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: var(--text-secondary);
+}
+
+.empty-state p {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* ============================
+   SKELETON LOADING
+   ============================ */
+.loading-skeleton {
+    background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ============================
+   RESPONSIVE DESIGN
+   ============================ */
+@media (max-width: 768px) {
+    .container-listar {
+        padding: 1rem;
+    }
+    
+    .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .page-title {
+        font-size: 1.8rem;
+    }
+    
+    .table-wrapper {
+        overflow-x: auto;
+    }
+    
+    table {
+        min-width: 600px;
+    }
+    
+    table thead th, table tbody td {
+        padding: 12px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .back-link {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .pautas-box {
+        padding: 20px;
+    }
+    
+    .pautas-box h3 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container-listar {
+        padding: 0.5rem;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .pautas-box {
+        padding: 15px;
+    }
+    
+    .pautas-box li {
+        font-size: 0.9rem;
+        padding-left: 30px;
+    }
+    
+    table {
+        min-width: 500px;
+    }
+    
+    table thead th, table tbody td {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+}

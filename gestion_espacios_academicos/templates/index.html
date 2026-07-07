@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema UABJB - Gestión de Espacios Académicos</title>
+    <link rel="stylesheet" href="{% static 'css/custom-styles.css' %}">
+</head>
+<body class="dashboard-body">
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">🏛️</div>
+                <div>
+                    <div class="header-title">UABJB - Sistema de Gestión</div>
+                    <div class="header-subtitle">Universidad Autónoma "José Ballivián"</div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <button class="theme-toggle">
+                    <span id="themeIcon">🌙</span>
+                    <span id="themeText">Modo Oscuro</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard">
+            <main class="main-content hero">
+                <div class="hero-bg"></div>
+
+                <div class="hero-card">
+                    <!-- 3 emojis decorativos -->
+                    <div class="hero-icons">
+                    <span class="ico">🎓</span>
+                    <span class="ico">🏫</span>
+                    <span class="ico">📅</span>
+                    </div>
+
+                    <h1 class="welcome-title">Gestión de Espacios Académicos</h1>
+                    <p class="welcome-subtitle">Reserva, administra y optimiza cada rincón del campus UABJB</p>
+
+                    <div class="auth-buttons">
+                    <a href="/login/" class="btn btn-login">
+                        <span class="ico">🔑</span> Iniciar Sesión
+                    </a>
+                    <a href="/registro/" class="btn btn-register">
+                        <span class="ico">✍️</span> Registrarse
+                    </a>
+                    </div>
+                </div>
+                </main>
+        </div>
+    </div>
+
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>

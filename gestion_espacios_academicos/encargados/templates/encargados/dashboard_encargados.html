@@ -1,0 +1,256 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Encargado - UABJB</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'encargados/css/styles.css' %}">
+</head>
+<body class="dashboard-encargado">
+    <div class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="logo"><i class="fas fa-graduation-cap"></i></div>
+                <div>
+                    <div class="header-title"><i class="fas fa-user-shield"></i> Dashboard Encargado</div>
+                    <div class="header-subtitle">Sistema de Gestión UABJB</div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <!-- Nuevo: Enlace al perfil -->
+                <div class="profile-link">
+                    <a href="{% url 'encargados:perfil_encargado' %}" title="Ver mi perfil">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Mi Perfil</span>
+                    </a>
+                </div>
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                    <span id="theme-text">Modo Oscuro</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="dashboard-container">
+            <h1 class="dashboard-title"><i class="fas fa-calendar-alt"></i> Bienvenido, {{ request.user.first_name|default:request.user.username }}</h1>
+            <p class="welcome-text">Gestiona el calendario y las solicitudes del mes actual.</p>
+
+            <div class="navegacion-mes">
+                <button class="btn-nav" onclick="cambiarMes(-1)"><i class="fas fa-chevron-left"></i> Anterior</button>
+                <span class="titulo-mes" id="titulo-mes">Julio 2025</span>
+                <button class="btn-nav" onclick="cambiarMes(1)">Siguiente <i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="calendario-minimalista">
+                <table>
+                    <thead>
+                        <tr class="dias-semana">
+                            <th>Dom</th>
+                            <th>Lun</th>
+                            <th>Mar</th>
+                            <th>Mié</th>
+                            <th>Jue</th>
+                            <th>Vie</th>
+                            <th>Sáb</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calendario-body">
+                        <!-- El calendario se genera dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="dashboard-actions">
+                <button class="btn-crear-evento" onclick="mostrarModalCrearEvento()">
+                    <i class="fas fa-plus"></i> Crear Evento
+                </button>
+                <a href="{% url 'reportes:generar_reportes' %}" class="btn-action"><i class="fas fa-file-alt"></i> Generar Reportes</a>
+                <a href="{% url 'encargados:lista_solicitudes' %}" class="btn-action"><i class="fas fa-list"></i> Ver Solicitudes</a>
+                <a href="{% url 'encargados:solicitudes_aceptadas' %}" class="btn-action"><i class="fas fa-list"></i> Solicitudes Aceptadas</a>
+                <a href="{% url 'encargados:solicitudes_pendientes' %}" class="btn-action"><i class="fas fa-list"></i> Solicitudes Pendientes</a>
+                <a href="{% url 'logout' %}" class="btn-action"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear evento -->
+    <div id="modalCrearEvento" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> Crear Nuevo Evento</h2>
+                <button class="close-btn" onclick="cerrarModalCrearEvento()">&times;</button>
+            </div>
+            <form id="formCrearEvento">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="nombreEvento">
+                        <i class="fas fa-calendar-check"></i> Nombre del Evento
+                    </label>
+                    <input type="text" id="nombreEvento" name="nombre_evento" required 
+                           placeholder="Ej: Conferencia de Ingeniería">
+                </div>
+
+                <div class="form-group">
+                    <label for="nombreSolicitante">
+                        <i class="fas fa-user"></i> Nombre del Solicitante
+                    </label>
+                    <input type="text" id="nombreSolicitante" name="nombre_solicitante" required 
+                           placeholder="Ej: Juan Pérez">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fechaEvento">
+                            <i class="fas fa-calendar"></i> Fecha
+                        </label>
+                        <input type="date" id="fechaEvento" name="fecha_evento" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="horaEvento">
+                            <i class="fas fa-clock"></i> Hora
+                        </label>
+                        <input type="time" id="horaEvento" name="hora_evento" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                <label for="espacioEvento">
+                    <i class="fas fa-map-marker-alt"></i> Espacio
+                </label>
+
+                {% if espacio_preseleccionado %}
+                    <!-- ✅ Solo un espacio: mostrar como texto plano -->
+                    <input type="hidden" name="espacio_id" value="{{ espacio_preseleccionado.id }}">
+                    <p style="margin: 0; padding: 0.5rem; background-color: #f0f0f0; border-radius: 4px;">
+                        <strong>{{ espacio_preseleccionado.nombre }}</strong>
+                    </p>
+                {% else %}
+                    <!-- ✅ Más de un espacio: mostrar select -->
+                    <select id="espacioEvento" name="espacio_id" required>
+                        <option value="">Selecciona un espacio...</option>
+                        {% for espacio in espacios %}
+                            <option value="{{ espacio.id }}">{{ espacio.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+            </div>
+
+                <div class="form-group">
+                    <label for="descripcionEvento">
+                        <i class="fas fa-align-left"></i> Descripción (Opcional)
+                    </label>
+                    <textarea id="descripcionEvento" name="descripcion" rows="3" 
+                              placeholder="Descripción del evento..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancelar" onclick="cerrarModalCrearEvento()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn-confirmar">
+                        <i class="fas fa-check"></i> Crear Evento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{% static 'encargados/js/dashboard_encargado.js' %}"></script>
+
+        <!-- Botón FAB que abre el tour -->
+    <button id="btn-ayuda-tour" class="btn-fab" title="¿Cómo usar el sistema?">
+    <i class="fas fa-question"></i>
+    </button>
+
+    <style>
+    .btn-fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border:none;border-radius:50%;background:#667eea;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25);display:grid;place-items:center;z-index:999;transition:transform .2s, background .2s}
+    .btn-fab:hover{transform:scale(1.1);background:#5568d3}
+
+    #tour-overlay{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.55);animation:fade .3s}
+    #tour-highlight{position:absolute;z-index:9999;border:3px solid #667eea;border-radius:8px;box-shadow:0 0 0 9999px rgba(0,0,0,.55);transition:all .5s;pointer-events:none}
+    #tour-popup{position:absolute;z-index:10000;background:#fff;color:#222;padding:1rem 1.2rem;max-width:280px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.35);font-size:.95rem}
+    #tour-popup h4{margin:.2rem 0 .6rem;font-size:1.1rem}
+    #tour-popup p{margin:0 0 .8rem;line-height:1.4}
+    #tour-popup nav{display:flex;gap:.5rem;justify-content:space-between}
+    #tour-popup button{border:none;padding:.4rem .7rem;border-radius:4px;cursor:pointer;font-size:.85rem}
+    #tour-popup .next{background:#667eea;color:#fff}
+    #tour-popup .prev{background:#e2e8f0}
+    #tour-popup .close{background:none;border:none;font-size:18px;color:#555;cursor:pointer}
+    @keyframes fade{from{opacity:0}to{opacity:1}}
+    </style>
+
+    <script>
+    /***************  TOUR INTERACTIVO ENCARGADO  ***************/
+    const tourSteps = [
+    {element:'.dashboard-title',title:'Tu dashboard',text:'Vista general del mes y tus próximas actividades como encargado.'},
+    {element:'.navegacion-mes',title:'Navegación',text:'Desplázate entre meses para planificar con anticipación.'},
+    {element:'.calendario-minimalista',title:'Calendario de reservas',text:'Donde puedes visualizar las solicitudes aceptadas. Haz clic para detalles.'},
+    {element:'.btn-crear-evento',title:'Crear evento rápido',text:'Aquí puedes agendar actividades sin pasar por solicitud.'},
+    {element:'.dashboard-actions',title:'Gestión diaria',text:'Accesos directos a solicitudes, reportes y eventos aceptados.'},
+    {element:'#btn-ayuda-tour',title:'¿Dudas?',text:'Pulsa este botón cuando quieras volver a ver esta guía.'}
+    ];
+
+    let current = 0, autoTimer = null;
+    const overlay   = document.createElement('div'); overlay.id   = 'tour-overlay';
+    const highlight = document.createElement('div'); highlight.id = 'tour-highlight';
+    const popup     = document.createElement('div'); popup.id     = 'tour-popup';
+
+    function showStep(idx){
+        const step = tourSteps[idx];
+        const target = document.querySelector(step.element);
+        if(!target){console.warn('Paso sin elemento:',step); return}
+
+        /* scroll suave hasta el elemento */
+        target.scrollIntoView({behavior:'smooth', block:'center'});
+
+        setTimeout(()=>{
+            const rect = target.getBoundingClientRect();
+            const pad  = 8;
+
+            highlight.style.left   = (rect.left - pad + window.scrollX) + 'px';
+            highlight.style.top    = (rect.top  - pad + window.scrollY) + 'px';
+            highlight.style.width  = (rect.width  + pad*2) + 'px';
+            highlight.style.height = (rect.height + pad*2) + 'px';
+
+            popup.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <h4>${step.title}</h4>
+                    <button class="close" onclick="stopTour()" title="Cerrar tour">&times;</button>
+                </div>
+                <p>${step.text}</p>
+                <nav>
+                    ${idx>0?'<button class="prev" onclick="prevStep()">Anterior</button>':''}
+                    <button class="next" onclick="nextStep()">${idx<tourSteps.length-1?'Siguiente':'Terminar'}</button>
+                </nav>
+            `;
+
+            const dx = rect.left + rect.width/2 - 140;
+            const dy = rect.bottom + 8 + window.scrollY;
+            popup.style.left = Math.max(10, Math.min(window.innerWidth - 290, dx)) + 'px';
+            popup.style.top  = dy + 'px';
+        }, 600);
+
+        current = idx;
+        resetAutoplay();
+    }
+
+    function nextStep(){ if(current < tourSteps.length-1) showStep(current+1); else stopTour(); }
+    function prevStep(){ if(current > 0) showStep(current-1); }
+    function resetAutoplay(){ clearTimeout(autoTimer); autoTimer = setTimeout(nextStep, 3000); }
+    function stopTour(){ clearTimeout(autoTimer); overlay.remove(); highlight.remove(); popup.remove(); localStorage.setItem('tour-enc-visto','1'); }
+    function startTour(){ document.body.append(overlay,highlight,popup); showStep(0); }
+
+    /* primera vez auto, después manual */
+    if(!localStorage.getItem('tour-enc-visto')){
+        window.addEventListener('load',()=>setTimeout(startTour,800));
+    }
+    document.addEventListener('DOMContentLoaded',()=>{
+        const btn = document.getElementById('btn-ayuda-tour');
+        if(btn) btn.addEventListener('click',startTour);
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar Espacios - UABJB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <style>
+        .doc-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .doc-link:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .doc-link i {
+            color: #ffffff;
+            font-size: 1rem;
+        }
+        .no-doc {
+            color: #718096;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="logo"><i class="fas fa-graduation-cap"></i></div>
+                <div>
+                    <div class="header-title"><i class="fas fa-list"></i> Lista de Espacios</div>
+                    <div class="header-subtitle">Sistema de Gestión UABJB</div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                    <span id="theme-text">Modo Oscuro</span>
+                </div>
+            </div>
+        </div>
+    </div>
+        <section class="requisitos-box">
+            <div class="requisitos-header">
+                <i class="fas fa-clipboard-check"></i>
+                <div>
+                <h3>Requisitos para reserva</h3>
+                <p>Todo lo que necesitas saber antes de solicitar</p>
+                </div>
+            </div>
+
+            <ul class="requisitos-lista">
+                <li>
+                <span class="req-ico">⏱️</span>
+                <div>
+                    <strong>Anticipación</strong>
+                    <span>Envía tu solicitud al menos 3 días antes para evitar conflictos.</span>
+                </div>
+                </li>
+                <li>
+                <span class="req-ico">📄</span>
+                <div>
+                    <strong>Documentación</strong>
+                    <span>Adjunta justificación en formato PDF.</span>
+                </div>
+                <li>
+                <span class="req-ico">✅</span>
+                <div>
+                    <strong>Confirmación</strong>
+                    <span>Recibirás respuesta en 24-48 h hábiles.</span>
+                </div>
+                </li>
+                <li>
+                <span class="req-ico">📋</span>
+                <div>
+                    <strong>Condiciones de uso</strong>
+                    <span>Lee detenidamente las políticas de solicitud/reserva.</span>
+                </div>
+                </li>
+            </ul>
+            </section>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Encargado</th>
+                        <th>Condiciones de Uso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Espacios de la facultad del usuario -->
+                    {% for espacio in espacios_carrera %}
+                    <tr>
+                        <td>{{ espacio.nombre }}</td>
+                        <td>{{ espacio.descripcion }}</td>
+                        <td>{{ espacio.encargado.get_full_name|default:espacio.encargado.username }}</td>
+                        <td style="text-align: center;">
+                            <span class="no-doc">—</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align:center;">No hay espacios disponibles para tu facultad.</td>
+                    </tr>
+                    {% endfor %}
+                    <!-- Espacios generales del campus -->
+                    {% for espacio in espacios_campus %}
+                    <tr>
+                        <td>{{ espacio.nombre }}</td>
+                        <td>{{ espacio.descripcion }}</td>
+                        <td>{{ espacio.encargado.get_full_name|default:espacio.encargado.username }}</td>
+                        <td style="text-align: center;">
+                            {% if espacio.documento_condiciones %}
+                                <a href="{{ espacio.documento_condiciones.url }}" class="doc-link" target="_blank">
+                                    <i class="fas fa-file-pdf"></i> Ver Documento
+                                </a>
+                            {% else %}
+                                <span class="no-doc">—</span>
+                            {% endif %}
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align:center;">No hay espacios del campus disponibles.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>

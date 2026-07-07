@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Editar perfil - UABJB</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+</head>
+<body data-theme="light">
+  <div class="header">
+    <div class="header-content">
+      <div class="logo"><i class="fas fa-user-edit"></i></div>
+      <div>
+        <div class="header-title">Editar perfil</div>
+        <div class="header-subtitle">Sistema de Gestión UABJB</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="login-card z-depth-1" style="max-width:480px; margin:3rem auto;">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}"><i class="fas fa-info-circle"></i> {{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="input-field">
+          <i class="fas fa-{{ field.name|cut:'_' }} prefix"></i>
+          {{ field }}
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {% if field.errors %}
+            <span class="helper-text red-text">{{ field.errors.0 }}</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <button type="submit" class="btn waves-effect waves-light btn-login">
+        <i class="fas fa-save"></i> Guardar cambios
+      </button>
+      <a href="{% url 'usuarios:perfil_usuario' %}" class="btn-flat">Cancelar</a>
+    </form>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>
