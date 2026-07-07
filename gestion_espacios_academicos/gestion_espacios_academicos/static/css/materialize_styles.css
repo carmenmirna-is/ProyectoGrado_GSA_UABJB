@@ -1,0 +1,97 @@
+:root{
+  --azul-marino: #003366;
+  --azul-cielo: #e6f1ff;
+  --azul-botón: #0059b3;
+  --azul-botón-hover: #004a99;
+  --gris-suave: #6c7a89;
+  --blanco: #ffffff;
+}
+
+body{
+  background: var(--azul-cielo);
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.login-card{
+  width: 100%;
+  max-width: 360px;
+  background: var(--blanco);
+  border-radius: 16px;
+  padding: 40px 32px 32px;
+  box-shadow: 0 8px 24px rgba(0,51,102,.12);
+}
+
+.logo-section i{
+  font-size: 56px;
+  color: var(--azul-marino);
+}
+
+.logo-title{
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--azul-marino);
+  margin: 8px 0 4px;
+}
+
+.logo-subtitle{
+  font-size: 14px;
+  color: var(--gris-suave);
+  margin-bottom: 24px;
+}
+
+/* ---------- inputs ---------- */
+.input-field input:focus{
+  border-bottom: 1px solid var(--azul-botón) !important;
+  box-shadow: 0 1px 0 0 var(--azul-botón) !important;
+}
+.input-field .prefix.active{
+  color: var(--azul-botón);
+}
+
+/* ---------- botón ---------- */
+.btn-login{
+  width: 100%;
+  background: var(--azul-botón);
+  border-radius: 8px;
+  height: 48px;
+  line-height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: .5px;
+  text-transform: none;
+}
+.btn-login:hover{
+  background: var(--azul-botón-hover);
+}
+
+/* ---------- divider ---------- */
+.divider{
+  height: 1px;
+  background: #dfe6ee;
+  margin: 24px 0;
+  text-align: center;
+  position: relative;
+}
+.divider span{
+  background: var(--blanco);
+  padding: 0 12px;
+  color: var(--gris-suave);
+  font-size: 13px;
+  position: relative;
+  top: -8px;
+}
+
+/* ---------- registro ---------- */
+.register-link{
+  font-size: 14px;
+  color: var(--gris-suave);
+}
+.register-link a{
+  color: var(--azul-botón);
+  font-weight: 500;
+}
