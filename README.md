@@ -95,11 +95,20 @@ ProyectoGrado_GSA_UABJB/
 
 ## Capturas de Pantalla
 
+### Index
+![Index](assets/Index.png)
+
 ### Inicio de sesión
-![Login](assets/login.png)
+![Login](assets/Login.png)
 
 ### Dashboard de Usuario
 ![DashboardUsuario](assets/DashboardUsuario.png)
+
+### Dashboard de Encargado
+![DashboardEncargado](assets/DashboardEncargado.png)
+
+### Dashboard de Administrador del Sistema
+![DashboardAdministrador](assets/DashboardAdministrador.png)
 
 ## Contexto Académico
 
