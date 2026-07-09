@@ -22,8 +22,6 @@ Academic Space Reservation Management System
 
 </p>
 
----
-
 ## 📖 Overview
 
 This web application was developed as an undergraduate capstone project for the Bachelor's Degree in Systems Engineering at Universidad Autónoma del Beni "José Ballivián" (UABJB).

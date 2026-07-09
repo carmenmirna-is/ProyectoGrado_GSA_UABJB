@@ -22,8 +22,6 @@ Sistema Web para la Gestión de Reservas de Espacios Académicos
 
 </p>
 
----
-
 ## 📖 Descripción
 
 Sistema web desarrollado como **Proyecto de Grado** para la obtención del título de Ingeniería de Sistemas en la Universidad Autónoma del Beni "José Ballivián" (UABJB).
