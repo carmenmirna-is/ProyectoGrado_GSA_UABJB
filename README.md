@@ -1,5 +1,9 @@
 # Sistema Web para la Gestión de Reservas de Espacios Académicos
 
+🌎 **Language / Idioma**
+
+🇪🇸 Español | 🇺🇸 [English](README.en.md)
+
 Sistema web desarrollado como **Proyecto de Grado** para optar al título de Ingeniería de Sistemas en la **Universidad Autónoma del Beni "José Ballivián" (UABJB)**, Facultad de Ingeniería y Tecnología.
 
 El sistema automatiza el proceso de solicitud, aprobación y control de reservas del **Salón Bicentenario** y la **Sala Audiovisual** del Campus Universitario "Hernán Melgar Justiniano", en Trinidad, Beni, Bolivia.
