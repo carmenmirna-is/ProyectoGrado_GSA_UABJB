@@ -5,10 +5,11 @@ services:
   db:
     image: postgres:15
     container_name: espacios_postgres
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: gestion_espacios_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: espacios123
       POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5433:5432"
@@ -34,17 +35,15 @@ services:
       - ./static:/app/static
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       # 🔧 FIX: Cambiar DEBUG=1 a DEBUG=True
       - DEBUG=True
       - DB_NAME=gestion_espacios_db
       - DB_USER=postgres
-      - DB_PASSWORD=espacios123
       - DB_HOST=db
       - DB_PORT=5432
-      # 📧 Agregar configuración de email
-      - EMAIL_HOST_USER=cibanezsanguino@gmail.com
-      - EMAIL_HOST_PASSWORD=ofwd qhdu hndd iqbh
       # 🔐 Secret key para desarrollo
       - SECRET_KEY=django-insecure-e*yhj@x@hci!2c#-@i0n3#ej3$=(&vvbqtse5u(b6&naao1rqe
     depends_on:
