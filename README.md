@@ -1,123 +1,190 @@
-# Sistema Web para la Gestión de Reservas de Espacios Académicos
+<p align="center">
+  <img src="assets/banner.png" width="100%">
+</p>
 
-🌎 **Language / Idioma**
+<h1 align="center">
+Sistema Web para la Gestión de Reservas de Espacios Académicos
+</h1>
 
-🇪🇸 Español | 🇺🇸 [English](README.en.md)
+<p align="center">
 
-Sistema web desarrollado como **Proyecto de Grado** para optar al título de Ingeniería de Sistemas en la **Universidad Autónoma del Beni "José Ballivián" (UABJB)**, Facultad de Ingeniería y Tecnología.
+[🇪🇸 Español](README.md) • [🇺🇸 English](README.en.md)
 
-El sistema automatiza el proceso de solicitud, aprobación y control de reservas del **Salón Bicentenario** y la **Sala Audiovisual** del Campus Universitario "Hernán Melgar Justiniano", en Trinidad, Beni, Bolivia.
+</p>
 
-**Autora:** Carmen Mirna Ibañez Sanguino
-**Tutores:** Ing. Johnny Rosas Callaú · Lic. William Chao Rivero
-**Fecha:** Noviembre de 2025
+<p align="center">
+
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
+![Django](https://img.shields.io/badge/Django-4.2-green?logo=django)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?logo=postgresql)
+![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker)
+![License](https://img.shields.io/badge/License-Academic-lightgrey)
+
+</p>
 
 ---
 
-## Descripción
+## 📖 Descripción
 
-Actualmente la gestión de espacios académicos compartidos se realiza de forma manual, generando duplicidad de solicitudes, falta de trazabilidad y demoras en la aprobación. Este sistema centraliza el proceso mediante una plataforma web accesible para tres perfiles de usuario, garantizando trazabilidad completa de las operaciones y una experiencia de usuario más ágil.
+Sistema web desarrollado como **Proyecto de Grado** para la obtención del título de Ingeniería de Sistemas en la Universidad Autónoma del Beni "José Ballivián" (UABJB).
 
-## Objetivo General
+La plataforma automatiza la gestión de reservas de espacios académicos mediante un flujo digital de solicitudes, aprobaciones y control de disponibilidad, reemplazando completamente el proceso manual utilizado por la institución.
 
-Desarrollar un sistema web escalable, transparente y mantenible para la gestión eficiente de reservas del Salón Bicentenario y la Sala Audiovisual de la Facultad de Ingeniería y Tecnología de la U.A.B.J.B., optimizando el proceso de solicitud, aprobación y control de reservas mediante automatización.
+---
 
-## Módulos del Sistema
+## ✨ Características
 
-El sistema está organizado en seis módulos principales:
+- ✔ Autenticación basada en roles
+- ✔ Gestión de usuarios
+- ✔ Gestión de espacios académicos
+- ✔ Solicitudes de reserva
+- ✔ Validación automática de conflictos
+- ✔ Calendario de disponibilidad
+- ✔ Notificaciones automáticas por correo
+- ✔ Reportes exportables
+- ✔ Dashboard personalizado según el rol
+- ✔ Arquitectura escalable basada en Django
 
-- **Módulo de Seguridad** — Autenticación, autorización y control de acceso basado en roles (administrador, encargado, usuario regular).
-- **Módulo de Gestión de Usuarios** — Registro autónomo, perfiles diferenciados y administración de información institucional.
-- **Módulo de Gestión de Espacios Académicos** — Registro de facultades, carreras, espacios de campus y espacios de carrera, con asignación de encargados.
-- **Módulo de Gestión de Solicitudes y Reservas** — Creación, modificación, aprobación y rechazo de solicitudes con validación automática de conflictos.
-- **Módulo de Calendario y Notificaciones** — Visualización en tiempo real de disponibilidad y notificaciones automáticas por correo electrónico.
-- **Módulo de Reportes** — Generación de informes estadísticos exportables en múltiples formatos.
+---
 
-## Perfiles de Usuario
+## 🎯 Objetivo
 
-- **Administrador del Sistema** — Configura la estructura organizativa: facultades, carreras, espacios y encargados.
-- **Encargado de Espacios** — Aprueba o rechaza solicitudes de reserva y controla el uso de los espacios bajo su responsabilidad.
-- **Usuario Solicitante** — Miembro de la comunidad universitaria que solicita reservas adjuntando la documentación requerida.
+Desarrollar una plataforma web escalable, transparente y mantenible que optimice la administración de espacios académicos mediante la automatización del proceso de reservas.
 
-## 🛠️ Tecnologías
+---
+
+## 👥 Roles del Sistema
+
+| Rol | Función |
+|------|----------|
+| Administrador | Configuración del sistema |
+| Encargado | Aprueba o rechaza reservas |
+| Usuario | Solicita reservas |
+
+---
+
+## 🏗 Arquitectura
+
+```
+Usuarios
+     │
+     ▼
+ Django 4.2
+     │
+ PostgreSQL
+     │
+ Docker
+```
+
+---
+
+## 🛠 Tecnologías
 
 | Categoría | Tecnología |
-|---|---|
+|------------|------------|
 | Lenguaje | Python 3.11 |
-| Framework web | Django 4.2 (arquitectura MTV) |
-| Base de datos | PostgreSQL 15 |
-| Contenedorización | Docker / Docker Compose |
-| Servidor de aplicación | Gunicorn |
-| Archivos estáticos | WhiteNoise |
-| Reportes | ReportLab, openpyxl, python-docx |
-| Frontend | HTML, CSS, JavaScript |
+| Framework | Django 4.2 |
+| Base de Datos | PostgreSQL 15 |
+| Contenedores | Docker |
+| Servidor | Gunicorn |
+| Static Files | WhiteNoise |
+| Reportes | ReportLab · OpenPyXL · python-docx |
+| Frontend | HTML · CSS · JavaScript |
 
-## 📦 Requisitos Previos
+---
 
-- [Docker](https://www.docker.com/) y Docker Compose instalados
-- Git
+## 📦 Instalación
 
-## 🚀 Instalación y Puesta en Marcha
+```bash
+git clone https://github.com/carmenmirna-is/ProyectoGrado_GSA_UABJB.git
 
-1. Clonar el repositorio:
-   ```bash
-   git clone https://github.com/carmenmirna-is/ProyectoGrado_GSA_UABJB.git
-   cd ProyectoGrado_GSA_UABJB
-   ```
+cd ProyectoGrado_GSA_UABJB
 
-2. Levantar los contenedores (base de datos PostgreSQL + servidor Django):
-   ```bash
-   docker-compose up --build
-   ```
+docker-compose up --build
+```
 
-   Este comando aplica automáticamente las migraciones, recolecta los archivos estáticos y levanta el servidor de desarrollo.
-
-3. Acceder a la aplicación en:
-   ```
-   http://localhost:8000
-   ```
-
-## Estructura del Proyecto
+Acceder a:
 
 ```
+http://localhost:8000
+```
+
+---
+
+## 📂 Estructura
+
+```text
 ProyectoGrado_GSA_UABJB/
-├── administrador/                  # App: módulo de administración
-├── encargados/                     # App: gestión de encargados de espacio
-├── gestion_espacios_academicos/     # Configuración principal del proyecto Django
-├── usuarios/                        # App: registro y perfiles de usuario
-├── reportes/                         # App: generación de reportes
-├── templates/                        # Plantillas HTML
-├── static/ · staticfiles/            # Archivos estáticos (CSS, JS, imágenes)
-├── media/                            # Archivos subidos por usuarios
-├── assets/                           # Recursos del proyecto (capturas, etc.)
-├── logs/                             # Registros del sistema
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
-└── manage.py
+
+administrador/
+
+encargados/
+
+usuarios/
+
+reportes/
+
+templates/
+
+static/
+
+media/
+
+assets/
+
+Dockerfile
+
+docker-compose.yml
+
+requirements.txt
 ```
 
-## Capturas de Pantalla
+---
 
-### Index
+## 📸 Capturas
+
+### Página Principal
+
 ![Index](assets/Index.png)
 
-### Inicio de sesión
+### Inicio de Sesión
+
 ![Login](assets/Login.png)
 
-### Dashboard de Usuario
-![DashboardUsuario](assets/DashboardUsuario.png)
+### Dashboard Usuario
 
-### Dashboard de Encargado
-![DashboardEncargado](assets/DashboardEncargado.png)
+![Usuario](assets/DashboardUsuario.png)
 
-### Dashboard de Administrador del Sistema
-![DashboardAdministrador](assets/DashboardAdministrador.png)
+### Dashboard Encargado
 
-## Contexto Académico
+![Encargado](assets/DashboardEncargado.png)
 
-Este proyecto corresponde al Proyecto de Grado presentado ante la Carrera de Ingeniería de Sistemas de la Facultad de Ingeniería y Tecnología, UABJB, como requisito para optar al título de Ingeniería de Sistemas (noviembre de 2025).
+### Dashboard Administrador
 
-## Licencia
+![Administrador](assets/DashboardAdministrador.png)
 
-Este proyecto fue desarrollado con fines académicos como parte del proceso de titulación en la UABJB.
+---
+
+## 🚀 Mejoras Futuras
+
+- API REST
+- Diseño Responsive
+- Integración con Google Calendar
+- Recordatorios automáticos
+- Sistema de códigos QR
+- Pruebas unitarias
+- CI/CD con GitHub Actions
+
+---
+
+## 🎓 Contexto Académico
+
+Proyecto desarrollado como Trabajo de Grado para optar al título de Ingeniería de Sistemas en la Universidad Autónoma del Beni "José Ballivián".
+
+---
+
+## 📄 Licencia
+
+Proyecto desarrollado con fines académicos.
+
+Aunque fue desarrollado como proyecto universitario, sigue prácticas modernas de ingeniería de software, incluyendo arquitectura modular, control de acceso basado en roles, Docker, PostgreSQL y desarrollo web con Django.

@@ -1,109 +1,151 @@
-# Web System for Academic Space Reservation Management
-🌎 **Language / Language**
+<p align="center">
+  <img src="assets/banner.png" width="100%">
+</p>
 
-🇺🇸 English | 🇪🇸 [Español](README.md)
+<h1 align="center">
+Academic Space Reservation Management System
+</h1>
 
-Web system developed as an **Undergraduate Capstone Project** to obtain the Bachelor's Degree in Systems Engineering at the **José Ballivián Autonomous University of Beni (UABJB)**, Faculty of Engineering and Technology.
+<p align="center">
 
-The system automates the request, approval, and management process for reservations of the **Bicentennial Hall** and the **Audiovisual Room** at the "Hernán Melgar Justiniano" University Campus, located in Trinidad, Beni, Bolivia.
+[🇺🇸 English](README.en.md) • [🇪🇸 Español](README.md)
 
-**Author:** Carmen Mirna Ibañez Sanguino  
-**Advisors:** Eng. Johnny Rosas Callaú · Lic. William Chao Rivero  
-**Date:** November 2025
+</p>
+
+<p align="center">
+
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
+![Django](https://img.shields.io/badge/Django-4.2-green?logo=django)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?logo=postgresql)
+![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker)
+![License](https://img.shields.io/badge/License-Academic-lightgrey)
+
+</p>
 
 ---
 
-## Description
+## 📖 Overview
 
-Currently, the management of shared academic spaces is carried out manually, resulting in duplicate requests, lack of traceability, and delays in the approval process. This system centralizes the entire workflow through a web platform accessible to three different user profiles, ensuring complete traceability and a faster user experience.
+This web application was developed as an undergraduate capstone project for the Bachelor's Degree in Systems Engineering at Universidad Autónoma del Beni "José Ballivián" (UABJB).
 
-## General Objective
+The platform automates the reservation workflow for academic spaces by replacing manual procedures with a centralized, transparent and scalable web application.
 
-Develop a scalable, transparent, and maintainable web system for the efficient management of reservations of the Bicentennial Hall and the Audiovisual Room at the Faculty of Engineering and Technology of UABJB, optimizing the reservation request, approval, and control process through automation.
+---
 
-## System Modules
+## ✨ Features
 
-The system is organized into six main modules:
+- ✔ Role-Based Authentication
+- ✔ User Management
+- ✔ Academic Space Management
+- ✔ Reservation Requests
+- ✔ Automatic Conflict Detection
+- ✔ Availability Calendar
+- ✔ Email Notifications
+- ✔ Exportable Reports
+- ✔ Role-Based Dashboards
+- ✔ Scalable Django Architecture
 
-- **Security Module** — Authentication, authorization, and role-based access control (administrator, manager, regular user).
-- **User Management Module** — Self-registration, differentiated user profiles, and institutional information management.
-- **Academic Space Management Module** — Registration of faculties, degree programs, campus facilities, and department spaces, including manager assignment.
-- **Reservation Management Module** — Creation, modification, approval, and rejection of reservation requests with automatic conflict validation.
-- **Calendar & Notification Module** — Real-time availability calendar and automatic email notifications.
-- **Reporting Module** — Generation of statistical reports exportable to multiple formats.
+---
 
-## User Roles
+## 🎯 Project Goal
 
-- **System Administrator** — Configures the organizational structure, including faculties, degree programs, academic spaces, and space managers.
-- **Space Manager** — Approves or rejects reservation requests and supervises the use of assigned academic spaces.
-- **Requester** — University community member who submits reservation requests along with the required documentation.
+Develop a scalable, maintainable, and transparent web platform to automate the reservation process for academic spaces.
 
-## 🛠️ Technologies
+---
+
+## 👥 User Roles
+
+| Role | Responsibility |
+|------|----------------|
+| Administrator | System configuration |
+| Space Manager | Approves reservations |
+| User | Creates reservation requests |
+
+---
+
+## 🏗 Architecture
+
+```
+Users
+   │
+   ▼
+Django 4.2
+   │
+PostgreSQL
+   │
+Docker
+```
+
+---
+
+## 🛠 Technologies
 
 | Category | Technology |
-|---|---|
-| Programming Language | Python 3.11 |
-| Web Framework | Django 4.2 (MTV Architecture) |
+|------------|------------|
+| Language | Python 3.11 |
+| Framework | Django 4.2 |
 | Database | PostgreSQL 15 |
-| Containerization | Docker / Docker Compose |
-| Application Server | Gunicorn |
+| Containers | Docker |
+| Server | Gunicorn |
 | Static Files | WhiteNoise |
-| Reporting | ReportLab, openpyxl, python-docx |
-| Frontend | HTML, CSS, JavaScript |
+| Reporting | ReportLab · OpenPyXL · python-docx |
+| Frontend | HTML · CSS · JavaScript |
 
-## 📦 Prerequisites
+---
 
-- [Docker](https://www.docker.com/) and Docker Compose installed
-- Git
+## 📦 Installation
 
-## 🚀 Installation & Setup
+```bash
+git clone https://github.com/carmenmirna-is/ProyectoGrado_GSA_UABJB.git
 
-1. Clone the repository:
+cd ProyectoGrado_GSA_UABJB
 
-   ```bash
-   git clone https://github.com/carmenmirna-is/ProyectoGrado_GSA_UABJB.git
-   cd ProyectoGrado_GSA_UABJB
-   ```
+docker-compose up --build
+```
 
-2. Start the containers (PostgreSQL database + Django server):
-
-   ```bash
-   docker-compose up --build
-   ```
-
-   This command automatically applies database migrations, collects static files, and starts the development server.
-
-3. Open the application at:
-
-   ```
-   http://localhost:8000
-   ```
-
-## Project Structure
+Open:
 
 ```
+http://localhost:8000
+```
+
+---
+
+## 📂 Project Structure
+
+```text
 ProyectoGrado_GSA_UABJB/
-├── administrador/                  # Administration module
-├── encargados/                     # Space manager module
-├── gestion_espacios_academicos/    # Main Django project configuration
-├── usuarios/                       # User registration and profiles
-├── reportes/                       # Reporting module
-├── templates/                      # HTML templates
-├── static/ · staticfiles/          # Static resources (CSS, JS, images)
-├── media/                          # User-uploaded files
-├── assets/                         # Project resources (screenshots, etc.)
-├── logs/                           # System logs
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
-└── manage.py
+
+administrador/
+
+encargados/
+
+usuarios/
+
+reportes/
+
+templates/
+
+static/
+
+media/
+
+assets/
+
+Dockerfile
+
+docker-compose.yml
+
+requirements.txt
 ```
 
-## Screenshots
+---
+
+## 📸 Screenshots
 
 ### Home Page
 
-![Home](assets/Index.png)
+![Index](assets/Index.png)
 
 ### Login
 
@@ -111,20 +153,38 @@ ProyectoGrado_GSA_UABJB/
 
 ### User Dashboard
 
-![UserDashboard](assets/DashboardUsuario.png)
+![User](assets/DashboardUsuario.png)
 
 ### Space Manager Dashboard
 
-![ManagerDashboard](assets/DashboardEncargado.png)
+![Manager](assets/DashboardEncargado.png)
 
-### System Administrator Dashboard
+### Administrator Dashboard
 
-![AdminDashboard](assets/DashboardAdministrador.png)
+![Admin](assets/DashboardAdministrador.png)
 
-## Academic Context
+---
 
-This project was developed as an Undergraduate Capstone Project submitted to the Systems Engineering Program of the Faculty of Engineering and Technology at UABJB, as a requirement for obtaining the Bachelor's Degree in Systems Engineering (November 2025).
+## 🚀 Future Improvements
 
-## License
+- REST API
+- Responsive UI
+- Google Calendar Integration
+- Email Reminders
+- QR Code Check-in
+- Unit Testing
+- GitHub Actions CI/CD
 
-This project was developed for academic purposes as part of the undergraduate degree completion process at UABJB.
+---
+
+## 🎓 Academic Context
+
+This project was developed as the undergraduate capstone project required to obtain the Bachelor's Degree in Systems Engineering at Universidad Autónoma del Beni "José Ballivián".
+
+---
+
+## 📄 License
+
+This project was developed for academic purposes.
+
+Although it originated as an undergraduate project, it follows modern software engineering practices including modular architecture, role-based access control, Docker containerization, PostgreSQL database design, and scalable web development using Django.
