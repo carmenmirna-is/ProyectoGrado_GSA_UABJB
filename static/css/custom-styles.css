@@ -362,3 +362,402 @@ body {
   align-items: center;   /* centra verticalmente la card */
   justify-content: center;
 }
+/* ============================
+   ADICIONES: NAV SLIM + BOTONES DE HEADER
+   ============================ */
+.brand-mark {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.brand-name {
+    color: white;
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: 0.5px;
+}
+
+.main-nav {
+    display: flex;
+    gap: 2.25rem;
+}
+
+.main-nav a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.main-nav a:hover {
+    color: white;
+}
+
+.theme-toggle-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.theme-toggle-icon:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.btn-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-header-login {
+    background: white;
+    color: var(--uabjb-blue);
+}
+
+.btn-header-login:hover {
+    background: var(--uabjb-yellow);
+    transform: translateY(-2px);
+}
+
+.btn-header-register {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.btn-header-register:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+}
+
+/* ============================
+   ADICIONES: HERO SPLIT
+   ============================ */
+.hero-split {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3.5rem;
+    align-items: center;
+}
+
+.eyebrow {
+    display: inline-block;
+    background: rgba(30, 58, 138, 0.08);
+    color: var(--uabjb-blue);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 1.25rem;
+}
+
+.hero-text h1 {
+    font-size: 2.75rem;
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--text-primary);
+    margin-bottom: 1.1rem;
+}
+
+.hero-desc {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    max-width: 480px;
+    margin-bottom: 2.2rem;
+}
+
+.hero-cta-row {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+    margin-bottom: 2.5rem;
+}
+
+.btn-primary {
+    background: var(--uabjb-blue);
+    color: white;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: var(--shadow);
+}
+
+.btn-primary:hover {
+    background: var(--uabjb-light-blue);
+    transform: translateY(-2px);
+    box-shadow: var(--card-hover);
+}
+
+.btn-text {
+    color: var(--uabjb-blue);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.btn-text:hover {
+    text-decoration: underline;
+}
+
+.hero-stats-row {
+    display: flex;
+    gap: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.hero-stats-row div {
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-stats-row strong {
+    font-size: 1.5rem;
+    color: var(--uabjb-blue);
+    font-weight: 800;
+}
+
+.hero-stats-row span {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* ============================
+   ADICIONES: VISUAL DEL HERO (MOCKUP DE RESERVA)
+   ============================ */
+.hero-visual {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 420px;
+}
+
+.dot-grid {
+    position: absolute;
+    inset: 8% 4%;
+    background-image: radial-gradient(var(--border-color) 1.5px, transparent 1.5px);
+    background-size: 18px 18px;
+    border-radius: 20px;
+    z-index: 0;
+}
+
+.shape {
+    position: absolute;
+    z-index: 1;
+}
+
+.shape-square {
+    width: 26px;
+    height: 26px;
+    background: var(--uabjb-yellow);
+    border-radius: 6px;
+    top: 6%;
+    left: 10%;
+    transform: rotate(15deg);
+}
+
+.shape-circle {
+    width: 18px;
+    height: 18px;
+    background: var(--uabjb-light-blue);
+    border-radius: 50%;
+    bottom: 10%;
+    left: 4%;
+}
+
+.shape-spark {
+    top: 18%;
+    right: 6%;
+    color: var(--uabjb-red);
+    font-size: 1.6rem;
+}
+
+.reservation-mock {
+    position: relative;
+    z-index: 2;
+    background: var(--bg-primary);
+    border-radius: 18px;
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 380px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.mock-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+}
+
+.mock-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.mock-dot.red { background: var(--uabjb-red); }
+.mock-dot.yellow { background: var(--uabjb-yellow); }
+.mock-dot.green { background: #22c55e; }
+
+.mock-title {
+    margin-left: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.mock-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    padding: 16px;
+}
+
+.mock-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    border-radius: 6px;
+}
+
+.mock-day.active {
+    background: var(--uabjb-blue);
+    color: white;
+    font-weight: 700;
+}
+
+.mock-list {
+    padding: 0 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mock-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+    padding: 8px 10px;
+    border-radius: 8px;
+}
+
+.mock-row span:nth-child(2) {
+    flex: 1;
+}
+
+.mock-tag {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+}
+
+.floating-badge {
+    position: absolute;
+    z-index: 3;
+    top: 4%;
+    right: 0;
+    background: var(--uabjb-yellow);
+    color: #1e293b;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 10px 16px;
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg);
+    transform: rotate(-6deg);
+}
+
+/* ============================
+   ADICIONES: INDICADOR DE ESTADO (reutilizado en la tarjeta mockup)
+   ============================ */
+.status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-dot--free {
+    background: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.status-dot--busy {
+    background: var(--uabjb-yellow);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.25);
+}
+
+/* ============================
+   RESPONSIVE: ADICIONES
+   ============================ */
+@media (max-width: 768px) {
+    .header-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-header {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .main-nav {
+        display: none;
+    }
+
+    .hero-split {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 3rem 1.5rem;
+    }
+
+    .hero-desc {
+        max-width: none;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-cta-row,
+    .hero-stats-row {
+        justify-content: center;
+    }
+
+    .hero-visual {
+        min-height: 340px;
+        margin-top: 1rem;
+    }
+}

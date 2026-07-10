@@ -10,50 +10,74 @@
 <body class="dashboard-body">
     <header class="header">
         <div class="header-content">
-            <div class="logo-section">
+            <div class="brand-mark">
                 <div class="logo">🏛️</div>
-                <div>
-                    <div class="header-title">UABJB - Sistema de Gestión</div>
-                    <div class="header-subtitle">Universidad Autónoma "José Ballivián"</div>
-                </div>
+                <span class="brand-name">UABJB</span>
             </div>
             <div class="header-controls">
-                <button class="theme-toggle">
+                <a href="/login/" class="btn-header btn-header-login">Iniciar Sesión</a>
+                <a href="/registro/" class="btn-header btn-header-register">Registrarse</a>
+                <button class="theme-toggle theme-toggle-icon" aria-label="Cambiar tema">
                     <span id="themeIcon">🌙</span>
-                    <span id="themeText">Modo Oscuro</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <div class="container">
-        <div class="dashboard">
-            <main class="main-content hero">
-                <div class="hero-bg"></div>
+    <section class="hero-split">
+        <div class="hero-text">
+            <span class="eyebrow">Universidad Autónoma del Beni "José Ballivián"</span>
+            <h1>Reserva espacios académicos sin filas ni papeleo</h1>
+            <p class="hero-desc">Solicita, aprueba y controla el uso del Salón Bicentenario y la Sala Audiovisual FIT desde un solo sistema, con historial completo y notificaciones automáticas.</p>
 
-                <div class="hero-card">
-                    <!-- 3 emojis decorativos -->
-                    <div class="hero-icons">
-                    <span class="ico">🎓</span>
-                    <span class="ico">🏫</span>
-                    <span class="ico">📅</span>
+            <div class="hero-cta-row">
+                <a href="/registro/" class="btn-primary">Crear cuenta</a>
+                <a href="/login/" class="btn-text">Ya tengo cuenta →</a>
+            </div>
+
+            <div class="hero-stats-row">
+                <div><strong>2</strong><span>espacios activos</span></div>
+                <div><strong>3</strong><span>perfiles de usuario</span></div>
+                <div><strong>6</strong><span>módulos integrados</span></div>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="dot-grid"></div>
+            <span class="shape shape-square"></span>
+            <span class="shape shape-circle"></span>
+            <span class="shape shape-spark">✦</span>
+
+            <div class="reservation-mock">
+                <div class="mock-header">
+                    <span class="mock-dot red"></span>
+                    <span class="mock-dot yellow"></span>
+                    <span class="mock-dot green"></span>
+                    <span class="mock-title">Julio 2026</span>
+                </div>
+                <div class="mock-calendar">
+                    <div class="mock-day">L</div><div class="mock-day">M</div><div class="mock-day">M</div>
+                    <div class="mock-day">J</div><div class="mock-day">V</div><div class="mock-day">S</div><div class="mock-day">D</div>
+                    <div class="mock-day">6</div><div class="mock-day">7</div><div class="mock-day active">8</div>
+                    <div class="mock-day">9</div><div class="mock-day">10</div><div class="mock-day">11</div><div class="mock-day">12</div>
+                </div>
+                <div class="mock-list">
+                    <div class="mock-row">
+                        <span class="status-dot status-dot--free"></span>
+                        <span>Salón Bicentenario</span>
+                        <span class="mock-tag">Disponible</span>
                     </div>
-
-                    <h1 class="welcome-title">Gestión de Espacios Académicos</h1>
-                    <p class="welcome-subtitle">Reserva, administra y optimiza cada rincón del campus UABJB</p>
-
-                    <div class="auth-buttons">
-                    <a href="/login/" class="btn btn-login">
-                        <span class="ico">🔑</span> Iniciar Sesión
-                    </a>
-                    <a href="/registro/" class="btn btn-register">
-                        <span class="ico">✍️</span> Registrarse
-                    </a>
+                    <div class="mock-row">
+                        <span class="status-dot status-dot--busy"></span>
+                        <span>Sala Audiovisual FIT</span>
+                        <span class="mock-tag">Reservada 14:00</span>
                     </div>
                 </div>
-                </main>
+            </div>
+
+            <div class="floating-badge">📅 Reserva en tiempo real</div>
         </div>
-    </div>
+    </section>
 
     <script src="{% static 'js/scripts.js' %}"></script>
 </body>
